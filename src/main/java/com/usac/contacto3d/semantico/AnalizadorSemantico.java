@@ -255,7 +255,7 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
     /* ======================== 3. Firmas ======================== */
 
     private void registrarFuncion(Funcion funcion) {
-        Tipo retorno = resolverTipo(funcion.getTipoRetorno(), funcion);
+        Tipo retorno = retornoValido(resolverTipo(funcion.getTipoRetorno(), funcion), funcion);
         funcion.setTipoRetorno(retorno);
         SimboloFuncion simbolo = new SimboloFuncion(funcion.getNombre(), retorno, parametros(funcion.getParametros()),
                 false, null, funcion.getArchivo(), funcion.getLinea(), funcion.getColumna());
@@ -287,7 +287,7 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
             }
         }
         for (DeclaracionMetodo metodo : declaracion.getMetodos()) {
-            Tipo retorno = resolverTipo(metodo.getTipoRetorno(), metodo);
+            Tipo retorno = retornoValido(resolverTipo(metodo.getTipoRetorno(), metodo), metodo);
             metodo.setTipoRetorno(retorno);
             SimboloFuncion simbolo = new SimboloFuncion(metodo.getNombre(), retorno,
                     parametros(metodo.getParametros()), true, clase.getNombre(),
@@ -296,6 +296,20 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
             metodo.setSimbolo(simbolo);
             agregarMiembro(clase.getMetodos(), simbolo, metodo, "El metodo");
         }
+    }
+
+    /**
+     * El valor de retorno ocupa una sola celda del marco; una estructura
+     * aplanada no cabe. Los objetos y arreglos si, porque son un puntero.
+     */
+    private Tipo retornoValido(Tipo retorno, Funcion funcion) {
+        if (retorno.esEstructura()) {
+            error(funcion, funcion.getNombre(), "'" + funcion.getNombre() + "' no puede retornar la estructura "
+                    + retorno + ". Se esperaba un tipo primitivo, un arreglo o un objeto; una estructura "
+                    + "se devuelve recibiendola por referencia ({} " + retorno + ")");
+            return Tipo.ERROR;
+        }
+        return retorno;
     }
 
     private void agregarMiembro(List<SimboloFuncion> existentes, SimboloFuncion nuevo, Nodo nodo, String que) {
@@ -1084,6 +1098,9 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
             funcion = resolver(conNombre(tabla.getFunciones().values(), nodo.getNombre()), argumentos, nodo,
                     "la funcion '" + nodo.getNombre() + "'");
         }
+        if (funcion != null) {
+            verificarReferencias(funcion, nodo.getArgumentos());
+        }
         nodo.setFuncion(funcion);
         Tipo tipo = funcion == null ? Tipo.ERROR : funcion.getTipoRetorno();
         nodo.setTipo(tipo);
@@ -1244,6 +1261,27 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         String esperados = porCantidad.stream().map(SimboloFuncion::getFirma).collect(Collectors.joining(" o "));
         error(nodo, lexema, "Los argumentos (" + pasados + ") no coinciden con " + que + ". Se esperaba " + esperados);
         return null;
+    }
+
+    /**
+     * Un parametro {} Estructura recibe la direccion de la estructura en el
+     * stack, asi que el argumento tiene que ser una estructura guardada en una
+     * variable (o en un campo de ella), no un elemento de un arreglo del heap.
+     */
+    private void verificarReferencias(SimboloFuncion funcion, List<Expresion> argumentos) {
+        for (int i = 0; i < argumentos.size(); i++) {
+            SimboloVariable parametro = funcion.getParametros().get(i);
+            if (!parametro.esPorReferencia() || !parametro.getTipo().esEstructura()) {
+                continue;
+            }
+            boolean enVariable = argumentos.get(i) instanceof Acceso acceso
+                    && acceso.getSimbolo() != null
+                    && acceso.getSufijos().stream().allMatch(sufijo -> sufijo instanceof SufijoAtributo);
+            if (!enVariable) {
+                error(argumentos.get(i), "El parametro '" + parametro.getNombre() + "' recibe la estructura por "
+                        + "referencia. Se esperaba una variable de tipo " + parametro.getTipo() + " o un campo de ella");
+            }
+        }
     }
 
     private static boolean calza(SimboloFuncion funcion, List<Tipo> argumentos, boolean exacto) {

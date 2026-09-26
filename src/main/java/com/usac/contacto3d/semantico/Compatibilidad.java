@@ -23,11 +23,11 @@ import com.usac.contacto3d.ast.expresiones.Operador;
  * Los metodos devuelven null cuando la operacion no es valida; quien llama
  * arma el mensaje, porque sabe la posicion y el contexto.
  */
-final class Compatibilidad {
+public final class Compatibilidad {
 
     private Compatibilidad() { }
 
-    static Tipo binaria(Operador operador, Tipo a, Tipo b) {
+    public static Tipo binaria(Operador operador, Tipo a, Tipo b) {
         return switch (operador) {
             case SUMA -> {
                 if (a.getBase() == Tipo.Base.CADENA || b.getBase() == Tipo.Base.CADENA) {
@@ -46,7 +46,7 @@ final class Compatibilidad {
         };
     }
 
-    static Tipo unaria(Operador operador, Tipo a) {
+    public static Tipo unaria(Operador operador, Tipo a) {
         return switch (operador) {
             // -'a' vale el codigo negado: un caracter negativo no existe, se sube a entero
             case NEGATIVO -> a.esNumerico() && !esBool(a) ? Tipo.dominante(Tipo.ENTERO, a) : null;
@@ -56,7 +56,7 @@ final class Compatibilidad {
     }
 
     /** Para == y != y para los casos de un elegir/switch. */
-    static boolean comparables(Tipo a, Tipo b) {
+    public static boolean comparables(Tipo a, Tipo b) {
         if (a.esNumerico() && b.esNumerico()) {
             return true;
         }
@@ -66,7 +66,7 @@ final class Compatibilidad {
         return a.equals(b);
     }
 
-    static boolean asignable(Tipo destino, Tipo origen) {
+    public static boolean asignable(Tipo destino, Tipo origen) {
         if (destino.esError() || origen.esError()) {
             return true;   // el error ya se reporto donde nacio
         }
@@ -89,17 +89,17 @@ final class Compatibilidad {
     }
 
     /** true si el origen es numerico y cabe en el destino solo perdiendo informacion. */
-    static boolean pierdeInformacion(Tipo destino, Tipo origen) {
+    public static boolean pierdeInformacion(Tipo destino, Tipo origen) {
         return destino.esNumerico() && origen.esNumerico()
                 && destino.getBase() != Tipo.Base.BOOLEANO && origen.getBase() != Tipo.Base.BOOLEANO
                 && origen.getJerarquia() > destino.getJerarquia();
     }
 
-    static boolean esEntero(Tipo tipo) {
+    public static boolean esEntero(Tipo tipo) {
         return tipo.getBase() == Tipo.Base.ENTERO || tipo.getBase() == Tipo.Base.CARACTER;
     }
 
-    static boolean esBool(Tipo tipo) {
+    public static boolean esBool(Tipo tipo) {
         return tipo.getBase() == Tipo.Base.BOOLEANO;
     }
 

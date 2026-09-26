@@ -1,0 +1,29 @@
+3
+3
+3.5
+3
+66
+a=7, f=7.0, c=A, ok=verdadero
+14
+mayor
+igual
+menor
+para: 25
+mientras: 5
+hacer: 3
+anidados: 3
+uno
+dos
+tres
+otro
+fib(10) = 55
+mover: 11
+copia: 11
+q: 11,50 p: 2
+Ana 90 0 70 5
+grupo: 42 7 0
+matriz: 50
+m[2][1] = 6
+suma: 100
+cubo: 6
+Error de ejecucion en Calculos.y linea 131: indice fuera de rango

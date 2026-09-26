@@ -1,6 +1,9 @@
 package com.usac.contacto3d;
 
 import com.usac.contacto3d.ast.ImpresorAst;
+import com.usac.contacto3d.c3d.GeneradorCuartetas;
+import com.usac.contacto3d.c3d.InterpreteCuartetas;
+import com.usac.contacto3d.c3d.ListaCuartetas;
 import com.usac.contacto3d.ast.Lenguaje;
 import com.usac.contacto3d.ast.Programa;
 import com.usac.contacto3d.constructores.ConstructorAstPig;
@@ -38,12 +41,13 @@ import java.util.List;
 /**
  * Orquesta el analisis de los archivos fuente.
  *
- * Por ahora (fase 3) llega hasta el analisis semantico. Desde consola:
+ * Por ahora (fase 4) llega hasta las cuartetas. Desde consola:
  *
  *     java -cp target/contacto-3d-1.0.0.jar com.usac.contacto3d.Compilador [opciones] archivo...
  *
  *     --tokens  tokens del archivo      --arbol  parse tree del archivo
  *     --ast     AST de cada modulo      --tabla  tabla de simbolos con la memoria
+ *     --c3d     cuartetas generadas     --ejecutar  corre las cuartetas (entrada por stdin)
  */
 public class Compilador {
 
@@ -117,6 +121,11 @@ public class Compilador {
         return new AnalizadorSemantico(errores).analizar(modulos);
     }
 
+    /** Cuartetas de un programa sin errores. */
+    public ListaCuartetas generarCuartetas(ResultadoSemantico resultado) {
+        return new GeneradorCuartetas().generar(resultado);
+    }
+
     /** El lexer del lenguaje segun la extension, ya conectado a la lista de errores. */
     private Lexer crearLexer(String nombre, CharStream entrada) {
         Lexer lexer;
@@ -146,6 +155,8 @@ public class Compilador {
         boolean verArbol = false;
         boolean verAst = false;
         boolean verTabla = false;
+        boolean verC3d = false;
+        boolean ejecutar = false;
         List<Path> archivos = new ArrayList<>();
 
         for (String arg : args) {
@@ -154,11 +165,13 @@ public class Compilador {
                 case "--arbol" -> verArbol = true;
                 case "--ast" -> verAst = true;
                 case "--tabla" -> verTabla = true;
+                case "--c3d" -> verC3d = true;
+                case "--ejecutar" -> ejecutar = true;
                 default -> archivos.add(Path.of(arg));
             }
         }
         if (archivos.isEmpty()) {
-            System.err.println("Uso: Compilador [--tokens] [--arbol] [--ast] [--tabla] archivo...");
+            System.err.println("Uso: Compilador [--tokens] [--arbol] [--ast] [--tabla] [--c3d] [--ejecutar] archivo...");
             System.exit(2);
         }
 
@@ -183,6 +196,18 @@ public class Compilador {
             }
             if (verTabla && resultado != null) {
                 imprimirTabla(resultado);
+            }
+            if ((verC3d || ejecutar) && resultado != null && !compilador.getErrores().hayErrores()) {
+                ListaCuartetas cuartetas = compilador.generarCuartetas(resultado);
+                if (verC3d) {
+                    System.out.print(cuartetas);
+                }
+                if (ejecutar) {
+                    String entrada = new String(System.in.readAllBytes());
+                    System.out.println("-- salida --");
+                    System.out.print(InterpreteCuartetas.ejecutar(cuartetas, entrada));
+                    System.out.println("-- fin --");
+                }
             }
 
             compilador.getErrores().ordenar();

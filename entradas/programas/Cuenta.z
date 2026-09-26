@@ -1,0 +1,89 @@
+// Clase de prueba con salida conocida (prueba_objetos.esperado).
+public class Cuenta {
+    String titular;
+    double saldo = 100.0;
+    int movimientos;
+    Cuenta respaldo;
+
+    public Cuenta(String t) {
+        titular = t;
+    }
+
+    public Cuenta(String t, double inicial) {
+        titular = t;
+        saldo = inicial;
+    }
+
+    public void depositar(double monto) {
+        saldo += monto;
+        registrar();
+    }
+
+    public boolean retirar(double monto) {
+        if (monto > saldo) return false;
+        saldo -= monto;
+        registrar();
+        return true;
+    }
+
+    void registrar() {
+        movimientos++;
+    }
+
+    public double getSaldo() {
+        return saldo;
+    }
+
+    public String resumen() {
+        return titular + ": " + saldo + " (" + movimientos + " mov)";
+    }
+
+    public void setRespaldo(Cuenta c) {
+        this.respaldo = c;
+    }
+
+    public Cuenta getRespaldo() {
+        return respaldo;
+    }
+
+    public int potencia(int base, int exp) {
+        return exp == 0 ? 1 : base * potencia(base, exp - 1);
+    }
+
+    public void tabla() {
+        int[][] m = new int[2][3];
+        for (int i = 0; i < 2; i++)
+            for (int j = 0; j < 3; j++)
+                m[i][j] = i * 10 + j;
+        int s = 0;
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 3; j++) {
+                s += m[i][j];
+            }
+        }
+        println("tabla: " + s + " " + m[1][2]);
+        switch (movimientos) {
+            case 0:
+                println("sin movimientos");
+            case 1:
+                println("uno");
+                break;
+            default:
+                println("varios");
+        }
+        int x = 17;
+        println("mod: " + (x % 5) + " ternario: " + (x > 10 ? "grande" : "chico"));
+        int k = 0;
+        do {
+            k += 2;
+        } while (k < 7);
+        println("do: " + k);
+        String a = "hola";
+        String b = "ho" + "la";
+        println("iguales: " + (a == b) + " distintas: " + (a != "chao"));
+        boolean t = true;
+        println(t);
+        print("sin salto");
+        println();
+    }
+}

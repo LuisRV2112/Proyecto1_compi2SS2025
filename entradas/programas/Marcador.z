@@ -1,0 +1,10 @@
+// Clase sin constructores: new Marcador() usa el implicito, que igual inicializa los atributos.
+public class Marcador {
+    int valor = 5;
+    String etiqueta = "m";
+
+    public int siguiente() {
+        valor++;
+        return valor;
+    }
+}

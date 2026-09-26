@@ -75,7 +75,7 @@ esto anidado : novus Persona(miObjeto.getNombre(), 30);
 miObjeto.nombre = "Yennifer";
 misObjetos[9] = novus Persona("Luis", 40);
 misObjetos[9].saludar();
-comandante = misObjetos[9].getAmigo().getNombre();
+comandante = misObjetos[9].getNombre() + " y " + miObjeto.getNombre();   // amigo es null: getAmigo().getNombre() fallaria
 >> "Nace en: " >> miObjeto.calcularAnioNacimiento(2026);
 
 // Funciones de Funciones.y y de MUNERA>
