@@ -1,0 +1,45 @@
+// Errores a proposito en Zetariano. Cada uno esta comentado con lo que se espera reportar.
+public class errores_z {
+
+    int edad
+    String nombre;                      // SINTACTICO: falta ';' en la linea anterior
+
+    public void lexicos() {
+        int a = 10 # 2;                 // LEXICO: '#' no pertenece al lenguaje
+        String s = "hola" @ ;           // LEXICO: '@'
+    }
+
+    public void sinParentesis(int n) {
+        if n > 0 {                      // SINTACTICO: falta '(' tras if
+            n = 1;
+        }
+    }
+
+    public void ternarioIncompleto(int n) {
+        int m = n > 0 ? 1;              // SINTACTICO: falta ':' del ternario
+    }
+
+    public void forMalo() {
+        for (int i = 0; i < 10) {       // SINTACTICO: falta el segundo ';'
+            println(i);
+        }
+    }
+
+    public void switchMalo(int op) {
+        switch (op) {
+            case 1
+                println("uno");         // SINTACTICO: falta ':' tras case 1
+                break;
+        }
+    }
+
+    public int sinTipoParametro(n) {    // SINTACTICO: parametro sin tipo
+        return n;
+    }
+
+    public void asignacionInvalida() {
+        int x = 3;
+        x =+ ;                          // SINTACTICO: falta la expresion
+        x ** 2;                         // SINTACTICO: '*' inesperado
+    }
+}

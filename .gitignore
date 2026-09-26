@@ -1,0 +1,38 @@
+# Compilacion
+target/
+*.class
+
+# Fuentes generadas por ANTLR (se regeneran con mvn generate-sources)
+gen/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Otros editores
+.vscode/
+.settings/
+.classpath
+.project
+
+# Salidas del compilador (se regeneran, no van al repo)
+salida/
+*.o
+*.out
+
+# Las imagenes generadas no se versionan...
+*.png
+# ...pero las capturas de los manuales SI
+!capturas/*.png
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+*~
+
+# Documentacion de trabajo personal (no va al repo)
+CONTEXTO.md
+fases/

@@ -1,0 +1,171 @@
+// Ejemplo de Zetariano que usa todas las construcciones del lenguaje.
+// Sirve de regresion: debe parsear con 0 errores.
+
+/* El archivo se llama igual
+   que la clase */
+public class Persona {
+
+    String nombre;
+    int edad;
+    double promedio = 0.0;
+    char inicial;
+    boolean activo = true;
+    Persona amigo = null;
+    int[] notas;
+    int[][] tablero;
+    int x, y = 5, z;
+
+    // Constructores sobrecargados
+    public Persona(String nombreParametro, int edadParametro) {
+        nombre = nombreParametro;
+        this.edad = edadParametro;
+        notas = new int[10];
+        tablero = new int[3][3];
+    }
+
+    public Persona() {
+        nombre = "Sin nombre";
+        edad = 0;
+    }
+
+    Persona(String nombreParametro) {
+        nombre = nombreParametro;
+    }
+
+    public void saludar() {
+        println("Hola " + nombre);
+    }
+
+    // Metodos sobrecargados
+    public int calcularAnioNacimiento(int anioActual) {
+        return anioActual - edad;
+    }
+
+    public int calcularAnioNacimiento() {
+        return calcularAnioNacimiento(2026);
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public Persona getAmigo() {
+        return amigo;
+    }
+
+    public int precedencia() {
+        // 2 + 3 * 4 debe agruparse como 2 + (3 * 4)
+        int a = 2 + 3 * 4;
+        int b = (2 + 3) * 4 % 7;
+        int c = -a + b / 2 - 1;
+        boolean d = !(a < b) && b >= c || a != c;
+        int mayor = a > b ? a : b > c ? b : c;   // ternario anidado, asocia a la derecha
+        return mayor;
+    }
+
+    public void asignaciones() {
+        int total = 10;
+        total += 5;
+        total -= 2;
+        total *= 3;
+        total++;
+        total--;
+        ++total;
+        --total;
+        int siguiente = total++ + --total;
+        {                                   // bloque suelto: abre su propio ambito
+            int temporal = total * 2;
+            total = temporal;
+        }
+        notas[0] += 1;
+        this.tablero[1][2] = notas[0] * 2;
+    }
+
+    public void condicionales(int n) {
+        if (n > 10) {
+            println("mayor");
+        } else if (n == 10) {
+            println("igual");
+        } else {
+            println("menor");
+        }
+
+        // Llaves opcionales con una sola instruccion
+        if (n < 0)
+            println("negativo");
+        else
+            println("no negativo");
+
+        if (n == 1) if (n > 0) println("uno"); else println("el else va con el if interno");
+    }
+
+    public void seleccion(int opcion) {
+        switch (opcion) {
+            case 1:
+                println("uno");
+                break;
+            case 2:
+            case 3:
+                println("dos o tres");     // el 2 cae al 3 (fall-through)
+            case 4:
+                println("y cae al cuatro");
+                break;
+            default:
+                println("otro");
+        }
+    }
+
+    public void ciclos(int n) {
+        for (int i = 0; i < n; i++) {
+            if (i == 5) continue;
+            print(i);
+        }
+        int j = 0;
+        for (; j < 10; ) j++;
+        for (j = 0, n = 3; j < n; j++, n--) {
+            println(j);
+        }
+        for (;;) {
+            break;
+        }
+        while (n > 0) {
+            n--;
+        }
+        do {
+            j = j - 1;
+        } while (j > 0);
+        do j++; while (j < 3);
+    }
+
+    public void entradaSalida() {
+        readln();                          // lee y descarta
+        String leido = readln();
+        char letra = 'x';
+        double pi = 3.1416;
+        println();
+        print("Valor: " + pi + " " + letra + leido);
+    }
+
+    public void matrices() {
+        int[][] m = new int[3][3];
+        int[][][] cubo = { { {1, 2}, {3, 4} }, { {5, 6}, {7, 8} } };
+        int[] lista = {1, 2, 3};
+        Persona[] grupo = new Persona[5];
+        grupo[0] = new Persona("Ana", 20);
+        grupo[1] = new Persona();
+        m[1][2] = cubo[0][1][1] + lista[2];
+        println(grupo[0].getNombre());
+        grupo[0].getAmigo().saludar();
+        String nombreAmigo = this.getAmigo().getNombre();
+    }
+
+    // Recursividad
+    public int factorial(int n) {
+        if (n <= 1) return 1;
+        return n * factorial(n - 1);
+    }
+
+    public int fibonacci(int n) {
+        return n < 2 ? n : fibonacci(n - 1) + fibonacci(n - 2);
+    }
+}

@@ -1,0 +1,38 @@
+// Errores semanticos a proposito en Zetariano.
+// El archivo se llama Figura.z pero la clase se llama Forma: error de nombre de archivo.
+public class Forma {
+
+    int lados;
+    double area;
+    int lados;                          // atributo repetido
+
+    public Forma(int l) {
+        lados = l;
+    }
+
+    public int getLados() {
+        return lados;
+    }
+
+    public int getLados() {             // metodo repetido (misma firma)
+        return 0;
+    }
+
+    public void pruebas() {
+        Forma f = new Forma("tres");    // constructor con argumentos de otro tipo
+        Forma g = new Forma(1, 2);      // constructor con otra cantidad de argumentos
+        int x = f.getArea();            // metodo inexistente
+        int y = f.getLados(5);          // metodo con otra firma
+        int m = 7 % 2.5;                // '%' exige enteros
+        int t = true ? 1 : "uno";       // ramas del ternario incompatibles
+        x;                              // un acceso suelto no es instruccion
+        f.getLados() = 3;               // asignar al resultado de una llamada
+        switch (lados) {
+            default:
+                break;
+            default:                    // dos casos por defecto
+                break;
+        }
+        return 5;                       // retorno con valor en un metodo void
+    }
+}
