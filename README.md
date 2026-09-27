@@ -17,14 +17,14 @@ Compilador de **tres lenguajes de alto nivel** (Y?, Zetariano y PigLatin) que ge
 | 2 | El AST común y los tres constructores | Lista |
 | 3 | Imports, tabla de símbolos y análisis semántico | Lista |
 | 4 | Generación de cuartetas (C3D) | Lista |
-| 5 | De cuartetas a un `.c` que compile con gcc | Pendiente |
+| 5 | De cuartetas a un `.c` que compile con gcc | Lista |
 | 6 | Árbol de trabajo, coloreado y documentación | Pendiente |
 
 ```
 src/main/antlr4/.../parser/   LenguajeY.g4, Zetariano.g4, PigLatin.g4
 src/main/java/com/usac/contacto3d/
 ├── Main.java                 stub (la ventana es de la fase 6)
-├── Compilador.java           compila un archivo (y sus imports) hasta las cuartetas
+├── Compilador.java           compila un archivo (y sus imports) hasta el .c
 ├── parser/IndentacionY.java  INDENT/DEDENT de Y?
 ├── errores/                  modelo y listeners, con soporte multi-archivo
 ├── ast/                      AST común: 37 nodos y el Visitante
@@ -33,7 +33,7 @@ src/main/java/com/usac/contacto3d/
 ├── simbolos/                 ámbitos, símbolos, offsets de stack y heap
 ├── ui/                       tema, panel de errores y base de los coloreadores
 ├── c3d/                      cuartetas: generador e intérprete de referencia
-└── generador/                fase 5
+└── generador/                TraductorC: cuartetas → C
 ```
 
 ---
@@ -45,17 +45,22 @@ mvn clean package
 java -jar target/contacto-3d-1.0.0.jar
 ```
 
-Para probar el análisis desde consola:
+Para compilar un programa desde consola y correrlo:
 
 ```bash
-java -cp target/contacto-3d-1.0.0.jar com.usac.contacto3d.Compilador [--tokens] [--arbol] [--ast] [--tabla] [--c3d] [--ejecutar] archivo...
+java -cp target/contacto-3d-1.0.0.jar com.usac.contacto3d.Compilador --c salida/programa.c entradas/ejemplo/Principal.pig
+gcc salida/programa.c -o salida/programa
+./salida/programa
 ```
+
+Otras opciones: `--tokens`, `--arbol`, `--ast`, `--tabla` (tabla de símbolos con la memoria),
+`--c3d` (cuartetas) y `--ejecutar` (corre las cuartetas sin pasar por C).
 
 `entradas/ejemplo/` tiene un programa completo (`Principal.pig` importa `Funciones.y` y
 `Persona.z`) que debe compilar sin errores; `entradas/errores/` tiene errores léxicos y
 sintácticos a propósito, y `entradas/errores_semanticos/` un error semántico de cada tipo.
 `entradas/programas/` tiene programas con su salida esperada; `entradas/programas/probar.sh`
-los ejecuta y compara.
+los ejecuta con el intérprete y compilados con gcc, y compara ambos contra lo esperado.
 
 ---
 

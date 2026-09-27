@@ -3,9 +3,10 @@ package com.usac.contacto3d.c3d;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -220,14 +221,23 @@ public class InterpreteCuartetas {
     /**
      * Un flotante entero se escribe con ".0" (como Java); si no, con hasta 6
      * decimales sin ceros sobrantes. La plantilla de C hace lo mismo con printf.
+     *
+     * Se redondea el valor binario EXACTO al par mas cercano, que es lo que hace
+     * printf de glibc; String.format redondea los empates hacia arriba y en
+     * casos como 0.0078125 daria un digito distinto al del programa en C.
      */
     public static String formatearFlotante(double valor) {
-        if (valor == Math.rint(valor) && Math.abs(valor) < 1e15) {
-            return String.format(Locale.ROOT, "%.1f", valor);
+        if (Double.isNaN(valor) || Double.isInfinite(valor)) {
+            return Double.isNaN(valor) ? "nan" : valor > 0 ? "inf" : "-inf";
         }
-        String texto = String.format(Locale.ROOT, "%.6f", valor);
-        texto = texto.replaceAll("0+$", "");
-        return texto.endsWith(".") ? texto + "0" : texto;
+        // printf conserva el signo aunque el resultado redondee a cero (-0.0); BigDecimal no
+        String signo = valor < 0 || (valor == 0 && 1 / valor < 0) ? "-" : "";
+        BigDecimal absoluto = new BigDecimal(Math.abs(valor));
+        if (valor == Math.rint(valor) && Math.abs(valor) < 1e15) {
+            return signo + absoluto.setScale(1, RoundingMode.HALF_EVEN).toPlainString();
+        }
+        String texto = absoluto.setScale(6, RoundingMode.HALF_EVEN).toPlainString().replaceAll("0+$", "");
+        return signo + (texto.endsWith(".") ? texto + "0" : texto);
     }
 
     /** Lo que se lee con "x <<" a un tipo no textual. Si no se entiende, vale 0. */

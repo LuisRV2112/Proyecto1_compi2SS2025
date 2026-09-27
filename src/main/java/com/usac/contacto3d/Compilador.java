@@ -10,6 +10,7 @@ import com.usac.contacto3d.constructores.ConstructorAstPig;
 import com.usac.contacto3d.constructores.ConstructorAstY;
 import com.usac.contacto3d.constructores.ConstructorAstZ;
 import com.usac.contacto3d.errores.ErrorCompilacion;
+import com.usac.contacto3d.generador.TraductorC;
 import com.usac.contacto3d.errores.ErroresLexicos;
 import com.usac.contacto3d.errores.ErroresSintacticos;
 import com.usac.contacto3d.errores.ListaErrores;
@@ -41,13 +42,14 @@ import java.util.List;
 /**
  * Orquesta el analisis de los archivos fuente.
  *
- * Por ahora (fase 4) llega hasta las cuartetas. Desde consola:
+ * Compila hasta el archivo C. Desde consola:
  *
  *     java -cp target/contacto-3d-1.0.0.jar com.usac.contacto3d.Compilador [opciones] archivo...
  *
  *     --tokens  tokens del archivo      --arbol  parse tree del archivo
  *     --ast     AST de cada modulo      --tabla  tabla de simbolos con la memoria
  *     --c3d     cuartetas generadas     --ejecutar  corre las cuartetas (entrada por stdin)
+ *     --c RUTA  escribe el programa en C en RUTA
  */
 public class Compilador {
 
@@ -126,6 +128,11 @@ public class Compilador {
         return new GeneradorCuartetas().generar(resultado);
     }
 
+    /** El programa en C, listo para gcc. */
+    public String traducirAC(ListaCuartetas cuartetas) {
+        return new TraductorC().traducir(cuartetas);
+    }
+
     /** El lexer del lenguaje segun la extension, ya conectado a la lista de errores. */
     private Lexer crearLexer(String nombre, CharStream entrada) {
         Lexer lexer;
@@ -157,10 +164,13 @@ public class Compilador {
         boolean verTabla = false;
         boolean verC3d = false;
         boolean ejecutar = false;
+        Path salidaC = null;
         List<Path> archivos = new ArrayList<>();
 
-        for (String arg : args) {
+        for (int i = 0; i < args.length; i++) {
+            String arg = args[i];
             switch (arg) {
+                case "--c" -> salidaC = Path.of(args[++i]);
                 case "--tokens" -> verTokens = true;
                 case "--arbol" -> verArbol = true;
                 case "--ast" -> verAst = true;
@@ -171,7 +181,7 @@ public class Compilador {
             }
         }
         if (archivos.isEmpty()) {
-            System.err.println("Uso: Compilador [--tokens] [--arbol] [--ast] [--tabla] [--c3d] [--ejecutar] archivo...");
+            System.err.println("Uso: Compilador [--tokens] [--arbol] [--ast] [--tabla] [--c3d] [--ejecutar] [--c salida.c] archivo...");
             System.exit(2);
         }
 
@@ -197,10 +207,17 @@ public class Compilador {
             if (verTabla && resultado != null) {
                 imprimirTabla(resultado);
             }
-            if ((verC3d || ejecutar) && resultado != null && !compilador.getErrores().hayErrores()) {
+            if ((verC3d || ejecutar || salidaC != null) && resultado != null && !compilador.getErrores().hayErrores()) {
                 ListaCuartetas cuartetas = compilador.generarCuartetas(resultado);
                 if (verC3d) {
                     System.out.print(cuartetas);
+                }
+                if (salidaC != null) {
+                    if (salidaC.getParent() != null) {
+                        java.nio.file.Files.createDirectories(salidaC.getParent());
+                    }
+                    java.nio.file.Files.writeString(salidaC, compilador.traducirAC(cuartetas));
+                    System.out.println("C generado en " + salidaC);
                 }
                 if (ejecutar) {
                     String entrada = new String(System.in.readAllBytes());

@@ -111,6 +111,8 @@ definir arreglos():
 
 definir anidado(entero n) -> entero:
 	// indentado con tabs (1 tab = 4 columnas)
+	si (n <= 0) entonces
+		retornar 0
 	si (n > 0) entonces
 		para(entero i = 0; i < n; i++):
 			si (i > 2) entonces
