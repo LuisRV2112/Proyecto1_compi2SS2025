@@ -7,8 +7,6 @@ Segundo semestre 2026
 Compilador de **tres lenguajes de alto nivel** (Y?, Zetariano y PigLatin) que genera
 **código de tres direcciones mediante cuartetas** y lo traduce a un archivo **C compilable**.
 
-![Contacto 3xtrat3rr3str3D](capturas/01_programa_ejecutado.png)
-
 - **[Manual de usuario](MANUAL_USUARIO.md)** — cómo abrir un proyecto, escribir en cada
   lenguaje, compilar, ver los resultados y generar el `.c`.
 - **[Manual técnico](MANUAL_TECNICO.md)** — tecnologías, diagramas de clases, palabras

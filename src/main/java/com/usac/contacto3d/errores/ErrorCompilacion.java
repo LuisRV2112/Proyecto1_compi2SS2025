@@ -1,12 +1,5 @@
 package com.usac.contacto3d.errores;
 
-/**
- * Un error detectado durante la compilacion.
- *
- * Respecto a la practica anterior se agrega el ARCHIVO: el proyecto maneja
- * varios archivos a la vez (.pig que importa .y y .z), asi que saber la linea
- * ya no alcanza, hay que saber en cual de todos.
- */
 public class ErrorCompilacion {
 
     private final TipoError tipo;

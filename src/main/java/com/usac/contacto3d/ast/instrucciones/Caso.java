@@ -6,7 +6,6 @@ import com.usac.contacto3d.ast.expresiones.Expresion;
 
 import java.util.List;
 
-/** Un caso de un Elegir. El por defecto (siempre / default) tiene valor null. */
 public class Caso extends Nodo {
 
     private final Expresion valor;

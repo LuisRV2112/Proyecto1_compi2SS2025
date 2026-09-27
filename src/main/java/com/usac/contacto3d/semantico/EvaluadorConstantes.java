@@ -6,12 +6,6 @@ import com.usac.contacto3d.ast.expresiones.OperacionBinaria;
 import com.usac.contacto3d.ast.expresiones.OperacionUnaria;
 import com.usac.contacto3d.ast.expresiones.Operador;
 
-/**
- * Calcula en compilacion el valor entero de una expresion, si se puede.
- *
- * El enunciado pide reportar un indice fuera de rango "si la expresion se
- * puede evaluar": arr[2 + 3] da 5 y se valida; arr[i] da null y no.
- */
 final class EvaluadorConstantes {
 
     private EvaluadorConstantes() { }
@@ -39,7 +33,7 @@ final class EvaluadorConstantes {
             case SUMA -> a + b;
             case RESTA -> a - b;
             case MULTIPLICACION -> a * b;
-            case DIVISION -> b == 0 ? null : a / b;   // la division entre cero no es constante, es un error de ejecucion
+            case DIVISION -> b == 0 ? null : a / b;
             case MODULO -> b == 0 ? null : a % b;
             default -> null;
         };

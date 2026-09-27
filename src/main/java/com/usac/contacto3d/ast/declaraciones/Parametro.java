@@ -11,10 +11,6 @@ public class Parametro extends Nodo {
 
     private final String nombre;
     private Tipo tipo;
-    /**
-     * Y? lo marca en la sintaxis ([] entero a, {} Persona p); en Zetariano los
-     * arreglos y objetos siempre pasan por referencia, como en Java.
-     */
     private final boolean porReferencia;
 
     public Parametro(String nombre, Tipo tipo, boolean porReferencia, int linea, int columna) {
@@ -29,7 +25,6 @@ public class Parametro extends Nodo {
     public void setTipo(Tipo tipo)   { this.tipo = tipo; }
     public boolean esPorReferencia() { return porReferencia; }
 
-    /** Lo resuelve el semantico; el generador lo usa en vez de volver a buscar el nombre. */
     private SimboloVariable simbolo;
 
     public SimboloVariable getSimbolo() { return simbolo; }

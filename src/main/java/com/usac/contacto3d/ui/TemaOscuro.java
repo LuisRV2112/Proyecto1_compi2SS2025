@@ -11,18 +11,6 @@ import javax.swing.plaf.metal.MetalLookAndFeel;
 import java.awt.Color;
 import java.awt.Font;
 
-/**
- * Deja toda la ventana en modo oscuro SIN depender de FlatLaf.
- *
- * El editor y los paneles propios se pintan solos, pero la barra de menu, las
- * pestañas, los botones y las tablas los dibuja el look and feel, y el que trae
- * Java por defecto (Metal) los pinta en gris claro: la ventana quedaria oscura
- * con las orillas blancas.
- *
- * Se intenta FlatLaf por reflexion; si no esta, se recolorea Metal completo con
- * un MetalTheme propio. Cambiar solo las claves de UIManager no alcanza, porque
- * Metal pinta muchos bordes con los colores de su tema interno.
- */
 public final class TemaOscuro {
 
     private static final Color FONDO       = new Color(0x1E1E1E);
@@ -37,7 +25,6 @@ public final class TemaOscuro {
     private TemaOscuro() {
     }
 
-    /** @return el nombre del tema aplicado, para dejarlo en la consola */
     public static String aplicar() {
         String aplicado = intentarFlatLaf();
         if (aplicado == null) {
@@ -148,7 +135,6 @@ public final class TemaOscuro {
         poner("ComboBox.background", FONDO_CLARO);
         poner("ComboBox.foreground", TEXTO);
 
-        // El arbol de trabajo y los dialogos de archivo tienen piezas propias.
         poner("Tree.background", FONDO_PANEL);
         poner("Tree.foreground", TEXTO);
         poner("Tree.textBackground", FONDO_PANEL);
@@ -165,7 +151,6 @@ public final class TemaOscuro {
         poner("FileChooser.foreground", TEXTO);
     }
 
-    /** Textos de los dialogos de Swing, fijos para no depender del sistema. */
     private static void textosEnEspaniol() {
         UIManager.put("OptionPane.yesButtonText", "Si");
         UIManager.put("OptionPane.noButtonText", "No");
@@ -191,7 +176,6 @@ public final class TemaOscuro {
         UIManager.put(clave, new ColorUIResource(color));
     }
 
-    /** Paleta oscura para Metal: esto es lo que elimina el gris de las orillas. */
     private static class TemaMetalOscuro extends DefaultMetalTheme {
 
         private static final ColorUIResource PRIMARIO_1   = new ColorUIResource(0x094771);

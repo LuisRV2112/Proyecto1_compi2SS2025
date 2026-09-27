@@ -5,7 +5,6 @@ import com.usac.contacto3d.ast.Visitante;
 
 import java.util.List;
 
-/** romper/continuar, break/continue e interrumpe/perge. */
 public class ControlCiclo extends Nodo implements Instruccion {
 
     public enum Accion { ROMPER, CONTINUAR }

@@ -7,10 +7,6 @@ import com.usac.contacto3d.simbolos.SimboloEstructura;
 
 import java.util.List;
 
-/**
- * Estructura de Y?. Es instruccion porque Y? tambien permite declararlas
- * dentro de una funcion.
- */
 public class DeclaracionEstructura extends Nodo implements Instruccion {
 
     private final String nombre;
@@ -25,7 +21,6 @@ public class DeclaracionEstructura extends Nodo implements Instruccion {
     public String getNombre()               { return nombre; }
     public List<CampoEstructura> getCampos() { return campos; }
 
-    /** Lo resuelve el semantico; el generador lo usa en vez de volver a buscar el nombre. Tiene los offsets. */
     private SimboloEstructura simbolo;
 
     public SimboloEstructura getSimbolo() { return simbolo; }

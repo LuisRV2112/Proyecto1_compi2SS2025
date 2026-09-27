@@ -47,12 +47,6 @@ import java.util.Objects;
 import static com.usac.contacto3d.constructores.Ayudante.columna;
 import static com.usac.contacto3d.constructores.Ayudante.linea;
 
-/**
- * Convierte el parse tree de Y? en el AST comun.
- *
- * Solo se usa sobre archivos que parsearon sin errores: no tiene que lidiar
- * con partes faltantes del arbol.
- */
 public class ConstructorAstY extends LenguajeYBaseVisitor<Nodo> {
 
     private final String archivo;
@@ -68,8 +62,6 @@ public class ConstructorAstY extends LenguajeYBaseVisitor<Nodo> {
         Ayudante.asignarArchivo(programa, archivo);
         return programa;
     }
-
-    /* ---------- estructuras y funciones ---------- */
 
     private DeclaracionEstructura estructura(EstructuraContext ctx) {
         List<CampoEstructura> campos = ctx.campo().stream().map(this::campo).toList();
@@ -100,7 +92,6 @@ public class ConstructorAstY extends LenguajeYBaseVisitor<Nodo> {
             case ParamValorContext p ->
                     new Parametro(p.ID().getText(), tipo(p.tipo()), false, linea(p.ID()), columna(p.ID()));
             case ParamArregloContext p -> {
-                // [] entero a -> una dimension de tamanio desconocido por cada []
                 List<Integer> dimensiones = new ArrayList<>();
                 p.CORCH_A().forEach(c -> dimensiones.add(null));
                 yield new Parametro(p.ID().getText(), Tipo.arreglo(tipo(p.tipo()), dimensiones), true,
@@ -116,8 +107,6 @@ public class ConstructorAstY extends LenguajeYBaseVisitor<Nodo> {
     private Tipo tipo(TipoContext ctx) {
         return Tipo.desdePalabra(ctx.getText());
     }
-
-    /* ---------- instrucciones ---------- */
 
     private List<Instruccion> bloque(BloqueContext ctx) {
         return instrucciones(ctx.instruccion());
@@ -250,7 +239,6 @@ public class ConstructorAstY extends LenguajeYBaseVisitor<Nodo> {
         return new ControlCiclo(ControlCiclo.Accion.CONTINUAR, linea(ctx), columna(ctx));
     }
 
-    /** Con dimensiones es un arreglo (entero m[3][2]); sin ellas, una variable. */
     private Nodo declaracion(DeclaracionContext ctx) {
         String nombre = ctx.ID().getText();
         Tipo tipo = tipo(ctx.tipo());
@@ -271,8 +259,6 @@ public class ConstructorAstY extends LenguajeYBaseVisitor<Nodo> {
                 linea(ctx), columna(ctx));
     }
 
-    /* ---------- expresiones ---------- */
-
     private Expresion expr(ExprContext ctx) {
         return ctx == null ? null : (Expresion) visit(ctx);
     }
@@ -289,7 +275,7 @@ public class ConstructorAstY extends LenguajeYBaseVisitor<Nodo> {
 
     @Override
     public Nodo visitExprAgrupacion(ExprAgrupacionContext ctx) {
-        return expr(ctx.expr());   // los parentesis ya fijaron la precedencia: no dejan nodo
+        return expr(ctx.expr());
     }
 
     @Override
@@ -396,9 +382,6 @@ public class ConstructorAstY extends LenguajeYBaseVisitor<Nodo> {
         return new Literal(ctx.VERDADERO() != null, Tipo.BOOLEANO, linea(ctx), columna(ctx));
     }
 
-    /* ---------- recorrido por defecto ---------- */
-
-    // Por si alguna regla cae en visitChildren: que los tokens sueltos no pisen el resultado
     @Override
     protected Nodo aggregateResult(Nodo acumulado, Nodo siguiente) {
         return acumulado != null ? acumulado : siguiente;

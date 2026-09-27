@@ -3,26 +3,6 @@ package com.usac.contacto3d.semantico;
 import com.usac.contacto3d.ast.Tipo;
 import com.usac.contacto3d.ast.expresiones.Operador;
 
-/**
- * Reglas de tipos, las mismas para los tres lenguajes.
- *
- * Jerarquia para la inferencia implicita (la mas alta gana):
- *     cadena 5 > flotante 4 > entero 3 > caracter 2 > bool 1
- *
- *   +               con una cadena concatena (el otro debe ser primitivo);
- *                   si no, gana la jerarquia mas alta
- *   - * /           la cadena no participa; gana la jerarquia mas alta
- *   %               solo enteros (y caracteres); da entero
- *   < > <= >=       numericos; dan bool
- *   == !=           tipos comparables; dan bool
- *   && || !         solo bool
- *
- * Asignar solo puede ampliar dentro de la familia numerica
- * (caracter -> entero -> flotante). bool y cadena exigen el mismo tipo.
- *
- * Los metodos devuelven null cuando la operacion no es valida; quien llama
- * arma el mensaje, porque sabe la posicion y el contexto.
- */
 public final class Compatibilidad {
 
     private Compatibilidad() { }
@@ -48,14 +28,12 @@ public final class Compatibilidad {
 
     public static Tipo unaria(Operador operador, Tipo a) {
         return switch (operador) {
-            // -'a' vale el codigo negado: un caracter negativo no existe, se sube a entero
             case NEGATIVO -> a.esNumerico() && !esBool(a) ? Tipo.dominante(Tipo.ENTERO, a) : null;
             case NOT -> esBool(a) ? Tipo.BOOLEANO : null;
             default -> throw new IllegalArgumentException("Operador binario: " + operador);
         };
     }
 
-    /** Para == y != y para los casos de un elegir/switch. */
     public static boolean comparables(Tipo a, Tipo b) {
         if (a.esNumerico() && b.esNumerico()) {
             return true;
@@ -68,13 +46,12 @@ public final class Compatibilidad {
 
     public static boolean asignable(Tipo destino, Tipo origen) {
         if (destino.esError() || origen.esError()) {
-            return true;   // el error ya se reporto donde nacio
+            return true;
         }
         if (origen.getBase() == Tipo.Base.NULO) {
             return aceptaNulo(destino);
         }
         if (destino.esArreglo() && origen.esArreglo()) {
-            // Se asigna la referencia: el tamanio no importa, la cantidad de dimensiones si
             return destino.getTipoElemento().equals(origen.getTipoElemento())
                     && destino.getDimensiones().size() == origen.getDimensiones().size();
         }
@@ -88,7 +65,6 @@ public final class Compatibilidad {
         };
     }
 
-    /** true si el origen es numerico y cabe en el destino solo perdiendo informacion. */
     public static boolean pierdeInformacion(Tipo destino, Tipo origen) {
         return destino.esNumerico() && origen.esNumerico()
                 && destino.getBase() != Tipo.Base.BOOLEANO && origen.getBase() != Tipo.Base.BOOLEANO

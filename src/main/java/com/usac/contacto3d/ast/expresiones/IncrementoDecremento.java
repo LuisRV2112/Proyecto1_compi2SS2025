@@ -6,10 +6,6 @@ import com.usac.contacto3d.ast.instrucciones.Instruccion;
 
 import java.util.List;
 
-/**
- * x++, x--, y en Zetariano tambien ++x y --x. Como expresion, el postfijo vale
- * lo de antes de sumar y el prefijo lo de despues.
- */
 public class IncrementoDecremento extends Expresion implements Instruccion {
 
     private final Acceso destino;

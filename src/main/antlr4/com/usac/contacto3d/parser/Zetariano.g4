@@ -1,16 +1,4 @@
-/*
- * Gramatica de Zetariano (archivos .z)
- *
- * Orientado a objetos, basado en Java. Un archivo contiene una sola clase;
- * que se llame igual que el archivo lo verifica el semantico, no la gramatica.
- *
- * Encapsulamiento, herencia y polimorfismo no se contemplan en este proyecto:
- * public/private se aceptan para no romper codigo estilo Java, pero no
- * significan nada.
- */
 grammar Zetariano;
-
-/* ============================== PARSER ============================== */
 
 programa
     : clase EOF
@@ -25,10 +13,6 @@ modificador
     | PRIVATE                               # modPrivado
     ;
 
-// Atributo y metodo con tipo comparten "tipo ID" y se separan despues, en
-// restoMiembro. Si fueran alternativas completas, un "int edad" sin ';'
-// no encajaria en ninguna y el error listaria todo lo que puede iniciar un
-// miembro en vez de decir que faltaba '(', '=', ',' o ';'.
 miembro
     : modificador? ID PAR_A listaParametros? PAR_C bloque                  # miembroConstructor
     | modificador? VOID ID PAR_A listaParametros? PAR_C bloque             # miembroMetodoVoid
@@ -44,7 +28,6 @@ listaParametros
     : parametro (COMA parametro)*
     ;
 
-// Arreglos y objetos pasan por referencia sin marca especial, como en Java
 parametro
     : tipo ID
     ;
@@ -66,15 +49,11 @@ bloque
     : LLAVE_A instruccion* LLAVE_C
     ;
 
-/* ---------- instrucciones ---------- */
-
 instruccion
     : bloque                                # instBloque
     | declaracionVariable PUNTOYCOMA        # instDeclaracion
     | asignacion PUNTOYCOMA                 # instAsignacion
     | incremento PUNTOYCOMA                 # instIncremento
-    // La gramatica acepta cualquier acceso; que termine en una llamada
-    // ("x;" no es instruccion) lo revisa el semantico
     | acceso PUNTOYCOMA                     # instLlamada
     | sentenciaIf                           # instIf
     | sentenciaSwitch                       # instSwitch
@@ -106,15 +85,10 @@ incremento
     | (INCREMENTO | DECREMENTO) acceso      # incrementoPrefijo
     ;
 
-// Cuerpo sin llaves = una sola instruccion. El else ambiguo se asocia al
-// if mas cercano: ANTLR toma la alternativa codiciosa, igual que Java.
 sentenciaIf
     : IF PAR_A expr PAR_C instruccion (ELSE instruccion)?
     ;
 
-// Hay fall-through: las instrucciones de una seccion siguen de largo a la
-// siguiente si no hay break, asi que cada seccion es solo una etiqueta con
-// lo que venga despues. Que haya un solo default lo revisa el semantico.
 sentenciaSwitch
     : SWITCH PAR_A expr PAR_C LLAVE_A seccionSwitch* LLAVE_C
     ;
@@ -124,7 +98,6 @@ seccionSwitch
     | DEFAULT DOSP instruccion*             # seccionDefault
     ;
 
-// Las tres partes son opcionales: for (;;) es un ciclo infinito
 sentenciaFor
     : FOR PAR_A inicioFor? PUNTOYCOMA expr? PUNTOYCOMA listaActualizacion? PAR_C instruccion
     ;
@@ -151,9 +124,6 @@ sentenciaDoWhile
     : DO instruccion WHILE PAR_A expr PAR_C PUNTOYCOMA
     ;
 
-/* ---------- expresiones ---------- */
-
-// La precedencia sale del orden: la primera alternativa binaria es la mas alta
 expr
     : PAR_A expr PAR_C                                      # exprAgrupacion
     | incremento                                            # exprIncremento
@@ -177,7 +147,6 @@ listaExpresiones
     : expr (COMA expr)*
     ;
 
-// Una cadena de accesos: persona.direccion.getCalle(), matriz[i][j], this.nombre
 acceso
     : raizAcceso sufijo*
     ;
@@ -203,9 +172,6 @@ literal
     | NULL                                  # litNulo
     ;
 
-/* ============================== LEXER =============================== */
-
-// Tipos
 INT      : 'int' ;
 DOUBLE   : 'double' ;
 CHAR     : 'char' ;
@@ -213,7 +179,6 @@ BOOLEAN  : 'boolean' ;
 STRING   : 'String' ;
 VOID     : 'void' ;
 
-// Palabras reservadas
 PUBLIC   : 'public' ;
 PRIVATE  : 'private' ;
 CLASS    : 'class' ;
@@ -237,7 +202,6 @@ PRINTLN  : 'println' ;
 PRINT    : 'print' ;
 READLN   : 'readln' ;
 
-// Operadores (los de dos caracteres ganan por coincidencia mas larga)
 INCREMENTO    : '++' ;
 DECREMENTO    : '--' ;
 MAS_IGUAL     : '+=' ;
@@ -260,7 +224,6 @@ NOT           : '!' ;
 ASIGNACION    : '=' ;
 INTERROGACION : '?' ;
 
-// Agrupacion y puntuacion
 PAR_A      : '(' ;
 PAR_C      : ')' ;
 CORCH_A    : '[' ;
@@ -272,7 +235,6 @@ COMA       : ',' ;
 DOSP       : ':' ;
 PUNTOYCOMA : ';' ;
 
-// Literales
 LIT_DECIMAL  : [0-9]+ '.' [0-9]+ ;
 LIT_ENTERO   : [0-9]+ ;
 LIT_CADENA   : '"' (~["\\\r\n] | '\\' .)* '"' ;
@@ -280,7 +242,6 @@ LIT_CARACTER : '\'' (~['\\\r\n] | '\\' .) '\'' ;
 
 ID : [a-zA-Z_] [a-zA-Z0-9_]* ;
 
-// Al canal oculto y no a skip: el coloreado necesita verlos
 COMENTARIO_LINEA  : '//' ~[\r\n]* -> channel(HIDDEN) ;
 COMENTARIO_BLOQUE : '/*' .*? '*/' -> channel(HIDDEN) ;
 WS                : [ \t\r\n\f]+ -> channel(HIDDEN) ;

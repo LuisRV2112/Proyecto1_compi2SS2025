@@ -9,17 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Ejecuta las cuartetas directamente, sin pasar por C.
- *
- * Sirve para comprobar que el generador es correcto antes de tener el
- * traductor (y despues, para comparar: el .c compilado debe imprimir lo mismo).
- * Por eso reproduce el modelo que va a tener el C: stack y heap de celdas
- * double, P y H globales, y temporales LOCALES a cada funcion.
- *
- * Las operaciones del sistema (cadenas, conversiones, lectura) se definen
- * aqui; la plantilla de C de la fase 5 tiene que hacer exactamente lo mismo.
- */
 public class InterpreteCuartetas {
 
     private static final int CELDAS = 1_000_000;
@@ -27,7 +16,6 @@ public class InterpreteCuartetas {
     private static final int MAXIMA_PROFUNDIDAD = 3_000;
     private static final double FIN_CADENA = -1;
 
-    /** Termina la ejecucion: halt, un error de ejecucion o un limite superado. */
     private static class Fin extends RuntimeException {
         Fin() {
             super(null, null, false, false);
@@ -60,13 +48,11 @@ public class InterpreteCuartetas {
         }
     }
 
-    /** Ejecuta el programa desde main y devuelve todo lo que imprimio. */
     public static String ejecutar(ListaCuartetas programa, String entrada) {
         InterpreteCuartetas interprete = new InterpreteCuartetas(programa, entrada);
         try {
             interprete.llamar("main");
         } catch (Fin fin) {
-            // halt o error: la salida ya tiene lo que corresponde
         }
         return interprete.salida.toString();
     }
@@ -147,8 +133,6 @@ public class InterpreteCuartetas {
         }
     }
 
-    /* ---------------- operandos ---------------- */
-
     private double valor(String operando, Map<String, Double> temporales) {
         return switch (operando) {
             case "P" -> p;
@@ -184,8 +168,6 @@ public class InterpreteCuartetas {
         throw new Fin();
     }
 
-    /* ---------------- sistema: cadenas y conversiones ---------------- */
-
     private String cadena(double puntero) {
         StringBuilder sb = new StringBuilder();
         int i = celda(puntero, heap);
@@ -205,7 +187,6 @@ public class InterpreteCuartetas {
         return puntero;
     }
 
-    /** El texto de un valor segun su tipo; lo usan IMPRIMIR y A_CADENA. */
     private String texto(double valor, String tipo) {
         return switch (tipo) {
             case "cadena" -> cadena(valor);
@@ -218,19 +199,10 @@ public class InterpreteCuartetas {
         };
     }
 
-    /**
-     * Un flotante entero se escribe con ".0" (como Java); si no, con hasta 6
-     * decimales sin ceros sobrantes. La plantilla de C hace lo mismo con printf.
-     *
-     * Se redondea el valor binario EXACTO al par mas cercano, que es lo que hace
-     * printf de glibc; String.format redondea los empates hacia arriba y en
-     * casos como 0.0078125 daria un digito distinto al del programa en C.
-     */
     public static String formatearFlotante(double valor) {
         if (Double.isNaN(valor) || Double.isInfinite(valor)) {
             return Double.isNaN(valor) ? "nan" : valor > 0 ? "inf" : "-inf";
         }
-        // printf conserva el signo aunque el resultado redondee a cero (-0.0); BigDecimal no
         String signo = valor < 0 || (valor == 0 && 1 / valor < 0) ? "-" : "";
         BigDecimal absoluto = new BigDecimal(Math.abs(valor));
         if (valor == Math.rint(valor) && Math.abs(valor) < 1e15) {
@@ -240,7 +212,6 @@ public class InterpreteCuartetas {
         return signo + (texto.endsWith(".") ? texto + "0" : texto);
     }
 
-    /** Lo que se lee con "x <<" a un tipo no textual. Si no se entiende, vale 0. */
     private static double convertir(String texto, String tipo) {
         String limpio = texto.trim();
         try {

@@ -40,25 +40,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Orquesta el analisis de los archivos fuente.
- *
- * Compila hasta el archivo C. Desde consola:
- *
- *     java -cp target/contacto-3d-1.0.0.jar com.usac.contacto3d.Compilador [opciones] archivo...
- *
- *     --tokens  tokens del archivo      --arbol  parse tree del archivo
- *     --ast     AST de cada modulo      --tabla  tabla de simbolos con la memoria
- *     --c3d     cuartetas generadas     --ejecutar  corre las cuartetas (entrada por stdin)
- *     --c RUTA  escribe el programa en C en RUTA
- */
 public class Compilador {
 
     private final ListaErrores errores = new ListaErrores();
-    /** El parser del ultimo archivo; hace falta para imprimir su arbol con nombres de regla. */
     private Parser ultimoParser;
     private ParserRuleContext ultimoArbol;
-    /* Del archivo que se compila (no de sus imports), para --arbol. */
     private Parser parserPrincipal;
     private ParserRuleContext arbolPrincipal;
     private List<Programa> modulos = List.of();
@@ -67,11 +53,6 @@ public class Compilador {
         return errores;
     }
 
-    /**
-     * Analiza un archivo segun su extension y construye su AST. Devuelve null
-     * si hubo errores lexicos o sintacticos: sobre un parse tree incompleto el
-     * AST no tendria sentido.
-     */
     public Programa analizar(Path archivo) throws IOException {
         String nombre = archivo.getFileName().toString();
         errores.setArchivoActual(nombre);
@@ -106,12 +87,6 @@ public class Compilador {
         };
     }
 
-    /**
-     * Compila un archivo completo hasta el semantico. Un .pig arrastra lo que
-     * importa; un .y o .z se analiza solo. Devuelve null si hubo errores antes
-     * del semantico (de parseo o de imports): con archivos faltantes o rotos,
-     * el semantico reportaria en cascada cosas que no existen.
-     */
     public ResultadoSemantico compilar(Path archivo) throws IOException {
         Programa principal = analizar(archivo);
         parserPrincipal = ultimoParser;
@@ -128,17 +103,14 @@ public class Compilador {
         return new AnalizadorSemantico(errores).analizar(modulos);
     }
 
-    /** Cuartetas de un programa sin errores. */
     public ListaCuartetas generarCuartetas(ResultadoSemantico resultado) {
         return new GeneradorCuartetas().generar(resultado);
     }
 
-    /** El programa en C, listo para gcc. */
     public String traducirAC(ListaCuartetas cuartetas) {
         return new TraductorC().traducir(cuartetas);
     }
 
-    /** El lexer del lenguaje segun la extension, ya conectado a la lista de errores. */
     private Lexer crearLexer(String nombre, CharStream entrada) {
         Lexer lexer;
         if (nombre.endsWith(".y")) {
@@ -259,7 +231,6 @@ public class Compilador {
     private static void imprimirTokens(Lexer lexer) {
         for (Token t = lexer.nextToken(); t.getType() != Token.EOF; t = lexer.nextToken()) {
             if (t.getChannel() == Token.DEFAULT_CHANNEL) {
-                // INDENT y DEDENT de Y? no estan en el vocabulario del lexer; su texto ya los describe
                 String nombre = lexer.getVocabulary().getSymbolicName(t.getType());
                 String texto = t.getText().replace("\n", "\\n").replace("\r", "\\r");
                 System.out.printf("  %3d:%-3d %-14s %s%n", t.getLine(), t.getCharPositionInLine(),

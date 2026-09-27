@@ -1,4 +1,4 @@
-# Manual de usuario — Contacto 3xtrat3rr3str3D
+  # Manual de usuario — Contacto 3xtrat3rr3str3D
 
 Contacto 3xtrat3rr3str3D compila programas escritos en tres lenguajes —**Y?**, **Zetariano**
 y **PigLatin**— a código de tres direcciones y a un programa en **C** que se puede compilar y
@@ -25,8 +25,6 @@ carpeta usada.
 ---
 
 ## 2. La ventana
-
-![Ventana principal](capturas/01_programa_ejecutado.png)
 
 | Zona | Para qué |
 |---|---|
@@ -73,28 +71,20 @@ Se compila **el archivo de la pestaña activa**:
 
 ### 4.1 Errores
 
-![Errores semánticos](capturas/05_errores_semanticos.png)
-
 La pestaña **Errores** lista cada error con su tipo (léxico en rojo, sintáctico en naranja,
 semántico en amarillo), archivo, línea, columna, lexema y una descripción que dice qué se
 esperaba. Los errores también se **subrayan en el editor**; al pasar el mouse sobre el
 subrayado aparece la descripción. **Doble clic** en un error abre el archivo (aunque sea un
 import) y lleva a la línea.
 
-![Errores léxicos y sintácticos](capturas/06_errores_sintacticos.png)
-
 Si hay errores léxicos o sintácticos no se hace el análisis semántico, y si hay cualquier
 error no se generan cuartetas ni C.
 
 ### 4.2 Cuartetas y tabla de símbolos
 
-![Cuartetas](capturas/02_cuartetas.png)
-
 **Cuartetas** muestra el código de tres direcciones: cada función empieza con
 `funcion nombre:`, los saltos usan etiquetas `L0`, `L1`… y los valores intermedios
 temporales `t0`, `t1`…
-
-![Tabla de símbolos](capturas/03_tabla_simbolos.png)
 
 **Tabla de símbolos** lista cada variable, parámetro, función, estructura y clase, con su
 ámbito y su lugar en memoria: `STACK` (relativo al marco de la función), `GLOBAL` (variables
@@ -102,8 +92,6 @@ de `VARIABILES>`) o, para campos y atributos, su desplazamiento dentro de la est
 objeto. Se puede ordenar haciendo clic en una columna.
 
 ### 4.3 Código C
-
-![Código C](capturas/04_codigo_c.png)
 
 **Código C** muestra el programa traducido. Con **Generar C** (`F6`) queda guardado en
 `salida/<nombre>.c`; con **Compilar > Guardar código C como...** se elige dónde. Para

@@ -9,25 +9,11 @@ import com.usac.contacto3d.simbolos.SimboloVariable;
 
 import java.util.List;
 
-/**
- * Variable simple, estructura u objeto, con o sin valor inicial.
- *
- *   entero x = 5                 Y?
- *   Persona p = new Persona();   Zetariano (tambien los atributos de una clase)
- *   esto x : numerus 5;          PigLatin
- *
- * Los arreglos con dimension en la declaracion (entero a[10]) son DeclaracionArreglo.
- */
 public class DeclaracionVariable extends Nodo implements Instruccion {
 
     private final String nombre;
-    /** No es final: el semantico cambia ESTRUCTURA por OBJETO cuando el nombre resulta ser una clase. */
     private Tipo tipo;
     private final Expresion valor;
-    /**
-     * True en la forma rapida de PigLatin "esto x : verum;", donde el tipo sale
-     * del literal. Si es valida o no lo decide el semantico.
-     */
     private final boolean tipoImplicito;
 
     public DeclaracionVariable(String nombre, Tipo tipo, Expresion valor, boolean tipoImplicito,
@@ -50,7 +36,6 @@ public class DeclaracionVariable extends Nodo implements Instruccion {
     public boolean tieneValor()      { return valor != null; }
     public boolean esTipoImplicito() { return tipoImplicito; }
 
-    /** Lo resuelve el semantico; el generador lo usa en vez de volver a buscar el nombre. */
     private SimboloVariable simbolo;
 
     public SimboloVariable getSimbolo() { return simbolo; }

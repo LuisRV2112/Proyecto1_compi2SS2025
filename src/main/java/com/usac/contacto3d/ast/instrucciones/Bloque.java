@@ -5,7 +5,6 @@ import com.usac.contacto3d.ast.Visitante;
 
 import java.util.List;
 
-/** Bloque suelto entre llaves de Zetariano: { ... }. Abre un ambito propio. */
 public class Bloque extends Nodo implements Instruccion {
 
     private final List<Instruccion> instrucciones;

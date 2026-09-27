@@ -21,19 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-/**
- * Tabla de errores lexicos, sintacticos y semanticos.
- *
- * Respecto a la practica se agrega la columna ARCHIVO, porque el proyecto
- * compila varios a la vez, y el doble clic ahora avisa archivo Y linea para
- * que la ventana pueda abrir el archivo correcto antes de saltar.
- */
 public class PanelErrores extends JPanel {
 
     private final Modelo modelo = new Modelo();
     private final JTable tabla = new JTable(modelo);
 
-    /** Se invoca con (archivo, linea) al hacer doble clic. */
     private BiConsumer<String, Integer> alSeleccionar = (archivo, linea) -> { };
 
     public PanelErrores() {
@@ -96,8 +88,6 @@ public class PanelErrores extends JPanel {
         return modelo.errores.size();
     }
 
-    /* ------------------------------------------------------------------ */
-
     private static class Modelo extends AbstractTableModel {
 
         private static final String[] COLUMNAS =
@@ -130,7 +120,6 @@ public class PanelErrores extends JPanel {
         }
     }
 
-    /** Un color por tipo de error, para distinguirlos de un vistazo. */
     private static class Renderer extends DefaultTableCellRenderer {
 
         private static final Color COLOR_LEXICO     = new Color(0xF44747);

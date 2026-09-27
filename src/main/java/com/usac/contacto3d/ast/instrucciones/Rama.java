@@ -6,7 +6,6 @@ import com.usac.contacto3d.ast.expresiones.Expresion;
 
 import java.util.List;
 
-/** Una rama de un Si. La rama por defecto (contrario / else / aliter) tiene condicion null. */
 public class Rama extends Nodo {
 
     private final Expresion condicion;

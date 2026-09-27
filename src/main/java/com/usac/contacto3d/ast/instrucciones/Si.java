@@ -5,13 +5,6 @@ import com.usac.contacto3d.ast.Visitante;
 
 import java.util.List;
 
-/**
- * si/sino/contrario, if/else if/else y si/aliter/finis.
- *
- * Todas las ramas van en una sola lista, la principal primero y la por
- * defecto (si hay) al final. Asi validar "retorna en todos los caminos" es un
- * for sobre las ramas y no un caso especial por cada tipo.
- */
 public class Si extends Nodo implements Instruccion {
 
     private final List<Rama> ramas;

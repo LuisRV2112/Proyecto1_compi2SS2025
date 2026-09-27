@@ -7,11 +7,6 @@ import com.usac.contacto3d.simbolos.SimboloFuncion;
 
 import java.util.List;
 
-/**
- * nombre(args) sin nada a la izquierda. En Y? y PigLatin es una funcion libre;
- * dentro de una clase de Zetariano es un metodo del propio objeto. Cual de
- * los dos lo resuelve el semantico.
- */
 public class LlamadaFuncion extends Expresion implements Instruccion {
 
     private final String nombre;
@@ -26,7 +21,6 @@ public class LlamadaFuncion extends Expresion implements Instruccion {
     public String getNombre()              { return nombre; }
     public List<Expresion> getArgumentos() { return argumentos; }
 
-    /** La sobrecarga elegida (funcion libre o metodo del propio objeto). Lo resuelve el semantico; el generador lo usa en vez de volver a buscar el nombre. */
     private SimboloFuncion funcion;
 
     public SimboloFuncion getFuncion() { return funcion; }

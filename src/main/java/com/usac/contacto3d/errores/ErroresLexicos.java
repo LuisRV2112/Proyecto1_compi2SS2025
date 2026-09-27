@@ -7,16 +7,6 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 
-/**
- * Captura los errores del analisis lexico.
- *
- * Se conecta con:
- *     lexer.removeErrorListeners();
- *     lexer.addErrorListener(new ErroresLexicos(errores));
- *
- * Quitar los listeners por defecto es obligatorio: los de ANTLR imprimen en
- * ingles a consola y NO registran nada, asi que los errores se perderian.
- */
 public class ErroresLexicos extends BaseErrorListener {
 
     private final ListaErrores errores;
@@ -29,8 +19,6 @@ public class ErroresLexicos extends BaseErrorListener {
     public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
                             int linea, int columna, String mensaje, RecognitionException e) {
 
-        // Errores de nuestro propio codigo del lexer (p. ej. la indentacion
-        // de Y?): ya traen el token y un mensaje en espanol.
         if (e instanceof ErrorConMensaje && offendingSymbol instanceof Token token) {
             errores.agregar(TipoError.LEXICO, token.getText(), mensaje, linea, columna + 1);
             return;
@@ -40,10 +28,9 @@ public class ErroresLexicos extends BaseErrorListener {
 
         errores.agregar(TipoError.LEXICO, lexema,
                 "Caracter no reconocido por el lenguaje: '" + lexema + "'",
-                linea, columna + 1);   // ANTLR cuenta columnas desde 0
+                linea, columna + 1);
     }
 
-    /** En errores lexicos offendingSymbol viene null: hay que sacarlo del stream. */
     private String extraerLexema(Recognizer<?, ?> recognizer, String mensaje) {
         if (recognizer instanceof Lexer lexer) {
             String texto = lexer.getErrorDisplay(

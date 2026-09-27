@@ -2,7 +2,6 @@ package com.usac.contacto3d.ast;
 
 import java.util.List;
 
-/** Dibuja el AST con lineas, para depurar desde consola. */
 public final class ImpresorAst {
 
     private ImpresorAst() { }

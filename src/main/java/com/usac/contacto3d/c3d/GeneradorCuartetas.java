@@ -63,45 +63,12 @@ import java.util.Map;
 
 import static com.usac.contacto3d.c3d.Operacion.*;
 
-/**
- * Recorre el AST ya validado y anotado, y produce las cuartetas.
- *
- * Como visitante devuelve DONDE quedo el valor de cada expresion: el nombre de
- * un temporal o una constante. Las instrucciones devuelven null.
- *
- * Modelo de ejecucion (el traductor a C lo respeta tal cual):
- *
- *  - stack y heap son arreglos de celdas; P apunta a la base del marco de la
- *    funcion que se ejecuta y H a la primera celda libre del heap.
- *  - Marco: [0] retorno, [1] this (metodos y constructores), parametros y
- *    locales (las posiciones las asigno el semantico).
- *  - Las globales de VARIABILES> ocupan el fondo del stack, [0, G); el primer
- *    marco empieza en G. Asi tambien se pueden pasar por referencia.
- *  - Cada funcion del lenguaje es una funcion de C y sus temporales son locales
- *    a ella: por eso una llamada recursiva no pisa los temporales pendientes
- *    de quien llama (n * factorial(n - 1)).
- *  - Llamar: se evaluan los argumentos en el marco actual, se escriben en el
- *    marco nuevo (P + tamanio del marco actual), P avanza, call, se lee el
- *    retorno de stack[P] y P vuelve.
- *  - heap[0] es la cadena vacia: null vale 0 y una cadena sin valor imprime "".
- *    Los literales de cadena se cargan una sola vez al arrancar, a partir de
- *    heap[1], asi que cada literal es una direccion constante.
- *  - Una cadena es un caracter por celda terminado en -1.
- *  - Un arreglo guarda sus dimensiones al inicio y despues los datos aplanados:
- *    heap[p] = d1, ..., heap[p+n-1] = dn, datos desde p+n. En Zetariano las
- *    dimensiones solo se conocen al ejecutar, y aplanar m[i][j] las necesita.
- *  - Un objeto son sus atributos seguidos en el heap; una estructura, sus
- *    campos aplanados donde este (stack, global o dentro de un arreglo).
- */
 public class GeneradorCuartetas implements Visitante<String> {
 
-    /** Donde esta un valor: zona y direccion (temporal o constante). */
     private record Ubicacion(boolean enHeap, String direccion) { }
 
-    /** Un paso de una cadena de accesos: o tiene ubicacion (se puede guardar ahi) o solo un valor. */
     private record Paso(Ubicacion ubicacion, String valor, Tipo tipo) { }
 
-    /** Un arreglo recien reservado: su puntero y cuantos elementos tiene. */
     private record Arreglo(String puntero, String total) { }
 
     private final ListaCuartetas codigo = new ListaCuartetas();
@@ -112,7 +79,6 @@ public class GeneradorCuartetas implements Visitante<String> {
     private final Deque<String> destinosRomper = new ArrayDeque<>();
     private final Deque<String> destinosContinuar = new ArrayDeque<>();
 
-    /** Literales de cadena y su direccion en el heap. */
     private final Map<String, Integer> literales = new LinkedHashMap<>();
     private int siguienteLiteral = 1;
 
@@ -144,11 +110,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         return programa;
     }
 
-    /**
-     * Lo que en C es main: carga los literales en el heap, ubica P y H, y
-     * llama a MAIOR>. Se arma al final porque hasta entonces no se conocen
-     * todos los literales.
-     */
     private void arranque(ListaCuartetas programa, ResultadoSemantico resultado) {
         programa.agregar(FUNCION, "main", null, null);
         programa.agregar(ESCRIBIR_HEAP, "0", "-1", null);
@@ -169,13 +130,10 @@ public class GeneradorCuartetas implements Visitante<String> {
         programa.agregar(FIN_FUNCION, "main", null, null);
     }
 
-    /* ======================== Funciones ======================== */
-
     private void generarFuncion(SimboloFuncion funcion, List<Instruccion> cuerpo,
                                 List<DeclaracionVariable> atributos) {
         funcionActual = funcion;
         emitir(FUNCION, funcion.getEtiqueta(), null, null);
-        // Los valores iniciales de los atributos van al principio de cada constructor
         for (DeclaracionVariable atributo : atributos) {
             if (atributo.tieneValor()) {
                 Ubicacion ubicacion = new Ubicacion(true,
@@ -202,7 +160,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         claseActual = null;
     }
 
-    /** Sin constructores declarados, new Clase() igual tiene que inicializar los atributos. */
     private static SimboloFuncion constructorImplicito(DeclaracionClase clase) {
         SimboloFuncion implicito = new SimboloFuncion(clase.getNombre(), Tipo.VACIO, new ArrayList<>(), true,
                 clase.getNombre(), clase.getArchivo(), clase.getLinea(), clase.getColumna());
@@ -211,7 +168,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         return implicito;
     }
 
-    /** Las globales se inicializan al empezar MAIOR>, en orden, antes de su primera instruccion. */
     private void generarPrincipal(Programa modulo, SimboloFuncion principal) {
         funcionActual = principal;
         emitir(FUNCION, principal.getEtiqueta(), null, null);
@@ -220,10 +176,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         emitir(FIN_FUNCION, principal.getEtiqueta(), null, null);
     }
 
-    /**
-     * Secuencia de llamada. Los argumentos se evaluan ANTES de mover P: pueden
-     * usar variables del marco actual (y hasta otras llamadas).
-     */
     private String llamar(SimboloFuncion funcion, List<Expresion> argumentos, String objeto) {
         List<SimboloVariable> parametros = funcion.getParametros();
         List<Object> valores = new ArrayList<>();
@@ -232,7 +184,6 @@ public class GeneradorCuartetas implements Visitante<String> {
             Expresion argumento = argumentos.get(i);
             if (parametro.getTipo().esEstructura()) {
                 Ubicacion ubicacion = recorrer((Acceso) argumento).ubicacion();
-                // Por referencia viaja la direccion; por valor, se copia la estructura entera
                 valores.add(parametro.esPorReferencia() ? ubicacion.direccion() : ubicacion);
             } else {
                 valores.add(valorPara(argumento, parametro.getTipo()));
@@ -261,8 +212,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         return retorno;
     }
 
-    /* ======================== Instrucciones ======================== */
-
     private void instrucciones(List<Instruccion> lista) {
         lista.forEach(instruccion -> instruccion.aceptar(this));
     }
@@ -285,7 +234,7 @@ public class GeneradorCuartetas implements Visitante<String> {
         int rango = nodo.getDimensiones().size();
         String puntero;
         if (nodo.tieneValor() && !(nodo.getValor() instanceof LiteralLista)) {
-            puntero = evaluar(nodo.getValor());   // otro arreglo: se comparte la referencia
+            puntero = evaluar(nodo.getValor());
         } else {
             List<String> dimensiones = nodo.getDimensiones().stream().map(this::evaluar).toList();
             Arreglo arreglo = reservarArreglo(dimensiones, tamanio(elemento));
@@ -300,7 +249,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         return null;
     }
 
-    /** La estructura ya quedo registrada en el semantico; no genera codigo. */
     @Override
     public String visitarDeclaracionEstructura(DeclaracionEstructura nodo) {
         return null;
@@ -316,7 +264,6 @@ public class GeneradorCuartetas implements Visitante<String> {
     public String visitarAsignacion(Asignacion nodo) {
         Acceso destino = nodo.getDestino();
         Tipo tipo = destino.getTipo();
-        // Como en Java, primero se ubica el destino y despues se evalua el valor
         Ubicacion ubicacion = recorrer(destino).ubicacion();
         if (!nodo.esCompuesta()) {
             inicializarCon(ubicacion, tipo, nodo.getValor());
@@ -330,14 +277,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         return null;
     }
 
-    /**
-     *     if_false c1 goto L1      (una rama por condicion)
-     *     ...cuerpo 1...
-     *     goto Lfin
-     * L1: if_false c2 goto L2
-     *     ...
-     * Lfin:
-     */
     @Override
     public String visitarSi(Si nodo) {
         String fin = etiqueta();
@@ -356,11 +295,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         return null;
     }
 
-    /**
-     * Primero todas las comparaciones, despues los cuerpos seguidos en el
-     * orden del codigo: asi un caso sin romper cae al siguiente (fall-through)
-     * sin hacer nada especial, y romper salta a Lfin.
-     */
     @Override
     public String visitarElegir(Elegir nodo) {
         String valor = evaluar(nodo.getValor());
@@ -390,12 +324,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         return null;
     }
 
-    /**
-     * Linicio: if_false cond goto Lfin
-     *          ...cuerpo...           romper -> Lfin, continuar -> Linicio
-     *          goto Linicio
-     * Lfin:
-     */
     @Override
     public String visitarMientras(Mientras nodo) {
         String inicio = etiqueta();
@@ -408,7 +336,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         return null;
     }
 
-    /** La condicion va al final; continuar salta a ella, no al inicio del cuerpo. */
     @Override
     public String visitarHacer(Hacer nodo) {
         String inicio = etiqueta();
@@ -422,7 +349,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         return null;
     }
 
-    /** Un mientras con el inicio antes y la actualizacion al final; continuar va a la actualizacion. */
     @Override
     public String visitarPara(Para nodo) {
         instrucciones(nodo.getInicio());
@@ -441,7 +367,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         return null;
     }
 
-    /** Cada ciclo apila sus etiquetas: en ciclos anidados, romper sale solo del mas interno. */
     private void cuerpoDeCiclo(List<Instruccion> cuerpo, String romper, String continuar) {
         destinosRomper.push(romper);
         destinosContinuar.push(continuar);
@@ -477,8 +402,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         return null;
     }
 
-    /* ======================== Expresiones ======================== */
-
     @Override
     public String visitarLiteral(Literal nodo) {
         return switch (nodo.getTipo().getBase()) {
@@ -494,7 +417,6 @@ public class GeneradorCuartetas implements Visitante<String> {
     public String visitarOperacionBinaria(OperacionBinaria nodo) {
         Operador operador = nodo.getOperador();
         if (operador == Operador.AND || operador == Operador.OR) {
-            // Cortocircuito: si la izquierda ya decide, la derecha no se evalua
             String resultado = temporal();
             String fin = etiqueta();
             emitir(ASIGNAR, evaluar(nodo.getIzquierda()), null, resultado);
@@ -509,11 +431,6 @@ public class GeneradorCuartetas implements Visitante<String> {
                 nodo.getTipo(), nodo);
     }
 
-    /**
-     * Traduce un operador segun los tipos que ya fijo el semantico: + con una
-     * cadena concatena, / entre enteros trunca, == entre cadenas compara el
-     * contenido.
-     */
     private String aritmetica(Operador operador, String a, Tipo tipoA, String b, Tipo tipoB,
                               Tipo resultado, Nodo nodo) {
         return switch (operador) {
@@ -565,10 +482,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         return paso.ubicacion() != null ? cargar(paso.ubicacion()) : paso.valor();
     }
 
-    /**
-     * Recorre una cadena de accesos de izquierda a derecha. Mientras se pueda
-     * se lleva la UBICACION (para poder guardar ahi); un metodo solo deja un valor.
-     */
     private Paso recorrer(Acceso acceso) {
         Paso actual;
         if (acceso.esThis()) {
@@ -590,7 +503,6 @@ public class GeneradorCuartetas implements Visitante<String> {
                 case SufijoAtributo atributo -> {
                     SimboloEstructura.Campo campo = atributo.getCampo();
                     if (actual.tipo().esEstructura()) {
-                        // La estructura esta aplanada: el campo es un desplazamiento en la misma zona
                         actual = new Paso(desplazar(actual.ubicacion(), campo.getOffset()), null, campo.getTipo());
                     } else {
                         String objeto = valorDe(actual);
@@ -625,13 +537,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         return paso.ubicacion() != null ? cargar(paso.ubicacion()) : paso.valor();
     }
 
-    /**
-     * m[i][j] con el arreglo aplanado:
-     *     posicion = i * d2 + j                (y en general, Horner sobre las dimensiones)
-     *     direccion = puntero + rango + posicion * tamanioElemento
-     * Las dimensiones se leen de la cabecera del arreglo, y cada indice se
-     * verifica contra la suya.
-     */
     private Ubicacion indexar(String arreglo, List<SufijoIndice> indices, Tipo tipoArreglo) {
         verificarNulo(arreglo, indices.get(0));
         int rango = indices.size();
@@ -649,14 +554,12 @@ public class GeneradorCuartetas implements Visitante<String> {
         return new Ubicacion(true, operar(SUMA, sumar(arreglo, rango), desplazamiento));
     }
 
-    /** Dentro de una clase puede ser un metodo del propio objeto: recibe el mismo this. */
     @Override
     public String visitarLlamadaFuncion(LlamadaFuncion nodo) {
         SimboloFuncion funcion = nodo.getFuncion();
         return llamar(funcion, nodo.getArgumentos(), funcion.esMetodo() ? cargarThis() : null);
     }
 
-    /** Reserva los atributos en el heap (nuevos, valen 0) y llama al constructor con ese this. */
     @Override
     public String visitarNuevoObjeto(NuevoObjeto nodo) {
         SimboloEstructura clase = nodo.getSimboloClase();
@@ -677,7 +580,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         return arreglo.puntero();
     }
 
-    /** Solo llega aqui como valor de un arreglo: el semantico ya le puso las dimensiones que trae. */
     @Override
     public String visitarLiteralLista(LiteralLista nodo) {
         return arregloDesdeLiteral(nodo);
@@ -706,7 +608,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         return resultado;
     }
 
-    /** "x <<" convierte el texto leido al tipo de x. */
     @Override
     public String visitarLeer(Leer nodo) {
         String texto = temporal();
@@ -723,12 +624,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         return texto;
     }
 
-    /* ==================== Valores compuestos ==================== */
-
-    /**
-     * Guarda un valor en una ubicacion. Una estructura se copia campo a campo
-     * (o se llena desde su lista {...}); lo demas ocupa una celda.
-     */
     private void inicializarCon(Ubicacion destino, Tipo tipo, Expresion valor) {
         if (tipo.esEstructura()) {
             if (valor instanceof LiteralLista lista) {
@@ -745,7 +640,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         guardar(destino, valorPara(valor, tipo));
     }
 
-    /** Una lista {...} en lugar de un arreglo crea el arreglo; cualquier otra cosa se evalua. */
     private String valorPara(Expresion valor, Tipo esperado) {
         if (valor instanceof LiteralLista lista && esperado.esArreglo()) {
             return arregloDesdeLiteral(lista);
@@ -761,7 +655,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         return arreglo.puntero();
     }
 
-    /** Escribe la cabecera con las dimensiones y avanza H lo que ocupan los datos. */
     private Arreglo reservarArreglo(List<String> dimensiones, int tamanioElemento) {
         String puntero = temporal();
         emitir(ASIGNAR, "H", null, puntero);
@@ -777,7 +670,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         return new Arreglo(puntero, total);
     }
 
-    /** Los valores anidados se escriben en orden de filas, igual que el aplanado. */
     private void llenarArreglo(String puntero, int rango, Tipo elemento, LiteralLista lista) {
         List<Expresion> valores = aplanar(lista, rango);
         int tamanio = tamanio(elemento);
@@ -797,10 +689,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         return planos;
     }
 
-    /**
-     * Valor por defecto de una declaracion sin valor. El stack se reutiliza
-     * entre llamadas, asi que hay que escribir el 0: la celda puede tener basura.
-     */
     private void porDefecto(Ubicacion ubicacion, Tipo tipo) {
         if (tipo.esEstructura()) {
             inicializarEstructura(ubicacion, tabla.buscarTipo(tipo.getNombre()));
@@ -809,7 +697,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         }
     }
 
-    /** Campos a 0; los arreglos con dimensiones constantes se reservan (entero notas[10]). */
     private void inicializarEstructura(Ubicacion ubicacion, SimboloEstructura estructura) {
         for (SimboloEstructura.Campo campo : estructura.getCampos().values()) {
             Ubicacion celda = desplazar(ubicacion, campo.getOffset());
@@ -827,11 +714,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         }
     }
 
-    /**
-     * El heap nuevo ya vale 0 (H solo avanza), asi que un arreglo de
-     * primitivos no necesita nada. Solo un arreglo de estructuras con arreglos
-     * adentro necesita recorrer sus elementos para reservarlos.
-     */
     private void inicializarElementos(Arreglo arreglo, int rango, Tipo elemento) {
         if (!elemento.esEstructura()) {
             return;
@@ -875,8 +757,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         }
     }
 
-    /* ==================== Verificaciones en ejecucion ==================== */
-
     private void verificarNulo(String puntero, Nodo nodo) {
         String seguir = etiqueta();
         emitir(IF_TRUE, operar(DIFERENTE, puntero, "0"), null, seguir);
@@ -899,13 +779,6 @@ public class GeneradorCuartetas implements Visitante<String> {
                 + nodo.getLinea() + ": " + mensaje), null, null);
     }
 
-    /* ======================== Memoria ======================== */
-
-    /**
-     * Globales: posicion absoluta en el fondo del stack. Locales y parametros:
-     * relativa a P. Un parametro {} Estructura guarda la direccion de la
-     * estructura, asi que hay que leerla primero.
-     */
     private Ubicacion ubicacionDe(SimboloVariable variable) {
         if (variable.getAlmacenamiento() == Simbolo.Almacenamiento.GLOBAL) {
             return new Ubicacion(false, String.valueOf(variable.getPosicion()));
@@ -944,8 +817,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         return new ArrayList<>(tabla.buscarTipo(estructura.getNombre()).getCampos().values());
     }
 
-    /* ======================== Utilidades ======================== */
-
     private String evaluar(Expresion expresion) {
         return expresion.aceptar(this);
     }
@@ -968,7 +839,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         return resultado;
     }
 
-    /** base + celdas; con constantes se calcula aqui, sin emitir nada. */
     private String sumar(String base, int celdas) {
         if (celdas == 0) {
             return base;
@@ -993,7 +863,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         return operando.matches("-?\\d+");
     }
 
-    /** Direccion del literal en el heap; el mismo texto se guarda una sola vez. */
     private String literal(String texto) {
         Integer direccion = literales.get(texto);
         if (direccion == null) {
@@ -1004,7 +873,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         return String.valueOf(direccion);
     }
 
-    /** Como imprimir o convertir un valor. El bool se escribe con las palabras de su lenguaje. */
     private static String etiquetaTipo(Tipo tipo, Nodo nodo) {
         return switch (tipo.getBase()) {
             case FLOTANTE -> "flotante";
@@ -1017,8 +885,6 @@ public class GeneradorCuartetas implements Visitante<String> {
             default -> "entero";
         };
     }
-
-    /* ==== Nodos que se generan desde su contenedor, no visitandolos sueltos ==== */
 
     @Override
     public String visitarPrograma(Programa nodo) {

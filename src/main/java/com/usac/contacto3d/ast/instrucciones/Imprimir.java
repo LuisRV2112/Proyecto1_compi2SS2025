@@ -6,10 +6,6 @@ import com.usac.contacto3d.ast.expresiones.Expresion;
 
 import java.util.List;
 
-/**
- * imprimir(...) de Y?, println/print de Zetariano y >> de PigLatin.
- * Los valores se imprimen seguidos; saltoLinea es false solo en print.
- */
 public class Imprimir extends Nodo implements Instruccion {
 
     private final List<Expresion> valores;

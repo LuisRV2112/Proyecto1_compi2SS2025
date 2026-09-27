@@ -16,15 +16,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Marca los errores sobre el propio codigo, con subrayado ondulado y tooltip.
- *
- * NO vuelve a analizar nada: recibe la lista de errores que ya produjo el
- * compilador y solo la traduce a marcas que RSyntaxTextArea sabe dibujar.
- *
- * Filtra por archivo, porque el editor muestra uno a la vez pero la lista
- * contiene los errores de todos los archivos compilados.
- */
 public class ParserErrores extends AbstractParser {
 
     private static final Color COLOR_LEXICO     = new Color(0xF44747);
@@ -34,7 +25,6 @@ public class ParserErrores extends AbstractParser {
     private List<ErrorCompilacion> errores = new ArrayList<>();
     private String archivoMostrado = "";
 
-    /** Actualiza las marcas del archivo que se esta viendo. */
     public void setErrores(ListaErrores lista, String archivoMostrado) {
         this.archivoMostrado = archivoMostrado == null ? "" : archivoMostrado;
         this.errores = new ArrayList<>();
@@ -60,7 +50,7 @@ public class ParserErrores extends AbstractParser {
         int totalLineas = raiz.getElementCount();
 
         for (ErrorCompilacion error : errores) {
-            int linea = error.getLinea() - 1;   // RSyntaxTextArea cuenta desde 0
+            int linea = error.getLinea() - 1;
             if (linea < 0 || linea >= totalLineas) {
                 continue;
             }
@@ -72,8 +62,6 @@ public class ParserErrores extends AbstractParser {
             int inicio = Math.min(inicioLinea + Math.max(0, error.getColumna() - 1), finLinea);
             int largo = error.getLexema().isEmpty() ? finLinea - inicio : error.getLexema().length();
 
-            // Algunos errores se ubican en la declaracion pero hablan de otra palabra de la
-            // linea (el tipo no declarado de un campo): se subraya esa palabra, la mas cercana
             int encontrado = buscarEnLinea(documento, inicioLinea, finLinea, error.getLexema(), inicio);
             if (encontrado >= 0) {
                 inicio = encontrado;
@@ -94,11 +82,10 @@ public class ParserErrores extends AbstractParser {
         return resultado;
     }
 
-    /** Posicion de la aparicion del lexema mas cercana a 'cerca', o -1 si no esta en la linea. */
     private static int buscarEnLinea(RSyntaxDocument documento, int inicioLinea, int finLinea,
                                      String lexema, int cerca) {
         if (lexema.isBlank() || lexema.startsWith("<")) {
-            return -1;   // "<fin de linea>" y compania no son texto de la linea
+            return -1;
         }
         try {
             String texto = documento.getText(inicioLinea, finLinea - inicioLinea);

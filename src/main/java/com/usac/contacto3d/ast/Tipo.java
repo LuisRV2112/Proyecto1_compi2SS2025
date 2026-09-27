@@ -5,35 +5,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Sistema de tipos unificado para los tres lenguajes.
- *
- * Los tres usan los mismos tipos con nombres distintos, asi que aqui se
- * normalizan:
- *
- *   Y?          Zetariano    PigLatin      Base
- *   entero      int          numerus       ENTERO
- *   flotante    double       decimalis     FLOTANTE
- *   cadena      String       textum        CADENA
- *   caracter    char         littera       CARACTER
- *   bool        boolean      bool          BOOLEANO
- *   -           void         -             VACIO
- *
- * Novedades respecto a la practica:
- *   - ARREGLO lleva una lista de dimensiones (matrices de N dimensiones)
- *   - OBJETO para las clases de Zetariano, que viven en el heap
- *   - getTamanio() en celdas, que el generador de C3D usa para los offsets
- */
 public class Tipo {
 
     public enum Base {
         ENTERO, FLOTANTE, CADENA, CARACTER, BOOLEANO,
-        ESTRUCTURA,  // estructura de Y? / PigLatin: vive en el stack
-        OBJETO,      // clase de Zetariano: vive en el heap
+        ESTRUCTURA,
+        OBJETO,
         ARREGLO,
-        VACIO,       // funciones sin retorno
-        NULO,        // literal null de Zetariano
-        ERROR        // se propaga tras un error, evita cascadas
+        VACIO,
+        NULO,
+        ERROR
     }
 
     public static final Tipo ENTERO    = new Tipo(Base.ENTERO,    null, null, List.of());
@@ -46,16 +27,14 @@ public class Tipo {
     public static final Tipo ERROR     = new Tipo(Base.ERROR,     null, null, List.of());
 
     private final Base base;
-    private final String nombre;            // ESTRUCTURA u OBJETO
-    private final Tipo tipoElemento;        // ARREGLO
-    private final List<Integer> dimensiones; // ARREGLO; null = no evaluable
+    private final String nombre;
+    private final Tipo tipoElemento;
+    private final List<Integer> dimensiones;
 
     private Tipo(Base base, String nombre, Tipo tipoElemento, List<Integer> dimensiones) {
         this.base = base;
         this.nombre = nombre;
         this.tipoElemento = tipoElemento;
-        // No List.copyOf: rechaza null, y una dimension null es valida ("no evaluable",
-        // como en el parametro [] entero a o en int[][] antes del new)
         this.dimensiones = dimensiones == null ? List.of()
                 : Collections.unmodifiableList(new ArrayList<>(dimensiones));
     }
@@ -68,7 +47,6 @@ public class Tipo {
         return new Tipo(Base.OBJETO, nombre, null, List.of());
     }
 
-    /** Arreglo de N dimensiones. Una dimension null significa "no evaluable". */
     public static Tipo arreglo(Tipo tipoElemento, List<Integer> dimensiones) {
         return new Tipo(Base.ARREGLO, null, tipoElemento, dimensiones);
     }
@@ -77,10 +55,6 @@ public class Tipo {
         return arreglo(tipoElemento, List.of());
     }
 
-    /**
-     * Normaliza la palabra de tipo de CUALQUIERA de los tres lenguajes.
-     * Lo que no reconoce se asume tipo definido por el usuario.
-     */
     public static Tipo desdePalabra(String palabra) {
         return switch (palabra) {
             case "entero", "int", "numerus"        -> ENTERO;
@@ -103,7 +77,6 @@ public class Tipo {
     public boolean esObjeto()     { return base == Base.OBJETO; }
     public boolean esError()      { return base == Base.ERROR; }
 
-    /** Los objetos y arreglos viven en el heap; el resto en el stack. */
     public boolean viveEnHeap() {
         return base == Base.ARREGLO || base == Base.OBJETO || base == Base.CADENA;
     }
@@ -115,7 +88,6 @@ public class Tipo {
         };
     }
 
-    /** Participa en aritmetica y comparaciones (todo menos cadena). */
     public boolean esNumerico() {
         return switch (base) {
             case ENTERO, FLOTANTE, CARACTER, BOOLEANO -> true;
@@ -123,10 +95,6 @@ public class Tipo {
         };
     }
 
-    /**
-     * Jerarquia para la inferencia implicita: al operar dos tipos, el
-     * resultado toma el de jerarquia mas alta.
-     */
     public int getJerarquia() {
         return switch (base) {
             case CADENA   -> 5;
@@ -142,20 +110,10 @@ public class Tipo {
         return a.getJerarquia() >= b.getJerarquia() ? a : b;
     }
 
-    /**
-     * Tamanio en celdas de memoria. Lo usa el generador de C3D para calcular
-     * offsets dentro del stack.
-     *
-     * Los primitivos ocupan una celda. Los arreglos y objetos tambien, porque
-     * lo que se guarda en el stack es el PUNTERO al heap, no el contenido.
-     * Las estructuras se aplanan: ocupan la suma de sus campos, y por eso el
-     * tamanio real lo calcula la tabla de simbolos, no esta clase.
-     */
     public int getTamanio() {
         return 1;
     }
 
-    /** Cantidad total de celdas de un arreglo, si todas sus dimensiones se conocen. */
     public Integer getTotalElementos() {
         if (!esArreglo() || dimensiones.isEmpty()) {
             return null;
@@ -199,7 +157,6 @@ public class Tipo {
         return base == otro.base
                 && Objects.equals(nombre, otro.nombre)
                 && Objects.equals(tipoElemento, otro.tipoElemento);
-        // Las dimensiones NO entran: un arreglo de 3 y uno de 5 son asignables.
     }
 
     @Override

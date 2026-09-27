@@ -8,18 +8,6 @@ import com.usac.contacto3d.ast.instrucciones.Instruccion;
 
 import java.util.List;
 
-/**
- * Raiz del AST de UN archivo.
- *
- * Tiene lugar para lo que puede traer cualquiera de los tres lenguajes; cada
- * uno llena solo lo suyo y deja el resto vacio:
- *
- *   Y?         estructuras, funciones
- *   Zetariano  clases (una sola)
- *   PigLatin   importaciones, globales (VARIABILES>), funciones (MUNERA>), principal (MAIOR>)
- *
- * El resolvedor de imports de la fase 3 junta los Programa de todos los archivos.
- */
 public class Programa extends Nodo {
 
     private final Lenguaje lenguaje;

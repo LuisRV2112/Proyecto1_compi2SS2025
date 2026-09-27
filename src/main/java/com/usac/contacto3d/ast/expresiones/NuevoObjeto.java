@@ -7,7 +7,6 @@ import com.usac.contacto3d.simbolos.SimboloFuncion;
 
 import java.util.List;
 
-/** new Clase(args) de Zetariano y novus Clase(args) de PigLatin. El objeto vive en el heap. */
 public class NuevoObjeto extends Expresion {
 
     private final String clase;
@@ -22,13 +21,11 @@ public class NuevoObjeto extends Expresion {
     public String getClase()               { return clase; }
     public List<Expresion> getArgumentos() { return argumentos; }
 
-    /** La clase, con su tamanio. Lo resuelve el semantico; el generador lo usa en vez de volver a buscar el nombre. */
     private SimboloEstructura simboloClase;
 
     public SimboloEstructura getSimboloClase() { return simboloClase; }
     public void setSimboloClase(SimboloEstructura simboloClase) { this.simboloClase = simboloClase; }
 
-    /** La sobrecarga elegida; null si la clase no declara constructores (el implicito, sin parametros). */
     private SimboloFuncion constructor;
 
     public SimboloFuncion getConstructor() { return constructor; }

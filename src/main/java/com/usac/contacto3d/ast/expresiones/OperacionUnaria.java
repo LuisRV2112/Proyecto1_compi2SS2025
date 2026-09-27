@@ -5,7 +5,6 @@ import com.usac.contacto3d.ast.Visitante;
 
 import java.util.List;
 
-/** Negativo (-x) o negacion logica (!x, non x). */
 public class OperacionUnaria extends Expresion {
 
     private final Operador operador;

@@ -6,11 +6,6 @@ import com.usac.contacto3d.ast.Visitante;
 
 import java.util.List;
 
-/**
- * Valor constante. El valor ya viene convertido: Integer, Double, String (sin
- * comillas y con los escapes resueltos), Character, Boolean, o null para el
- * null de Zetariano.
- */
 public class Literal extends Expresion {
 
     private final Object valor;

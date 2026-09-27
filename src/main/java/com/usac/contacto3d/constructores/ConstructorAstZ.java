@@ -50,14 +50,6 @@ import java.util.List;
 import static com.usac.contacto3d.constructores.Ayudante.columna;
 import static com.usac.contacto3d.constructores.Ayudante.linea;
 
-/**
- * Convierte el parse tree de Zetariano en el AST comun.
- *
- * Dos normalizaciones propias de este lenguaje:
- *  - "int x, y = 5;" se separa en una DeclaracionVariable por nombre
- *  - "if / else if / else" encadenados se aplanan en un solo Si con varias
- *    ramas, igual que el si/sino de Y?
- */
 public class ConstructorAstZ extends ZetarianoBaseVisitor<Nodo> {
 
     private final String archivo;
@@ -71,8 +63,6 @@ public class ConstructorAstZ extends ZetarianoBaseVisitor<Nodo> {
         Ayudante.asignarArchivo(programa, archivo);
         return programa;
     }
-
-    /* ---------- clase ---------- */
 
     private DeclaracionClase clase(ClaseContext ctx) {
         List<DeclaracionVariable> atributos = new ArrayList<>();
@@ -116,20 +106,18 @@ public class ConstructorAstZ extends ZetarianoBaseVisitor<Nodo> {
         }
         return ctx.parametro().stream().map(p -> {
             Tipo tipo = tipo(p.tipo());
-            // Como en Java: arreglos y objetos pasan por referencia, sin marca
             boolean referencia = tipo.esArreglo() || tipo.esObjeto();
             return new Parametro(p.ID().getText(), tipo, referencia, linea(p.ID()), columna(p.ID()));
         }).toList();
     }
 
-    /** En Zetariano un tipo con nombre siempre es una clase: no hay estructuras. */
     private Tipo tipo(TipoContext ctx) {
         Tipo tipo = tipoBase(ctx.tipoBase());
         if (ctx.CORCH_A().isEmpty()) {
             return tipo;
         }
         List<Integer> dimensiones = new ArrayList<>();
-        ctx.CORCH_A().forEach(c -> dimensiones.add(null));   // el tamanio llega con el new
+        ctx.CORCH_A().forEach(c -> dimensiones.add(null));
         return Tipo.arreglo(tipo, dimensiones);
     }
 
@@ -137,8 +125,6 @@ public class ConstructorAstZ extends ZetarianoBaseVisitor<Nodo> {
         Tipo tipo = Tipo.desdePalabra(ctx.getText());
         return tipo.esEstructura() ? Tipo.objeto(tipo.getNombre()) : tipo;
     }
-
-    /* ---------- instrucciones ---------- */
 
     private List<Instruccion> bloque(BloqueContext ctx) {
         return instrucciones(ctx.instruccion());
@@ -156,7 +142,6 @@ public class ConstructorAstZ extends ZetarianoBaseVisitor<Nodo> {
         return lista;
     }
 
-    /** Cuerpo de if/while/for: sin llaves es una sola instruccion. */
     private List<Instruccion> cuerpo(InstruccionContext ctx) {
         return ctx instanceof InstBloqueContext b ? bloque(b.bloque()) : instrucciones(List.of(ctx));
     }
@@ -306,19 +291,12 @@ public class ConstructorAstZ extends ZetarianoBaseVisitor<Nodo> {
                 linea(ctx), columna(ctx));
     }
 
-    /**
-     * Lado izquierdo de una asignacion o un incremento. La gramatica deja pasar
-     * "f() = 3": se envuelve en un Acceso para que el semantico lo reporte como
-     * no asignable en vez de fallar aqui.
-     */
     private Acceso destino(AccesoContext ctx) {
         Nodo nodo = visit(ctx);
         return nodo instanceof LlamadaFuncion llamada
                 ? Acceso.deLlamada(llamada, List.of(), llamada.getLinea(), llamada.getColumna())
                 : (Acceso) nodo;
     }
-
-    /* ---------- expresiones ---------- */
 
     private Expresion expr(ExprContext ctx) {
         return ctx == null ? null : (Expresion) visit(ctx);
@@ -336,7 +314,7 @@ public class ConstructorAstZ extends ZetarianoBaseVisitor<Nodo> {
 
     @Override
     public Nodo visitExprAgrupacion(ExprAgrupacionContext ctx) {
-        return expr(ctx.expr());   // los parentesis ya fijaron la precedencia: no dejan nodo
+        return expr(ctx.expr());
     }
 
     @Override
@@ -417,7 +395,6 @@ public class ConstructorAstZ extends ZetarianoBaseVisitor<Nodo> {
         return new Leer(null, linea(ctx), columna(ctx));
     }
 
-    /** Una llamada sola, sin nada despues, queda como LlamadaFuncion y no como Acceso. */
     @Override
     public Nodo visitAcceso(AccesoContext ctx) {
         List<Sufijo> sufijos = ctx.sufijo().stream().map(this::sufijo).toList();
@@ -475,9 +452,6 @@ public class ConstructorAstZ extends ZetarianoBaseVisitor<Nodo> {
         return new Literal(null, Tipo.NULO, linea(ctx), columna(ctx));
     }
 
-    /* ---------- recorrido por defecto ---------- */
-
-    // Por si alguna regla cae en visitChildren: que los tokens sueltos no pisen el resultado
     @Override
     protected Nodo aggregateResult(Nodo acumulado, Nodo siguiente) {
         return acumulado != null ? acumulado : siguiente;

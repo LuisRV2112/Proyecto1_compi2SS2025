@@ -6,7 +6,6 @@ import com.usac.contacto3d.simbolos.SimboloFuncion;
 
 import java.util.List;
 
-/** .metodo(args) — llamada a un metodo sobre lo que va a la izquierda. */
 public class SufijoMetodo extends Sufijo {
 
     private final String nombre;
@@ -21,7 +20,6 @@ public class SufijoMetodo extends Sufijo {
     public String getNombre()              { return nombre; }
     public List<Expresion> getArgumentos() { return argumentos; }
 
-    /** La sobrecarga elegida. Lo resuelve el semantico; el generador lo usa en vez de volver a buscar el nombre. */
     private SimboloFuncion metodo;
 
     public SimboloFuncion getMetodo() { return metodo; }

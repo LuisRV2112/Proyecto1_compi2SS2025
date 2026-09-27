@@ -9,11 +9,6 @@ import javax.swing.JTextArea;
 import java.awt.BorderLayout;
 import java.awt.Font;
 
-/**
- * Consola del programa: a la izquierda lo que el programa va a leer (una
- * linea por cada lectura), a la derecha lo que imprimio. La entrada se
- * escribe antes de ejecutar, igual que redirigir un archivo a stdin.
- */
 public class PanelConsola extends JPanel {
 
     private final JTextArea entrada = area(true);

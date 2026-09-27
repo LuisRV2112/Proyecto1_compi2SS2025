@@ -5,7 +5,6 @@ import com.usac.contacto3d.ast.Visitante;
 
 import java.util.List;
 
-/** condicion ? siVerdadero : siFalso — solo Zetariano. */
 public class Ternario extends Expresion {
 
     private final Expresion condicion;

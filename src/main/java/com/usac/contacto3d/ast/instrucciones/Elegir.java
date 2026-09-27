@@ -6,12 +6,6 @@ import com.usac.contacto3d.ast.expresiones.Expresion;
 
 import java.util.List;
 
-/**
- * elegir de Y? y switch de Zetariano.
- *
- * Los casos se guardan en el orden en que aparecen, incluido el por defecto:
- * con fall-through, un default en medio sigue de largo al caso de abajo.
- */
 public class Elegir extends Nodo implements Instruccion {
 
     private final Expresion valor;

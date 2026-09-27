@@ -5,13 +5,6 @@ import com.usac.contacto3d.parser.LenguajeYLexer;
 import org.antlr.v4.runtime.Lexer;
 import org.fife.ui.rsyntaxtextarea.Token;
 
-/**
- * Coloreado de Y?: el tipo de cada token lo decide LenguajeYLexer (el mismo
- * lexer del compilador), no RSyntaxTextArea.
- *
- * Los INDENT/DEDENT que agrega el lexer miden cero caracteres, asi que
- * ColoreadorBase no les asigna texto.
- */
 public class ColoreadorY extends ColoreadorBase {
 
     @Override

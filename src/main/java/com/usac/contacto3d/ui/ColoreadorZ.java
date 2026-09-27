@@ -5,7 +5,6 @@ import com.usac.contacto3d.parser.ZetarianoLexer;
 import org.antlr.v4.runtime.Lexer;
 import org.fife.ui.rsyntaxtextarea.Token;
 
-/** Coloreado de Zetariano: el tipo de cada token lo decide ZetarianoLexer. */
 public class ColoreadorZ extends ColoreadorBase {
 
     @Override

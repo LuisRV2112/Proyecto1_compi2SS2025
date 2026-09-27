@@ -13,7 +13,6 @@ import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 
-/** La tabla de simbolos de la ultima compilacion, con la zona y posicion de memoria de cada uno. */
 public class PanelTablaSimbolos extends JPanel {
 
     private static final String[] COLUMNAS =

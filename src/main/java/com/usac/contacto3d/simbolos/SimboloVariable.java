@@ -2,14 +2,12 @@ package com.usac.contacto3d.simbolos;
 
 import com.usac.contacto3d.ast.Tipo;
 
-/** Variable, parametro o arreglo. */
 public class SimboloVariable extends Simbolo {
 
     private final Categoria categoria;
     private boolean inicializada;
     private int tamanio = 1;
 
-    /** Los arreglos y objetos se pasan por referencia (enunciado del proyecto). */
     private boolean porReferencia;
 
     public SimboloVariable(String nombre, Tipo tipo, Categoria categoria,

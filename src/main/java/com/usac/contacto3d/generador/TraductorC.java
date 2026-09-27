@@ -12,27 +12,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-/**
- * Convierte las cuartetas en un archivo C que compila con gcc.
- *
- * La traduccion es casi uno a uno: C tiene goto y etiquetas. Cada
- * "funcion X: ... fin X" es una funcion de C con sus temporales como variables
- * locales, que es lo que hace funcionar la recursividad. Las operaciones del
- * sistema (cadenas, lectura, conversiones) son funciones de la plantilla, con
- * la misma semantica que InterpreteCuartetas, que es la referencia.
- *
- * Para que compile sin warnings aun con -Wall -Wextra:
- *  - un temporal que nadie lee no se declara: si la operacion no tiene
- *    efectos se omite, y si los tiene (leer, concatenar) se emite solo la llamada
- *  - solo se emiten las etiquetas a las que algun salto llega, y siempre como
- *    "L3: ;" porque antes de C23 una etiqueta no puede cerrar un bloque
- *  - las funciones no son static, asi que no avisa por las que no se llaman
- */
 public class TraductorC {
 
     private static final String SANGRIA = "    ";
 
-    /** Operaciones que solo calculan un valor: si nadie lo lee, se pueden omitir. */
     private static final Set<Operacion> SIN_EFECTOS = Set.of(
             Operacion.ASIGNAR, Operacion.SUMA, Operacion.RESTA, Operacion.MULTIPLICACION,
             Operacion.NEGATIVO, Operacion.MENOR, Operacion.MAYOR, Operacion.MENOR_IGUAL,
@@ -122,13 +105,11 @@ public class TraductorC {
         c.append("}\n");
     }
 
-    /** La linea de C de una cuarteta, o null si no hace falta emitir nada. */
     private String traducir(Cuarteta q, Set<String> leidos, Set<String> etiquetasUsadas, boolean esMain) {
         String r = q.resultado();
         String a = operando(q.arg1());
         String b = operando(q.arg2());
 
-        // El valor no lo lee nadie: sin efectos se omite; con efectos queda solo la llamada
         boolean resultadoMuerto = r != null && esTemporal(r) && !leidos.contains(r);
         if (resultadoMuerto && SIN_EFECTOS.contains(q.operacion())) {
             return null;
@@ -169,7 +150,6 @@ public class TraductorC {
         };
     }
 
-    /** Una asignacion a H reserva heap: se verifica que no se haya agotado. */
     private static String asignacion(String destino, String valor) {
         String linea = operando(destino) + " = " + valor + ";";
         return destino.equals("H") ? linea + " verificar_heap();" : linea;
@@ -198,7 +178,6 @@ public class TraductorC {
         };
     }
 
-    /** Un indice constante va tal cual; uno calculado se convierte a entero. */
     private static String indice(String operando) {
         return operando.matches("\\d+") ? operando : "(int) " + operando(operando);
     }
@@ -207,7 +186,6 @@ public class TraductorC {
         return operando;
     }
 
-    /** Prefijo para no chocar con nombres de C: una funcion del usuario podria llamarse printf. */
     private static String nombreC(String funcion) {
         return "f_" + funcion;
     }
@@ -222,10 +200,6 @@ public class TraductorC {
         }
     }
 
-    /* ------------------------------------------------------------------------
-     * Plantilla: memoria, P, H y las funciones del sistema. Cada una hace
-     * exactamente lo mismo que su operacion en InterpreteCuartetas.
-     * ------------------------------------------------------------------------ */
     private static final String PLANTILLA = """
             /*
              * Generado por Contacto 3xtrat3rr3str3D a partir del codigo de tres direcciones.

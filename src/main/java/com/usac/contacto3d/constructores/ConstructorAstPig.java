@@ -46,13 +46,6 @@ import java.util.Objects;
 import static com.usac.contacto3d.constructores.Ayudante.columna;
 import static com.usac.contacto3d.constructores.Ayudante.linea;
 
-/**
- * Convierte el parse tree de PigLatin en el AST comun.
- *
- * Un tipo con nombre (esto p : Persona) puede ser una estructura de un .y o
- * una clase de un .z; aqui todavia no se sabe, asi que queda como ESTRUCTURA
- * y el semantico lo cambia a OBJETO si el nombre resulta ser una clase.
- */
 public class ConstructorAstPig extends PigLatinBaseVisitor<Nodo> {
 
     private final String archivo;
@@ -77,8 +70,6 @@ public class ConstructorAstPig extends PigLatinBaseVisitor<Nodo> {
         return new Importacion(partes, linea(ctx), columna(ctx));
     }
 
-    /* ---------- declaraciones ---------- */
-
     private List<Instruccion> declaraciones(List<DeclaracionContext> contextos) {
         return contextos.stream().map(this::visit).filter(Objects::nonNull)
                 .map(Instruccion.class::cast).toList();
@@ -94,7 +85,6 @@ public class ConstructorAstPig extends PigLatinBaseVisitor<Nodo> {
         return declaracionArreglo(ctx.declaracionArreglo());
     }
 
-    /** Ya se reporto como error sintactico; si se llegara a construir, no deja nodo. */
     @Override
     public Nodo visitDeclStructuraObsoleta(DeclStructuraObsoletaContext ctx) {
         return null;
@@ -126,7 +116,6 @@ public class ConstructorAstPig extends PigLatinBaseVisitor<Nodo> {
                 linea(ctx.ID(0)), columna(ctx.ID(0)));
     }
 
-    /** esto x : novus Persona(...): aqui si se sabe que es una clase. */
     @Override
     public Nodo visitVarObjeto(VarObjetoContext ctx) {
         NuevoObjeto objeto = nuevoObjeto(ctx.nuevoObjeto());
@@ -154,8 +143,6 @@ public class ConstructorAstPig extends PigLatinBaseVisitor<Nodo> {
         return Tipo.desdePalabra(ctx.getText());
     }
 
-    /* ---------- funciones ---------- */
-
     @Override
     public Nodo visitFuncionActio(FuncionActioContext ctx) {
         return new Funcion(ctx.ID().getText(), parametros(ctx.listaParametros()), Tipo.VACIO,
@@ -177,7 +164,6 @@ public class ConstructorAstPig extends PigLatinBaseVisitor<Nodo> {
                 .toList();
     }
 
-    /** Las declaraciones de VARIABILES[ ... ] quedan al inicio del cuerpo, antes de las instrucciones. */
     private List<Instruccion> cuerpoFuncion(CuerpoFuncionContext ctx) {
         List<Instruccion> cuerpo = new ArrayList<>();
         if (ctx.bloqueVariables() != null) {
@@ -186,8 +172,6 @@ public class ConstructorAstPig extends PigLatinBaseVisitor<Nodo> {
         cuerpo.addAll(instrucciones(ctx.instruccion()));
         return cuerpo;
     }
-
-    /* ---------- instrucciones ---------- */
 
     private List<Instruccion> bloque(BloqueContext ctx) {
         return instrucciones(ctx.instruccion());
@@ -315,19 +299,12 @@ public class ConstructorAstPig extends PigLatinBaseVisitor<Nodo> {
                 linea(ctx), columna(ctx));
     }
 
-    /**
-     * Lado izquierdo de una asignacion, lectura o incremento. La gramatica deja
-     * pasar "f() = 3": se envuelve en un Acceso para que el semantico lo
-     * reporte como no asignable en vez de fallar aqui.
-     */
     private Acceso destino(AccesoContext ctx) {
         Nodo nodo = visit(ctx);
         return nodo instanceof LlamadaFuncion llamada
                 ? Acceso.deLlamada(llamada, List.of(), llamada.getLinea(), llamada.getColumna())
                 : (Acceso) nodo;
     }
-
-    /* ---------- expresiones ---------- */
 
     private Expresion expr(ExprContext ctx) {
         return ctx == null ? null : (Expresion) visit(ctx);
@@ -345,7 +322,7 @@ public class ConstructorAstPig extends PigLatinBaseVisitor<Nodo> {
 
     @Override
     public Nodo visitExprAgrupacion(ExprAgrupacionContext ctx) {
-        return expr(ctx.expr());   // los parentesis ya fijaron la precedencia: no dejan nodo
+        return expr(ctx.expr());
     }
 
     @Override
@@ -408,7 +385,6 @@ public class ConstructorAstPig extends PigLatinBaseVisitor<Nodo> {
         return new NuevoObjeto(ctx.ID().getText(), expresiones(ctx.listaExpresiones()), linea(ctx), columna(ctx));
     }
 
-    /** Una llamada sola, sin nada despues, queda como LlamadaFuncion y no como Acceso. */
     @Override
     public Nodo visitAcceso(AccesoContext ctx) {
         List<Sufijo> sufijos = ctx.sufijo().stream().map(this::sufijo).toList();
@@ -460,9 +436,6 @@ public class ConstructorAstPig extends PigLatinBaseVisitor<Nodo> {
         return new Literal(ctx.VERUM() != null, Tipo.BOOLEANO, linea(ctx), columna(ctx));
     }
 
-    /* ---------- recorrido por defecto ---------- */
-
-    // Por si alguna regla cae en visitChildren: que los tokens sueltos no pisen el resultado
     @Override
     protected Nodo aggregateResult(Nodo acumulado, Nodo siguiente) {
         return acumulado != null ? acumulado : siguiente;

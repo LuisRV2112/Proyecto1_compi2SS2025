@@ -6,7 +6,6 @@ import com.usac.contacto3d.ast.expresiones.Expresion;
 
 import java.util.List;
 
-/** Ciclo con la condicion al final: hacer de Y?, do-while de Zetariano y facere de PigLatin. */
 public class Hacer extends Nodo implements Instruccion {
 
     private final List<Instruccion> cuerpo;

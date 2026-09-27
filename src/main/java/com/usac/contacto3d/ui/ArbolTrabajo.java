@@ -26,13 +26,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-/**
- * El arbol de trabajo: una carpeta del disco con sus archivos y subcarpetas.
- *
- * Doble clic abre un archivo; el clic derecho ofrece crear, renombrar,
- * eliminar y actualizar. La ventana se entera de lo que pasa por medio de
- * Escucha, porque un archivo renombrado o eliminado puede estar abierto.
- */
 public class ArbolTrabajo extends JPanel {
 
     public interface Escucha {
@@ -84,7 +77,6 @@ public class ArbolTrabajo extends JPanel {
         arbol.expandRow(0);
     }
 
-    /** Relee el disco conservando las carpetas que estaban desplegadas. */
     public void actualizar() {
         if (raiz == null) {
             return;
@@ -101,7 +93,6 @@ public class ArbolTrabajo extends JPanel {
         desplegar(nodoRaiz, desplegadas);
     }
 
-    /** Busca por nombre en todo el arbol (los errores solo traen el nombre del archivo). */
     public Optional<Path> buscar(String nombreArchivo) {
         if (raiz == null) {
             return Optional.empty();
@@ -113,8 +104,6 @@ public class ArbolTrabajo extends JPanel {
         }
     }
 
-    /* ---------------------------- construccion ---------------------------- */
-
     private DefaultMutableTreeNode construir(Path ruta) {
         DefaultMutableTreeNode nodo = new DefaultMutableTreeNode(ruta);
         if (Files.isDirectory(ruta)) {
@@ -125,7 +114,6 @@ public class ArbolTrabajo extends JPanel {
         return nodo;
     }
 
-    /** Carpetas primero, despues archivos, cada grupo alfabetico; sin ocultos. */
     private static List<Path> hijosOrdenados(Path carpeta) {
         try (Stream<Path> hijos = Files.list(carpeta)) {
             return hijos.filter(p -> !p.getFileName().toString().startsWith("."))
@@ -145,8 +133,6 @@ public class ArbolTrabajo extends JPanel {
             desplegar((DefaultMutableTreeNode) nodo.getChildAt(i), desplegadas);
         }
     }
-
-    /* ------------------------- menu contextual ------------------------- */
 
     private void menuContextual(MouseEvent evento) {
         if (!evento.isPopupTrigger() || raiz == null) {
@@ -180,7 +166,6 @@ public class ArbolTrabajo extends JPanel {
         return item;
     }
 
-    /** Se crea dentro de la carpeta seleccionada, o junto al archivo seleccionado. */
     public void crear(boolean esCarpeta) {
         if (raiz == null) {
             return;
@@ -233,7 +218,6 @@ public class ArbolTrabajo extends JPanel {
             return;
         }
         try (Stream<Path> recorrido = Files.walk(ruta)) {
-            // De adentro hacia afuera: una carpeta solo se borra vacia
             List<Path> todo = new ArrayList<>(recorrido.toList());
             todo.sort(Comparator.reverseOrder());
             for (Path p : todo) {
@@ -282,7 +266,6 @@ public class ArbolTrabajo extends JPanel {
         return null;
     }
 
-    /** Muestra solo el nombre, con el icono del lenguaje. */
     private static class Renderer extends DefaultTreeCellRenderer {
         @Override
         public Component getTreeCellRendererComponent(JTree arbol, Object valor, boolean seleccionado,

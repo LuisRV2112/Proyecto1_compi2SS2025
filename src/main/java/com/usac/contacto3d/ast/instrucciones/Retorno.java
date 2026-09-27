@@ -6,7 +6,6 @@ import com.usac.contacto3d.ast.expresiones.Expresion;
 
 import java.util.List;
 
-/** retornar, return y reddere; el valor es null en funciones sin retorno. */
 public class Retorno extends Nodo implements Instruccion {
 
     private final Expresion valor;

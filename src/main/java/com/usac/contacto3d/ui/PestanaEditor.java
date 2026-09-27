@@ -18,13 +18,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-/**
- * Un archivo abierto en el editor.
- *
- * El coloreado de cada lenguaje se registra aqui con un tipo MIME propio que
- * apunta a su coloreador (ColoreadorY, ColoreadorZ, ColoreadorPig). Los
- * errores de la ultima compilacion se marcan con ParserErrores.
- */
 public class PestanaEditor extends JPanel {
 
     public static final String ESTILO_Y = "text/lenguaje-y";
@@ -52,7 +45,7 @@ public class PestanaEditor extends JPanel {
         editor.setSyntaxEditingStyle(estiloPara(archivo));
         editor.setText(Files.readString(archivo, StandardCharsets.UTF_8));
         editor.setCaretPosition(0);
-        editor.discardAllEdits();   // que Ctrl+Z no deshaga la carga del archivo
+        editor.discardAllEdits();
         editor.addParser(marcas);
 
         editor.getDocument().addDocumentListener(new DocumentListener() {
@@ -67,7 +60,6 @@ public class PestanaEditor extends JPanel {
         add(scroll, BorderLayout.CENTER);
     }
 
-    /** El coloreador segun la extension; cualquier otro archivo se muestra sin color. */
     public static String estiloPara(Path archivo) {
         String nombre = archivo.getFileName().toString();
         if (nombre.endsWith(".y")) return ESTILO_Y;
@@ -88,14 +80,12 @@ public class PestanaEditor extends JPanel {
         guardar();
     }
 
-    /** Tras renombrar en el arbol: el contenido es el mismo, cambia la ruta (y quiza el lenguaje). */
     public void setArchivo(Path archivo) {
         this.archivo = archivo;
         editor.setSyntaxEditingStyle(estiloPara(archivo));
         alCambiarEstado.run();
     }
 
-    /** Subraya los errores de este archivo; la lista trae los de todos los archivos compilados. */
     public void marcarErrores(ListaErrores errores) {
         marcas.setErrores(errores, archivo.getFileName().toString());
         editor.forceReparsing(marcas);
@@ -107,7 +97,6 @@ public class PestanaEditor extends JPanel {
             editor.setCaretPosition(editor.getLineStartOffset(destino));
             editor.requestFocusInWindow();
         } catch (BadLocationException e) {
-            // linea fuera del archivo: se queda donde esta
         }
     }
 

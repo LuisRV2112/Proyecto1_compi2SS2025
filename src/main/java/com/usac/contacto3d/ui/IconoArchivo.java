@@ -12,10 +12,6 @@ import java.awt.RenderingHints;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-/**
- * Iconos del arbol de trabajo, dibujados en codigo: una carpeta, o un cuadro
- * con la inicial del lenguaje (Y, Z, P) en su color. No hacen falta imagenes.
- */
 public final class IconoArchivo implements Icon {
 
     private static final int TAMANIO = 16;
@@ -53,7 +49,7 @@ public final class IconoArchivo implements Icon {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setColor(color);
         if (letra == null) {
-            g2.fillRoundRect(x, y + 3, 7, 4, 2, 2);          // pestania de la carpeta
+            g2.fillRoundRect(x, y + 3, 7, 4, 2, 2);
             g2.fillRoundRect(x, y + 5, TAMANIO - 1, 10, 3, 3);
         } else {
             g2.setStroke(new BasicStroke(1.2f));

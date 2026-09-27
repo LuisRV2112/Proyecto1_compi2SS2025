@@ -37,23 +37,10 @@ import com.usac.contacto3d.ast.instrucciones.Rama;
 import com.usac.contacto3d.ast.instrucciones.Retorno;
 import com.usac.contacto3d.ast.instrucciones.Si;
 
-/**
- * Patron Visitante sobre el AST: un metodo por cada clase de nodo.
- *
- * El generico T es lo que devuelve cada visita, y permite que la MISMA interfaz
- * sirva para recorridos distintos:
- *
- *     Visitante<Tipo>      analisis semantico: devuelve el tipo de cada expresion
- *     Visitante<Operando>  generador de C3D: devuelve donde quedo el resultado
- *
- * Ser interfaz da una ventaja concreta: al agregar un nodo nuevo, el compilador
- * senala TODOS los visitantes que faltan actualizar.
- */
 public interface Visitante<T> {
 
     T visitarPrograma(Programa nodo);
 
-    // Declaraciones
     T visitarImportacion(Importacion nodo);
     T visitarDeclaracionVariable(DeclaracionVariable nodo);
     T visitarDeclaracionArreglo(DeclaracionArreglo nodo);
@@ -65,7 +52,6 @@ public interface Visitante<T> {
     T visitarDeclaracionConstructor(DeclaracionConstructor nodo);
     T visitarParametro(Parametro nodo);
 
-    // Instrucciones
     T visitarBloque(Bloque nodo);
     T visitarAsignacion(Asignacion nodo);
     T visitarSi(Si nodo);
@@ -79,7 +65,6 @@ public interface Visitante<T> {
     T visitarRetorno(Retorno nodo);
     T visitarImprimir(Imprimir nodo);
 
-    // Expresiones
     T visitarLiteral(Literal nodo);
     T visitarOperacionBinaria(OperacionBinaria nodo);
     T visitarOperacionUnaria(OperacionUnaria nodo);

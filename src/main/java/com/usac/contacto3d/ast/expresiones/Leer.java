@@ -6,16 +6,8 @@ import com.usac.contacto3d.ast.instrucciones.Instruccion;
 
 import java.util.List;
 
-/**
- * Lectura de consola, en sus tres formas:
- *
- *   x = leer()   /  String s = readln();   expresion: vale el texto leido
- *   leer()       /  readln();  /  <<        instruccion: lee y descarta
- *   x <<                                    instruccion con destino (PigLatin)
- */
 public class Leer extends Expresion implements Instruccion {
 
-    /** Solo en la forma "x <<" de PigLatin. */
     private final Acceso destino;
 
     public Leer(Acceso destino, int linea, int columna) {

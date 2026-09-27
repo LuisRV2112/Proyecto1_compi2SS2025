@@ -26,9 +26,6 @@
             <version>${antlr.version}</version>
         </dependency>
 
-        <!-- Editor. El coloreado NO usa sus palabras predefinidas: el enunciado
-             prohibe librerias para colorear, asi que el color lo deciden
-             nuestros lexers (ver ColoreadorBase). -->
         <dependency>
             <groupId>com.fifesoft</groupId>
             <artifactId>rsyntaxtextarea</artifactId>
@@ -44,7 +41,6 @@
 
     <build>
         <plugins>
-            <!-- Genera los tres lexers y parsers desde src/main/antlr4 -->
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>

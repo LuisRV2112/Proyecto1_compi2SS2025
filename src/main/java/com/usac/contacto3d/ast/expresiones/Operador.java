@@ -1,6 +1,5 @@
 package com.usac.contacto3d.ast.expresiones;
 
-/** Operadores de los tres lenguajes, normalizados. */
 public enum Operador {
     SUMA("+"), RESTA("-"), MULTIPLICACION("*"), DIVISION("/"), MODULO("%"),
     MENOR("<"), MAYOR(">"), MENOR_IGUAL("<="), MAYOR_IGUAL(">="),
@@ -18,7 +17,6 @@ public enum Operador {
         return simbolo;
     }
 
-    /** Operador binario a partir de su simbolo en cualquiera de los tres lenguajes. */
     public static Operador binario(String simbolo) {
         return switch (simbolo) {
             case "+"  -> SUMA;
@@ -38,7 +36,6 @@ public enum Operador {
         };
     }
 
-    /** El '-' unario es NEGATIVO, no RESTA; la negacion es '!' o 'non' segun el lenguaje. */
     public static Operador unario(String simbolo) {
         return switch (simbolo) {
             case "-"        -> NEGATIVO;
@@ -47,7 +44,6 @@ public enum Operador {
         };
     }
 
-    /** Operacion de una asignacion compuesta de Zetariano: += es SUMA. Null para '='. */
     public static Operador deAsignacion(String simbolo) {
         return switch (simbolo) {
             case "="  -> null;

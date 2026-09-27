@@ -6,7 +6,6 @@ import com.usac.contacto3d.simbolos.SimboloEstructura;
 
 import java.util.List;
 
-/** .nombre — campo de una estructura o atributo de un objeto. */
 public class SufijoAtributo extends Sufijo {
 
     private final String nombre;
@@ -18,7 +17,6 @@ public class SufijoAtributo extends Sufijo {
 
     public String getNombre() { return nombre; }
 
-    /** El campo con su offset. Lo resuelve el semantico; el generador lo usa en vez de volver a buscar el nombre. */
     private SimboloEstructura.Campo campo;
 
     public SimboloEstructura.Campo getCampo() { return campo; }

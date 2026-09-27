@@ -6,7 +6,6 @@ import com.usac.contacto3d.ast.expresiones.Expresion;
 
 import java.util.List;
 
-/** Ciclo con la condicion al inicio: mientras de Y?, while de Zetariano y dum de PigLatin. */
 public class Mientras extends Nodo implements Instruccion {
 
     private final Expresion condicion;

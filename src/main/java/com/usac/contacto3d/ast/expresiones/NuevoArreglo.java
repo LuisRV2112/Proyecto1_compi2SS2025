@@ -6,7 +6,6 @@ import com.usac.contacto3d.ast.Visitante;
 
 import java.util.List;
 
-/** new int[3][3] de Zetariano: reserva el arreglo aplanado en el heap. */
 public class NuevoArreglo extends Expresion {
 
     private Tipo tipoElemento;

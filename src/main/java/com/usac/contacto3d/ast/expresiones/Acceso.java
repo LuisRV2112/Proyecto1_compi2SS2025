@@ -8,20 +8,8 @@ import com.usac.contacto3d.simbolos.SimboloEstructura;
 
 import java.util.List;
 
-/**
- * Una variable y la cadena de accesos que le sigue:
- *
- *   x                              raiz "x", sin sufijos
- *   miObjeto.apellidos[0].getNombre()  raiz "miObjeto", tres sufijos
- *   this.nombre                    raiz this
- *   crear().nombre                 raiz una llamada
- *
- * Es instruccion porque "misObjetos[9].hablar();" se usa por su efecto. Que
- * en ese caso termine en un SufijoMetodo lo revisa el semantico.
- */
 public class Acceso extends Expresion implements Instruccion {
 
-    /** Null cuando la raiz es this o una llamada. */
     private final String nombre;
     private final boolean esThis;
     private final LlamadaFuncion llamada;
@@ -53,18 +41,15 @@ public class Acceso extends Expresion implements Instruccion {
     public LlamadaFuncion getLlamada() { return llamada; }
     public List<Sufijo> getSufijos()   { return sufijos; }
 
-    /** Una variable sola, sin sufijos. */
     public boolean esSimple() {
         return nombre != null && sufijos.isEmpty();
     }
 
-    /** La variable de la raiz. Lo resuelve el semantico; el generador lo usa en vez de volver a buscar el nombre. */
     private Simbolo simbolo;
 
     public Simbolo getSimbolo() { return simbolo; }
     public void setSimbolo(Simbolo simbolo) { this.simbolo = simbolo; }
 
-    /** Dentro de una clase, un nombre suelto puede ser un atributo del propio objeto (this implicito). */
     private SimboloEstructura.Campo campoImplicito;
 
     public SimboloEstructura.Campo getCampoImplicito() { return campoImplicito; }

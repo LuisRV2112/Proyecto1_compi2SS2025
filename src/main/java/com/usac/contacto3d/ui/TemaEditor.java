@@ -9,13 +9,6 @@ import org.fife.ui.rtextarea.Gutter;
 import java.awt.Color;
 import java.awt.Font;
 
-/**
- * Paleta del editor. Define un color por cada tipo de token que producen los
- * coloreadores de los tres lenguajes.
- *
- * Los colores son libres segun el enunciado. Lo que NO es libre es de donde
- * salen: el coloreado debe generarse desde los lexers propios, sin librerias.
- */
 public final class TemaEditor {
 
     public static final Color FONDO        = new Color(0x1E1E1E);

@@ -7,20 +7,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Definicion de un tipo del usuario: 'estructura' de Y? o 'class' de Zetariano.
- *
- * Los campos se APLANAN: cada uno recibe un offset relativo al inicio de la
- * estructura, y el tamanio total es la suma. Asi el generador de C3D accede a
- * un atributo con una sola suma de direcciones (base + offset) en vez de
- * navegar punteros.
- *
- * Las estructuras de Y? viven en el stack; los objetos de Zetariano en el heap,
- * pero el calculo de offsets es el mismo.
- */
 public class SimboloEstructura extends Simbolo {
 
-    /** Un campo con su posicion relativa dentro de la estructura. */
     public static class Campo {
         private final String nombre;
         private final Tipo tipo;
@@ -57,10 +45,6 @@ public class SimboloEstructura extends Simbolo {
 
     public boolean esClase() { return esClase; }
 
-    /**
-     * Agrega un campo calculando su offset.
-     * @return false si el nombre ya existia (hay que reportarlo como error)
-     */
     public boolean agregarCampo(String nombre, Tipo tipo, int tamanio) {
         if (campos.containsKey(nombre)) {
             return false;
@@ -77,14 +61,11 @@ public class SimboloEstructura extends Simbolo {
     @Override
     public int getTamanio() { return tamanioTotal; }
 
-    /* --------- Metodos y constructores (solo para clases de Zetariano) --------- */
-
     public void agregarMetodo(SimboloFuncion metodo)       { metodos.add(metodo); }
     public void agregarConstructor(SimboloFuncion c)       { constructores.add(c); }
     public List<SimboloFuncion> getMetodos()               { return metodos; }
     public List<SimboloFuncion> getConstructores()         { return constructores; }
 
-    /** Busca un metodo por nombre y cantidad de argumentos (soporta sobrecarga). */
     public SimboloFuncion buscarMetodo(String nombre, int cantidadArgumentos) {
         for (SimboloFuncion metodo : metodos) {
             if (metodo.getNombre().equals(nombre)

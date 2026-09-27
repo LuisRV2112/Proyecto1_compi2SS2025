@@ -15,23 +15,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-/**
- * Carga los archivos que importa un .pig.
- *
- * Solo el .pig importa: los .y y .z no tienen import, asi que no puede haber
- * ciclos y basta con no cargar dos veces el mismo archivo.
- *
- * Donde se busca "import carpeta.Persona.z" (el auxiliar aclaro que no importa
- * en que carpeta este, mientras el principal lo importe):
- *   1. carpeta/Persona.z junto al .pig
- *   2. carpeta/Persona.z junto a la carpeta del .pig (el .pig esta dentro de
- *      una carpeta del proyecto e importa desde la raiz)
- *   3. Persona.z junto al .pig
- *   4. cualquier Persona.z dentro de la carpeta del .pig, a cualquier profundidad
- */
 public class ResolvedorImports {
 
-    /** Parsea un archivo y construye su AST; null si tuvo errores lexicos o sintacticos. */
     @FunctionalInterface
     public interface Cargador {
         Programa cargar(Path archivo) throws IOException;
@@ -47,10 +32,6 @@ public class ResolvedorImports {
         this.cargador = cargador;
     }
 
-    /**
-     * @return el principal seguido de cada archivo importado que se pudo cargar.
-     *         Los que tuvieron errores de parseo ya los reporto el cargador.
-     */
     public List<Programa> resolver(Path rutaPrincipal, Programa principal) throws IOException {
         List<Programa> modulos = new ArrayList<>();
         modulos.add(principal);
@@ -72,7 +53,7 @@ public class ResolvedorImports {
                 continue;
             }
             if (!cargados.add(ruta.toRealPath())) {
-                continue;   // importado dos veces: se carga una sola
+                continue;
             }
             Programa modulo = cargador.cargar(ruta);
             if (modulo != null) {
@@ -105,7 +86,6 @@ public class ResolvedorImports {
                     .sorted()
                     .toList();
         }
-        // Si hay varios con el mismo nombre, se prefiere el que coincide con la carpeta del import
         return encontrados.stream().filter(p -> p.endsWith(relativa)).findFirst()
                 .orElse(encontrados.isEmpty() ? null : encontrados.get(0));
     }

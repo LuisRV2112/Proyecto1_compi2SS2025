@@ -1,8 +1,4 @@
 #!/bin/bash
-# Prueba cada programa de esta carpeta por los dos caminos y compara con su .esperado:
-#   1. el interprete de cuartetas (la referencia)
-#   2. el C generado, compilado con gcc -Wall -Wextra -Werror (un warning cuenta como falla)
-# Uso (desde la raiz, despues de mvn package):  entradas/programas/probar.sh
 cd "$(dirname "$0")/../.." || exit 1
 JAR=target/contacto-3d-1.0.0.jar
 mkdir -p salida

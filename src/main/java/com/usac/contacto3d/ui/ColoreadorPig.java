@@ -5,10 +5,6 @@ import com.usac.contacto3d.parser.PigLatinLexer;
 import org.antlr.v4.runtime.Lexer;
 import org.fife.ui.rsyntaxtextarea.Token;
 
-/**
- * Coloreado de PigLatin: el tipo de cada token lo decide PigLatinLexer.
- * El comentario de bloque abre y cierra con el mismo ##.
- */
 public class ColoreadorPig extends ColoreadorBase {
 
     @Override

@@ -1,13 +1,3 @@
-/*
- * Gramatica de Y? (archivos .y)
- *
- * La indentacion define los bloques, como en Python. ANTLR no sabe hacerlo
- * solo: el lexer delega en IndentacionY, que lleva la pila de niveles y
- * emite los tokens artificiales INDENT y DEDENT (ver esa clase).
- *
- * Consecuencia para el parser: una instruccion simple termina en NUEVA_LINEA
- * y un bloque es  NUEVA_LINEA INDENT instruccion+ DEDENT.
- */
 grammar LenguajeY;
 
 tokens { INDENT, DEDENT }
@@ -27,32 +17,22 @@ import com.usac.contacto3d.errores.ErrorConMensaje;
     @Override
     public void reset() {
         super.reset();
-        // reset() tambien lo llama el constructor de Lexer, antes de inicializar el campo
         if (indentacion != null) {
             indentacion.reiniciar();
         }
     }
 }
 
-/* ============================== PARSER ============================== */
-
-// Secciones en linea a proposito: con funcion* en su propia regla, un token
-// inesperado entre funciones haria que la recuperacion saltara hasta el EOF
-// y se perderian los errores siguientes (ver la misma nota en PigLatin.g4).
 programa
     : (SEC_ESTRUCTURAS NUEVA_LINEA estructura*)?
       SEC_FUNCIONES NUEVA_LINEA funcion*
       EOF
     ;
 
-/* ---------- estructuras ---------- */
-
-// Tambien se pueden declarar dentro de una funcion (instEstructura)
 estructura
     : ESTRUCTURA ID DOSP NUEVA_LINEA INDENT campo+ DEDENT
     ;
 
-// Dentro de una estructura la dimension de un arreglo debe ser constante
 campo
     : tipo ID dimensionConstante* NUEVA_LINEA
     ;
@@ -60,8 +40,6 @@ campo
 dimensionConstante
     : CORCH_A LIT_ENTERO CORCH_C
     ;
-
-/* ---------- funciones ---------- */
 
 funcion
     : DEFINIR ID PAR_A listaParametros? PAR_C (FLECHA tipo)? DOSP bloque
@@ -90,9 +68,6 @@ bloque
     : NUEVA_LINEA INDENT instruccion+ DEDENT
     ;
 
-/* ---------- instrucciones ---------- */
-
-// El ';' final es opcional: el enunciado lo usa en algunos ejemplos (contador++;)
 instruccion
     : instruccionSimple PUNTOYCOMA? NUEVA_LINEA # instSimple
     | estructura                            # instEstructura
@@ -101,15 +76,11 @@ instruccion
     | sentenciaPara                         # instPara
     | sentenciaMientras                     # instMientras
     | sentenciaHacer                        # instHacer
-    // Una linea con mas sangria sin nada que abra bloque. Reconocerla aqui
-    // mantiene balanceados INDENT y DEDENT; si no, el DEDENT sobrante hace
-    // que la recuperacion de ANTLR se salte el resto del archivo.
     | INDENT instruccion+ DEDENT
       { notifyErrorListeners($INDENT, "Sangria inesperada: la instruccion anterior no abre un bloque. Se esperaba la misma sangria que la linea anterior", new ErrorConMensaje(this)); }
                                             # instSangriaInesperada
     ;
 
-// Las que caben en una linea; se separan para reutilizarlas en el para y en los casos
 instruccionSimple
     : declaracion                           # simpleDeclaracion
     | asignacion                            # simpleAsignacion
@@ -152,7 +123,6 @@ ramaContrario
     : CONTRARIO DOSP? bloque
     ;
 
-// La llave del elegir es de bloque: el lexer la distingue de la de un literal
 sentenciaElegir
     : ELEGIR PAR_A expr PAR_C LLAVE_A NUEVA_LINEA
       (INDENT caso* casoSiempre? DEDENT)?
@@ -167,7 +137,6 @@ casoSiempre
     : SIEMPRE DOSP cuerpoCaso
     ;
 
-// Hay fall-through, asi que un caso vacio es valido: cae al siguiente
 cuerpoCaso
     : bloque                                # cuerpoBloque
     | instruccionSimple PUNTOYCOMA? NUEVA_LINEA # cuerpoEnLinea
@@ -196,9 +165,6 @@ sentenciaHacer
     : HACER DOSP bloque MIENTRAS PAR_A expr PAR_C PUNTOYCOMA? NUEVA_LINEA
     ;
 
-/* ---------- expresiones ---------- */
-
-// La precedencia sale del orden: la primera alternativa binaria es la mas alta
 expr
     : PAR_A expr PAR_C                                  # exprAgrupacion
     | (MENOS | NOT) expr                                # exprUnaria
@@ -215,7 +181,6 @@ expr
     | LLAVE_A listaExpresiones? LLAVE_C                 # exprLista
     ;
 
-// Una lista entre llaves inicializa arreglos y estructuras (posicional)
 listaExpresiones
     : expr (COMA expr)*
     ;
@@ -241,19 +206,15 @@ literal
     | (VERDADERO | FALSO)                   # litBooleano
     ;
 
-/* ============================== LEXER =============================== */
-
 SEC_ESTRUCTURAS : '%estructuras' ;
 SEC_FUNCIONES   : '%funciones' ;
 
-// Tipos
 ENTERO    : 'entero' ;
 FLOTANTE  : 'flotante' ;
 CADENA    : 'cadena' ;
 CARACTER  : 'caracter' ;
 BOOL      : 'bool' ;
 
-// Palabras reservadas
 ESTRUCTURA : 'estructura' ;
 DEFINIR    : 'definir' ;
 RETORNAR   : 'retornar' ;
@@ -274,7 +235,6 @@ LEER       : 'leer' ;
 VERDADERO  : 'verdadero' ;
 FALSO      : 'falso' ;
 
-// Operadores (los de dos caracteres ganan por coincidencia mas larga)
 FLECHA      : '->' ;
 INCREMENTO  : '++' ;
 DECREMENTO  : '--' ;
@@ -293,7 +253,6 @@ MAYOR       : '>' ;
 NOT         : '!' ;
 ASIGNACION  : '=' ;
 
-// Agrupacion y puntuacion
 PAR_A      : '(' ;
 PAR_C      : ')' ;
 CORCH_A    : '[' ;
@@ -305,7 +264,6 @@ COMA       : ',' ;
 DOSP       : ':' ;
 PUNTOYCOMA : ';' ;
 
-// Literales
 LIT_FLOTANTE : [0-9]+ '.' [0-9]+ ;
 LIT_ENTERO   : [0-9]+ ;
 LIT_CADENA   : '"' (~["\\\r\n] | '\\' .)* '"' ;
@@ -313,11 +271,8 @@ LIT_CARACTER : '\'' (~['\\\r\n] | '\\' .) '\'' ;
 
 ID : [a-zA-Z_] [a-zA-Z0-9_]* ;
 
-// Canal por defecto: marca el fin de una instruccion. IndentacionY oculta
-// las de lineas vacias o que solo tienen comentario.
 NUEVA_LINEA : '\r'? '\n' | '\r' ;
 
-// Al canal oculto y no a skip: el coloreado necesita verlos
 COMENTARIO_LINEA  : '//' ~[\r\n]* -> channel(HIDDEN) ;
 COMENTARIO_BLOQUE : '/*' .*? '*/' -> channel(HIDDEN) ;
 WS                : [ \t\f]+ -> channel(HIDDEN) ;

@@ -5,7 +5,6 @@ import com.usac.contacto3d.ast.Visitante;
 
 import java.util.List;
 
-/** [indice]. Una matriz m[i][j] son dos sufijos seguidos. */
 public class SufijoIndice extends Sufijo {
 
     private final Expresion indice;

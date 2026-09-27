@@ -8,13 +8,6 @@ import com.usac.contacto3d.simbolos.SimboloFuncion;
 
 import java.util.List;
 
-/**
- * Funcion libre: definir de Y? y actio/ratio de PigLatin.
- *
- * Es la base de DeclaracionMetodo y DeclaracionConstructor, que comparten
- * todo (nombre, parametros, cuerpo, marco de pila) y solo se distinguen en
- * que reciben el objeto como parametro implicito.
- */
 public class Funcion extends Nodo {
 
     private final String nombre;
@@ -41,7 +34,6 @@ public class Funcion extends Nodo {
         return tipoRetorno == null || tipoRetorno.getBase() == Tipo.Base.VACIO;
     }
 
-    /** Lo resuelve el semantico; el generador lo usa en vez de volver a buscar el nombre. Tiene el marco y la etiqueta. */
     private SimboloFuncion simbolo;
 
     public SimboloFuncion getSimbolo() { return simbolo; }

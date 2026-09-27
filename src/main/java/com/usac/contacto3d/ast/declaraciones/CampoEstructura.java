@@ -6,10 +6,6 @@ import com.usac.contacto3d.ast.Visitante;
 
 import java.util.List;
 
-/**
- * Campo de una estructura de Y?. Si es arreglo, el tipo ya trae las
- * dimensiones (siempre constantes dentro de una estructura).
- */
 public class CampoEstructura extends Nodo {
 
     private final String nombre;

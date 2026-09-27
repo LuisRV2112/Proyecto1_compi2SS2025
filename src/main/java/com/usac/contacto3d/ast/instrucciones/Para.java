@@ -6,13 +6,6 @@ import com.usac.contacto3d.ast.expresiones.Expresion;
 
 import java.util.List;
 
-/**
- * para de Y?, for de Zetariano y per de PigLatin.
- *
- * Inicio y actualizacion son listas porque Zetariano admite varias separadas
- * por coma (j = 0, n = 3), y pueden quedar vacias. Sin condicion, el ciclo es
- * infinito: for (;;).
- */
 public class Para extends Nodo implements Instruccion {
 
     private final List<Instruccion> inicio;

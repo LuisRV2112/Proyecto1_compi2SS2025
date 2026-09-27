@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/** Acumula las cuartetas y reparte nombres unicos de temporales y etiquetas. */
 public class ListaCuartetas {
 
     private final List<Cuarteta> cuartetas = new ArrayList<>();
@@ -30,7 +29,6 @@ public class ListaCuartetas {
         return contadorTemporales;
     }
 
-    /** Una cuarteta por linea; las etiquetas y funciones sin sangria, para leerlo como C3D. */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

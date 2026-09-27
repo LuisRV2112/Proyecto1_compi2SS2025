@@ -1,9 +1,7 @@
 package com.usac.contacto3d.c3d;
 
-/** Una instruccion de tres direcciones: operacion y hasta tres operandos. */
 public record Cuarteta(Operacion operacion, String arg1, String arg2, String resultado) {
 
-    /** Texto legible: t2 = t0 + t1, stack[t3] = t4, if_false t2 goto L1, ... */
     @Override
     public String toString() {
         String simbolo = operacion.simbolo();

@@ -6,7 +6,6 @@ import com.usac.contacto3d.ast.instrucciones.Instruccion;
 
 import java.util.List;
 
-/** Metodo de una clase de Zetariano. Se puede sobrecargar. */
 public class DeclaracionMetodo extends Funcion {
 
     public DeclaracionMetodo(String nombre, List<Parametro> parametros, Tipo tipoRetorno,

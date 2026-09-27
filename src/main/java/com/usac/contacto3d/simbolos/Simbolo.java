@@ -2,14 +2,6 @@ package com.usac.contacto3d.simbolos;
 
 import com.usac.contacto3d.ast.Tipo;
 
-/**
- * Base de todo lo que se registra en la tabla de simbolos.
- *
- * NOVEDAD respecto a la practica: cada simbolo lleva una POSICION DE MEMORIA.
- * El codigo de tres direcciones no trabaja con nombres sino con direcciones
- * (stack[5], heap[12]), asi que el offset hay que asignarlo aqui, durante el
- * analisis semantico, antes de generar cuartetas.
- */
 public abstract class Simbolo {
 
     public enum Categoria {
@@ -33,12 +25,11 @@ public abstract class Simbolo {
         }
     }
 
-    /** Donde vive el valor en tiempo de ejecucion. */
     public enum Almacenamiento {
-        STACK,      // variables locales, parametros, estructuras aplanadas
-        HEAP,       // arreglos, cadenas y objetos
-        GLOBAL,     // variables de la seccion VARIABILES> de PigLatin
-        NINGUNO     // funciones, clases y tipos: no ocupan celdas
+        STACK,
+        HEAP,
+        GLOBAL,
+        NINGUNO
     }
 
     protected final String nombre;
@@ -50,7 +41,6 @@ public abstract class Simbolo {
     protected String nombreAmbito = "global";
     protected int nivelAmbito = 0;
 
-    /** Posicion en el stack o en el heap. -1 mientras no se le asigne. */
     protected int posicion = -1;
     protected Almacenamiento almacenamiento = Almacenamiento.NINGUNO;
 
@@ -84,12 +74,10 @@ public abstract class Simbolo {
 
     public abstract Categoria getCategoria();
 
-    /** Cuantas celdas ocupa. Las estructuras aplanadas ocupan mas de una. */
     public int getTamanio() {
         return 1;
     }
 
-    /** Texto extra para la columna de detalle de la tabla. */
     public abstract String getDetalle();
 
     @Override

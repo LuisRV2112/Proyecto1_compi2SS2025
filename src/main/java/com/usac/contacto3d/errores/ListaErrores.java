@@ -4,12 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * Coleccion central de errores. Todas las fases reportan aqui.
- *
- * Lleva un "archivo actual" para no tener que pasarlo en cada llamada: el
- * compilador lo fija antes de analizar cada archivo importado.
- */
 public class ListaErrores {
 
     private final List<ErrorCompilacion> errores = new ArrayList<>();
@@ -31,7 +25,6 @@ public class ListaErrores {
         errores.add(new ErrorCompilacion(tipo, archivoActual, lexema, descripcion, linea, columna));
     }
 
-    /** Atajo para el analizador semantico. */
     public void semantico(String lexema, String descripcion, int linea, int columna) {
         agregar(TipoError.SEMANTICO, lexema, descripcion, linea, columna);
     }
@@ -48,7 +41,6 @@ public class ListaErrores {
         return !errores.isEmpty();
     }
 
-    /** True si no hubo errores lexicos ni sintacticos: se puede seguir al AST. */
     public boolean parseoExitoso() {
         return errores.stream()
                 .noneMatch(e -> e.getTipo() == TipoError.LEXICO || e.getTipo() == TipoError.SINTACTICO);
@@ -62,7 +54,6 @@ public class ListaErrores {
         errores.clear();
     }
 
-    /** Ordena por archivo, linea y columna para la tabla de la interfaz. */
     public void ordenar() {
         errores.sort(Comparator
                 .comparing(ErrorCompilacion::getArchivo)

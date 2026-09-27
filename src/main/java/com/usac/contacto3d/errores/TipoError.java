@@ -1,6 +1,5 @@
 package com.usac.contacto3d.errores;
 
-/** Clasificacion de los errores que puede reportar el compilador. */
 public enum TipoError {
     LEXICO("Lexico"),
     SINTACTICO("Sintactico"),

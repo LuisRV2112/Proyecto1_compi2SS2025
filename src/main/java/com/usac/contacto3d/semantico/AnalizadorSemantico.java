@@ -62,42 +62,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * Valida el programa completo (el .pig y todo lo que importa) y asigna memoria.
- *
- * Trabaja en pasadas, y el orden importa: asi una funcion puede llamar a otra
- * declarada mas abajo o en otro archivo, y una estructura puede usar otra
- * declarada despues.
- *
- *   1. registrar todas las estructuras y clases (solo el nombre)
- *   2. completar sus campos, con offsets, en orden de dependencia
- *   3. registrar las firmas de funciones, metodos y constructores
- *   4. analizar los cuerpos de Y? y Zetariano
- *   5. analizar PigLatin: globales, funciones de MUNERA> y MAIOR>
- *
- * Como visitante devuelve el tipo de cada expresion (las instrucciones
- * devuelven null). Tras un error la expresion vale Tipo.ERROR, que se acepta
- * en silencio mas arriba: un error se reporta una sola vez, donde nace.
- *
- * Ademas anota el AST (simbolo de cada variable, sobrecarga elegida en cada
- * llamada, offset de cada campo) para que el generador no resuelva nada de nuevo.
- */
 public class AnalizadorSemantico implements Visitante<Tipo> {
 
     private final ListaErrores errores;
     private final TablaSimbolos tabla = new TablaSimbolos();
 
-    /* Estructuras por nombre, para completar sus campos en orden de dependencia. */
     private final Map<String, DeclaracionEstructura> declaracionesEstructura = new HashMap<>();
     private final Set<String> estructurasEnProceso = new HashSet<>();
     private final Set<String> estructurasCompletas = new HashSet<>();
 
-    /* Contexto de lo que se esta analizando. */
     private SimboloEstructura claseActual;
     private SimboloFuncion funcionActual;
     private int ciclosAbiertos;
     private int elegirAbiertos;
-    /** Las declaraciones de VARIABILES> de PigLatin van a la zona global, no al stack. */
     private boolean declarandoGlobales;
     private int siguienteGlobal;
 
@@ -141,8 +118,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         return new ResultadoSemantico(modulos, tabla, principal, siguienteGlobal);
     }
 
-    /* =================== 1-2. Estructuras y clases =================== */
-
     private void validarNombreDeArchivo(Programa modulo) {
         for (DeclaracionClase clase : modulo.getClases()) {
             String esperado = clase.getNombre() + Lenguaje.ZETARIANO.getExtension();
@@ -181,12 +156,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         return true;
     }
 
-    /**
-     * Los campos se aplanan: una estructura anidada ocupa sus celdas dentro de
-     * la que la contiene, asi que antes hay que conocer su tamanio. Por eso se
-     * completa primero la anidada, y una estructura que se contiene a si misma
-     * (directa o indirectamente) no tendria tamanio finito.
-     */
     private void completarEstructura(String nombre) {
         DeclaracionEstructura declaracion = declaracionesEstructura.get(nombre);
         if (declaracion == null || estructurasCompletas.contains(nombre)) {
@@ -216,7 +185,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         estructurasCompletas.add(nombre);
     }
 
-    /** Los atributos se ubican por offset dentro del objeto, que vive en el heap. */
     private void completarClase(DeclaracionClase declaracion) {
         SimboloEstructura clase = declaracion.getSimbolo();
         if (clase == null) {
@@ -232,10 +200,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         tabla.cerrarAmbito();
     }
 
-    /**
-     * El campo tambien se declara como simbolo ATRIBUTO en el ambito de su tipo,
-     * para que salga en la tabla. Su posicion es el offset dentro del tipo.
-     */
     private SimboloVariable agregarCampo(SimboloEstructura tipo, String nombre, Tipo tipoCampo, int celdas,
                                          Nodo nodo, Simbolo.Almacenamiento zona) {
         if (!tipo.agregarCampo(nombre, tipoCampo, celdas)) {
@@ -251,8 +215,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         tabla.declarar(simbolo);
         return simbolo;
     }
-
-    /* ======================== 3. Firmas ======================== */
 
     private void registrarFuncion(Funcion funcion) {
         Tipo retorno = retornoValido(resolverTipo(funcion.getTipoRetorno(), funcion), funcion);
@@ -298,10 +260,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         }
     }
 
-    /**
-     * El valor de retorno ocupa una sola celda del marco; una estructura
-     * aplanada no cabe. Los objetos y arreglos si, porque son un puntero.
-     */
     private Tipo retornoValido(Tipo retorno, Funcion funcion) {
         if (retorno.esEstructura()) {
             error(funcion, funcion.getNombre(), "'" + funcion.getNombre() + "' no puede retornar la estructura "
@@ -330,7 +288,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
             parametro.setTipo(tipo);
             SimboloVariable simbolo = SimboloVariable.parametro(parametro.getNombre(), tipo,
                     parametro.getArchivo(), parametro.getLinea(), parametro.getColumna());
-            // Por referencia la celda guarda la direccion, no el valor: ocupa una sola
             boolean referencia = parametro.esPorReferencia() || tipo.esArreglo() || tipo.esObjeto();
             simbolo.setPorReferencia(referencia);
             simbolo.setTamanio(referencia ? 1 : tamanio(tipo));
@@ -340,13 +297,10 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         return simbolos;
     }
 
-    /** Nombre unico para el C3D: las sobrecargas reciben un sufijo numerico. */
     private String etiqueta(String base) {
         int uso = usosEtiqueta.merge(base, 1, Integer::sum);
         return uso == 1 ? base : base + "_" + uso;
     }
-
-    /* ======================== 4-5. Cuerpos ======================== */
 
     private void analizarClase(DeclaracionClase declaracion) {
         SimboloEstructura clase = declaracion.getSimbolo();
@@ -355,8 +309,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         }
         claseActual = clase;
 
-        // Los valores iniciales de los atributos se ejecutan dentro de cada
-        // constructor; aqui solo se validan, con this disponible
         tabla.abrirMarcoFuncion("atributos de " + clase.getNombre());
         for (DeclaracionVariable atributo : declaracion.getAtributos()) {
             if (atributo.tieneValor()) {
@@ -375,11 +327,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         claseActual = null;
     }
 
-    /**
-     * Las globales de VARIABILES> las ven las funciones de MUNERA> y MAIOR>,
-     * pero no las de Y? ni Zetariano (Y? prohibe variables globales). Por eso
-     * viven en un ambito que se abre solo mientras se analiza el .pig.
-     */
     private SimboloFuncion analizarPigLatin(Programa modulo) {
         tabla.abrirAmbito("VARIABILES");
         declarandoGlobales = true;
@@ -390,7 +337,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
             analizarFuncion(funcion.getSimbolo(), funcion.getParametros(), funcion.getCuerpo(), false, funcion);
         }
 
-        // MAIOR> se trata como una funcion sin parametros ni retorno: necesita su propio marco
         SimboloFuncion principal = new SimboloFuncion("principal", Tipo.VACIO, new ArrayList<>(), false, null,
                 modulo.getArchivo(), modulo.getLinea(), modulo.getColumna());
         principal.setEtiqueta(etiqueta("principal"));
@@ -412,9 +358,9 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
 
         String duenio = funcion.getClaseDuenia() == null ? "" : funcion.getClaseDuenia() + ".";
         tabla.abrirMarcoFuncion(duenio + funcion.getNombre());
-        tabla.reservarStack(1);                 // SimboloFuncion.CELDA_RETORNO
+        tabla.reservarStack(1);
         if (conThis) {
-            tabla.reservarStack(1);             // SimboloFuncion.CELDA_THIS
+            tabla.reservarStack(1);
         }
         List<SimboloVariable> parametros = funcion.getParametros();
         for (int i = 0; i < parametros.size(); i++) {
@@ -438,7 +384,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         elegirAbiertos = elegirAnteriores;
     }
 
-    /** Analiza un cuerpo y reporta lo que queda despues de un retorno, romper o continuar. */
     private void instrucciones(List<Instruccion> lista) {
         Instruccion corte = null;
         boolean inalcanzableReportado = false;
@@ -458,10 +403,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         }
     }
 
-    /**
-     * Un romper/continuar fuera de lugar ya se reporto como tal; tratarlo
-     * ademas como corte agregaria un "codigo inalcanzable" por la misma causa.
-     */
     private boolean cortaElFlujo(Instruccion instruccion) {
         return switch (instruccion) {
             case Retorno r -> true;
@@ -470,11 +411,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         };
     }
 
-    /**
-     * Los ciclos no cuentan: su condicion puede ser falsa desde el inicio y el
-     * cuerpo no ejecutarse nunca. Un si cuenta solo si tiene rama por defecto y
-     * todas sus ramas retornan.
-     */
     private boolean siempreRetorna(List<Instruccion> cuerpo) {
         for (Instruccion instruccion : cuerpo) {
             boolean retorna = switch (instruccion) {
@@ -491,13 +427,10 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         return false;
     }
 
-    /* ======================== Declaraciones ======================== */
-
     @Override
     public Tipo visitarDeclaracionVariable(DeclaracionVariable nodo) {
         Tipo tipo = resolverTipo(nodo.getTipo(), nodo);
         nodo.setTipo(tipo);
-        // El valor se analiza antes de declarar: "entero x = x" debe fallar
         if (nodo.tieneValor()) {
             verificarValor(nodo.getValor(), tipo, nodo.getNombre());
         }
@@ -520,7 +453,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         if (nodo.tieneValor()) {
             verificarValor(nodo.getValor(), tipo, nodo.getNombre());
         }
-        // En el stack solo va el puntero; el contenido aplanado va en el heap
         SimboloVariable simbolo = SimboloVariable.arreglo(nodo.getNombre(), tipo, nodo.tieneValor(),
                 nodo.getArchivo(), nodo.getLinea(), nodo.getColumna());
         simbolo.setPorReferencia(true);
@@ -529,7 +461,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         return null;
     }
 
-    /** Evalua las dimensiones que se puedan: null donde no es constante. */
     private List<Integer> dimensiones(List<Expresion> expresiones) {
         List<Integer> dimensiones = new ArrayList<>();
         for (Expresion expresion : expresiones) {
@@ -547,7 +478,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         return dimensiones;
     }
 
-    /** Estructura declarada dentro de una funcion de Y?. */
     @Override
     public Tipo visitarDeclaracionEstructura(DeclaracionEstructura nodo) {
         registrarEstructura(nodo);
@@ -573,12 +503,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         }
     }
 
-    /**
-     * Valida que un valor pueda guardarse en algo del tipo esperado. Las
-     * listas {..} no tienen tipo propio: se validan contra el esperado.
-     *
-     * @return el tipo del valor (para una lista, con las dimensiones que trae)
-     */
     private Tipo verificarValor(Expresion valor, Tipo esperado, String destino) {
         if (valor instanceof LiteralLista lista) {
             return validarLista(lista, esperado, destino);
@@ -616,11 +540,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         return resultado;
     }
 
-    /**
-     * Cada nivel de llaves es una dimension. Donde la dimension no se declaro
-     * (Zetariano: int[][] m = {...}) se toma del literal, y todas las filas
-     * deben medir lo mismo, porque el arreglo se aplana.
-     */
     private Tipo validarListaArreglo(LiteralLista lista, Tipo esperado, String destino) {
         List<Integer> dimensiones = esperado.getDimensiones();
         int cantidad = lista.getElementos().size();
@@ -658,19 +577,17 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         return Tipo.arreglo(esperado.getTipoElemento(), inferidas);
     }
 
-    /** Los literales de estructura son posicionales: un valor por campo, en orden. */
     private Tipo validarListaEstructura(LiteralLista lista, Tipo esperado, String destino) {
         SimboloEstructura estructura = tabla.buscarTipo(esperado.getNombre());
         List<SimboloEstructura.Campo> campos = new ArrayList<>(estructura.getCampos().values());
         List<Expresion> valores = lista.getElementos();
         if (campos.size() != valores.size()) {
-            // Con la cantidad equivocada, comparar campo por campo solo daria errores en cascada
             String nombres = campos.stream().map(SimboloEstructura.Campo::getNombre).collect(Collectors.joining(", "));
             error(lista, "La estructura " + esperado + " tiene " + campos.size() + " campo(s) y la lista trae "
                     + valores.size() + " valor(es). Se esperaba un valor por campo, en orden: " + nombres);
             valores.forEach(valor -> {
                 if (!(valor instanceof LiteralLista)) {
-                    valor.aceptar(this);   // igual se analizan, por si tienen errores propios
+                    valor.aceptar(this);
                 }
             });
             return esperado;
@@ -681,8 +598,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         }
         return esperado;
     }
-
-    /* ======================== Instrucciones ======================== */
 
     @Override
     public Tipo visitarBloque(Bloque nodo) {
@@ -720,7 +635,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         return null;
     }
 
-    /** Lo que va a la izquierda de =, ++ o << debe ser un lugar donde guardar, no una llamada. */
     private void verificarAsignable(Acceso destino) {
         List<Sufijo> sufijos = destino.getSufijos();
         boolean esLlamada = sufijos.isEmpty() ? destino.getLlamada() != null
@@ -791,7 +705,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
     @Override
     public Tipo visitarHacer(Hacer nodo) {
         cuerpoDeCiclo(nodo.getCuerpo());
-        // Despues de cerrar el cuerpo: lo declarado adentro no se ve en la condicion
         condicion(nodo.getCondicion());
         return null;
     }
@@ -882,8 +795,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         return null;
     }
 
-    /* ======================== Expresiones ======================== */
-
     @Override
     public Tipo visitarLiteral(Literal nodo) {
         if (nodo.getValor() instanceof Long valor) {
@@ -959,7 +870,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         return tipo;
     }
 
-    /** Un nombre suelto: variable visible, o dentro de una clase, un atributo del propio objeto. */
     private Tipo raiz(Acceso nodo) {
         String nombre = nodo.getNombre();
         if (tabla.buscar(nombre) instanceof SimboloVariable variable) {
@@ -996,7 +906,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
                     i++;
                 }
                 case SufijoIndice indice -> {
-                    // Los indices seguidos se consumen juntos: m[i][j] es un solo acceso aplanado
                     int consumidos = 0;
                     while (i + consumidos < sufijos.size() && sufijos.get(i + consumidos) instanceof SufijoIndice) {
                         consumidos++;
@@ -1043,11 +952,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         return metodo == null ? Tipo.ERROR : metodo.getTipoRetorno();
     }
 
-    /**
-     * Un arreglo de N dimensiones se indexa con N indices; con menos quedaria
-     * una fila suelta del arreglo aplanado, que no se puede representar. Cada
-     * indice constante se valida contra su dimension, si esta se conoce.
-     */
     private Tipo indices(List<Sufijo> indices, Tipo tipo) {
         for (Sufijo sufijo : indices) {
             Tipo tipoIndice = ((SufijoIndice) sufijo).getIndice().aceptar(this);
@@ -1083,10 +987,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         return resultado;
     }
 
-    /**
-     * Dentro de una clase, f(x) es un metodo del propio objeto; fuera, una
-     * funcion libre de un .y o de MUNERA>.
-     */
     @Override
     public Tipo visitarLlamadaFuncion(LlamadaFuncion nodo) {
         List<Tipo> argumentos = tipos(nodo.getArgumentos());
@@ -1121,7 +1021,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
             nodo.setSimboloClase(clase);
             tipo = clase.getTipo();
             if (clase.getConstructores().isEmpty()) {
-                // Sin constructores declarados solo existe el implicito, sin parametros
                 if (!argumentos.isEmpty()) {
                     error(nodo, nodo.getClase(), "La clase '" + clase.getNombre() + "' no declara constructores. "
                             + "Se esperaba crearla sin argumentos: " + clase.getNombre() + "()");
@@ -1191,7 +1090,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         return tipo;
     }
 
-    /** El texto leido es una cadena; "x <<" de PigLatin lo convierte al tipo de x al ejecutarse. */
     @Override
     public Tipo visitarLeer(Leer nodo) {
         if (nodo.tieneDestino()) {
@@ -1205,8 +1103,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         nodo.setTipo(Tipo.CADENA);
         return Tipo.CADENA;
     }
-
-    /* ==================== Resolucion de llamadas ==================== */
 
     private List<Tipo> tipos(List<Expresion> expresiones) {
         return expresiones.stream().map(e -> e.aceptar(this)).toList();
@@ -1222,10 +1118,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         return lista;
     }
 
-    /**
-     * Elige la sobrecarga: primero por cantidad de argumentos, despues la que
-     * calce exacto en tipos, y si ninguna calza exacto, la primera compatible.
-     */
     private SimboloFuncion resolver(List<SimboloFuncion> candidatas, List<Tipo> argumentos, Nodo nodo, String que) {
         String lexema = nodo instanceof LlamadaFuncion l ? l.getNombre()
                 : nodo instanceof SufijoMetodo m ? m.getNombre() : lexema(nodo);
@@ -1234,7 +1126,7 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
             return null;
         }
         if (argumentos.stream().anyMatch(Tipo::esError)) {
-            return null;   // un argumento ya fallo: no se sabe que sobrecarga quiso
+            return null;
         }
         List<SimboloFuncion> porCantidad = candidatas.stream()
                 .filter(f -> f.getCantidadParametros() == argumentos.size()).toList();
@@ -1263,11 +1155,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         return null;
     }
 
-    /**
-     * Un parametro {} Estructura recibe la direccion de la estructura en el
-     * stack, asi que el argumento tiene que ser una estructura guardada en una
-     * variable (o en un campo de ella), no un elemento de un arreglo del heap.
-     */
     private void verificarReferencias(SimboloFuncion funcion, List<Expresion> argumentos) {
         for (int i = 0; i < argumentos.size(); i++) {
             SimboloVariable parametro = funcion.getParametros().get(i);
@@ -1296,13 +1183,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         return true;
     }
 
-    /* ========================= Utilidades ========================= */
-
-    /**
-     * Pone el tipo definitivo a un nombre de tipo. PigLatin no sabe si
-     * "Persona" es estructura o clase hasta que se registran todos los
-     * archivos: aqui se decide.
-     */
     private Tipo resolverTipo(Tipo tipo, Nodo nodo) {
         return switch (tipo.getBase()) {
             case ESTRUCTURA, OBJETO -> {
@@ -1322,7 +1202,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         };
     }
 
-    /** Celdas que ocupa un valor: una estructura se aplana; lo demas es un valor o un puntero. */
     private int tamanio(Tipo tipo) {
         if (tipo.esEstructura()) {
             SimboloEstructura estructura = tabla.buscarTipo(tipo.getNombre());
@@ -1336,7 +1215,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         return sufijos.isEmpty() ? acceso.getLlamada() != null : sufijos.get(sufijos.size() - 1) instanceof SufijoMetodo;
     }
 
-    /** Texto legible de un acceso para los mensajes: p.direccion.calle, m[..], this.x */
     private static String descripcion(Acceso acceso) {
         StringBuilder sb = new StringBuilder(acceso.esThis() ? "this"
                 : acceso.getNombre() != null ? acceso.getNombre() : acceso.getLlamada().getNombre() + "()");
@@ -1350,7 +1228,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         return sb.toString();
     }
 
-    /** La palabra reservada que el usuario escribio, segun el lenguaje del archivo. */
     private static String palabra(Nodo nodo, String y, String zetariano, String pig) {
         Lenguaje lenguaje = Lenguaje.desdeArchivo(nodo.getArchivo());
         if (lenguaje == null) {
@@ -1387,8 +1264,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         errores.agregar(new ErrorCompilacion(TipoError.SEMANTICO, nodo.getArchivo(), lexema, descripcion,
                 nodo.getLinea(), nodo.getColumna()));
     }
-
-    /* ==== Nodos que se analizan desde las pasadas, no visitandolos sueltos ==== */
 
     @Override
     public Tipo visitarPrograma(Programa nodo) {

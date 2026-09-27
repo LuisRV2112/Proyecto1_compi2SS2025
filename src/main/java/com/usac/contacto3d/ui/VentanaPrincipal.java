@@ -49,21 +49,11 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-/**
- * La ventana: arbol de trabajo a la izquierda, editor con pestanas al centro,
- * y abajo los resultados de la ultima compilacion (errores, cuartetas, tabla
- * de simbolos, codigo C y consola).
- *
- * Se compila el archivo de la pestana activa: un .pig arrastra lo que importa;
- * un .y o .z se analiza solo. Antes se guardan los archivos abiertos, porque
- * el compilador lee del disco (los imports tambien).
- */
 public class VentanaPrincipal extends JFrame {
 
     private static final String PREFERENCIA_CARPETA = "ultimaCarpeta";
     private static final long SEGUNDOS_EJECUCION = 10;
 
-    /** Lo que se hace despues de compilar. */
     private enum Accion { ANALIZAR, GENERAR_C, EJECUTAR, GCC }
 
     private record Compilacion(Path archivo, ListaErrores errores, ResultadoSemantico resultado,
@@ -114,8 +104,6 @@ public class VentanaPrincipal extends JFrame {
             abrirCarpeta(Path.of(anterior));
         }
     }
-
-    /* =========================== construccion =========================== */
 
     private JPanel crearContenido() {
         inferior.addTab("Errores", panelErrores);
@@ -218,7 +206,6 @@ public class VentanaPrincipal extends JFrame {
     private static RSyntaxTextArea areaSoloLectura() {
         RSyntaxTextArea area = new RSyntaxTextArea();
         TemaEditor.aplicar(area);
-        // Sin coloreado: el enunciado prohibe librerias para colorear, y este texto no es de nuestros lenguajes
         area.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_NONE);
         area.setEditable(false);
         area.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
@@ -231,8 +218,6 @@ public class VentanaPrincipal extends JFrame {
         TemaEditor.aplicarAlMargen(scroll.getGutter());
         return scroll;
     }
-
-    /* ======================= archivos y carpetas ======================= */
 
     public void abrirCarpeta(Path carpeta) {
         arbol.abrirCarpeta(carpeta);
@@ -297,7 +282,6 @@ public class VentanaPrincipal extends JFrame {
         }
     }
 
-    /** Titulo de la pestana con su boton de cerrar. */
     private JPanel encabezado(PestanaEditor pestana, JLabel titulo) {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
         panel.setOpaque(false);
@@ -376,7 +360,6 @@ public class VentanaPrincipal extends JFrame {
         });
     }
 
-    /** "Descargar" la carpeta de trabajo completa como un .zip. */
     private void exportarProyecto() {
         Path raiz = arbol.getRaiz();
         if (raiz == null) {
@@ -394,7 +377,7 @@ public class VentanaPrincipal extends JFrame {
              Stream<Path> recorrido = Files.walk(raiz)) {
             for (Path archivo : recorrido.filter(Files::isRegularFile).toList()) {
                 if (archivo.toAbsolutePath().equals(destino.toAbsolutePath())) {
-                    continue;   // el propio zip, si se guardo dentro de la carpeta
+                    continue;
                 }
                 zip.putNextEntry(new ZipEntry(raiz.getFileName() + "/" + raiz.relativize(archivo).toString().replace('\\', '/')));
                 Files.copy(archivo, zip);
@@ -438,8 +421,6 @@ public class VentanaPrincipal extends JFrame {
         System.exit(0);
     }
 
-    /* =========================== compilacion =========================== */
-
     private void compilar(Accion accion) {
         if (trabajando) {
             return;
@@ -482,11 +463,9 @@ public class VentanaPrincipal extends JFrame {
                 }
                 boolean ejecutar = accion == Accion.EJECUTAR || accion == Accion.GCC;
                 if (ejecutar && !ultima.exitosa()) {
-                    // La pestana Errores ya quedo seleccionada; la consola dice por que no corrio
                     consola.mostrar("No se ejecuto: hay " + ultima.errores().cantidad()
                             + " error(es). Corregilos (ver la pestana Errores) y volve a ejecutar.");
                 } else if (ejecutar && ultima.resultado().principal() == null) {
-                    // Un .y o .z solo define funciones, estructuras o clases: no hay MAIOR> que correr
                     consola.mostrar("No hay nada que ejecutar: " + ultima.archivo().getFileName()
                             + " no tiene programa principal.\n\nSolo un .pig tiene MAIOR>. Abri el .pig que importa "
                             + "este archivo, dejalo en la pestana activa y ejecuta desde ahi.");
@@ -528,7 +507,6 @@ public class VentanaPrincipal extends JFrame {
         }
     }
 
-    /** Doble clic en un error: abre su archivo (puede ser un import) y va a la linea. */
     private void irAError(String nombreArchivo, int linea) {
         Optional<PestanaEditor> abierta = pestanas().stream()
                 .filter(p -> p.getArchivo().getFileName().toString().equals(nombreArchivo)).findFirst();
@@ -547,9 +525,6 @@ public class VentanaPrincipal extends JFrame {
         });
     }
 
-    /* ========================= codigo C y ejecucion ========================= */
-
-    /** El .c queda en la carpeta salida/ del proyecto (o junto al archivo si no hay carpeta abierta). */
     private void guardarCodigoCEnSalida() {
         Path base = arbol.getRaiz() != null ? arbol.getRaiz() : ultima.archivo().toAbsolutePath().getParent();
         Path destino = base.resolve("salida").resolve(nombreSinExtension(ultima.archivo()) + ".c");
@@ -589,7 +564,6 @@ public class VentanaPrincipal extends JFrame {
                 "Ejecutado con el interprete de cuartetas");
     }
 
-    /** Compila el .c con gcc en una carpeta temporal y lo corre con la entrada de la consola. */
     private void ejecutarConGcc() {
         String codigo = ultima.codigoC();
         String entrada = consola.getEntrada();
@@ -656,8 +630,6 @@ public class VentanaPrincipal extends JFrame {
             }
         }.execute();
     }
-
-    /* =========================== utilidades =========================== */
 
     private List<PestanaEditor> pestanas() {
         List<PestanaEditor> lista = new ArrayList<>();

@@ -10,15 +10,10 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 
 import java.util.Map;
 
-/**
- * Captura los errores sintacticos y los traduce a mensajes en espanol,
- * incluyendo que tokens se esperaban y en que regla ocurrio.
- */
 public class ErroresSintacticos extends BaseErrorListener {
 
     private static final int MAX_ESPERADOS = 6;
 
-    /** Tokens sin texto propio (o con uno invisible) y como se le nombran al usuario. */
     private static final Map<String, String> NOMBRES_LEGIBLES = Map.of(
             "NUEVA_LINEA", "fin de linea",
             "INDENT", "inicio de bloque (mas sangria)",
