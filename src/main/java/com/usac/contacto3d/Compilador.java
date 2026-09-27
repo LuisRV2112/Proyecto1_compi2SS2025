@@ -35,6 +35,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,6 +75,10 @@ public class Compilador {
     public Programa analizar(Path archivo) throws IOException {
         String nombre = archivo.getFileName().toString();
         errores.setArchivoActual(nombre);
+        if (!Files.isRegularFile(archivo)) {
+            errores.agregar(TipoError.LEXICO, nombre, "No existe el archivo " + archivo, 0, 0);
+            return null;
+        }
 
         Lexer lexer = crearLexer(nombre, CharStreams.fromPath(archivo));
         if (lexer == null) {

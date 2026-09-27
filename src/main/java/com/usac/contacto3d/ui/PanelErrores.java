@@ -56,6 +56,9 @@ public class PanelErrores extends JPanel {
         int[] anchos = {90, 160, 60, 70, 130, 600};
         for (int i = 0; i < anchos.length; i++) {
             tabla.getColumnModel().getColumn(i).setPreferredWidth(anchos[i]);
+            if (i < anchos.length - 1) {
+                tabla.getColumnModel().getColumn(i).setMinWidth(anchos[i] * 3 / 4);
+            }
         }
 
         tabla.addMouseListener(new MouseAdapter() {

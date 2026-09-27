@@ -7,6 +7,14 @@ Segundo semestre 2026
 Compilador de **tres lenguajes de alto nivel** (Y?, Zetariano y PigLatin) que genera
 **código de tres direcciones mediante cuartetas** y lo traduce a un archivo **C compilable**.
 
+![Contacto 3xtrat3rr3str3D](capturas/01_programa_ejecutado.png)
+
+- **[Manual de usuario](MANUAL_USUARIO.md)** — cómo abrir un proyecto, escribir en cada
+  lenguaje, compilar, ver los resultados y generar el `.c`.
+- **[Manual técnico](MANUAL_TECNICO.md)** — tecnologías, diagramas de clases, palabras
+  reservadas, símbolos y gramáticas, tabla de compatibilidad de tipos de los tres lenguajes,
+  modelo de memoria, cuartetas y traducción a C.
+
 ---
 
 ## Avance
@@ -18,12 +26,12 @@ Compilador de **tres lenguajes de alto nivel** (Y?, Zetariano y PigLatin) que ge
 | 3 | Imports, tabla de símbolos y análisis semántico | Lista |
 | 4 | Generación de cuartetas (C3D) | Lista |
 | 5 | De cuartetas a un `.c` que compile con gcc | Lista |
-| 6 | Árbol de trabajo, coloreado y documentación | Pendiente |
+| 6 | Árbol de trabajo, coloreado y documentación | Lista |
 
 ```
 src/main/antlr4/.../parser/   LenguajeY.g4, Zetariano.g4, PigLatin.g4
 src/main/java/com/usac/contacto3d/
-├── Main.java                 stub (la ventana es de la fase 6)
+├── Main.java                 abre la ventana
 ├── Compilador.java           compila un archivo (y sus imports) hasta el .c
 ├── parser/IndentacionY.java  INDENT/DEDENT de Y?
 ├── errores/                  modelo y listeners, con soporte multi-archivo
@@ -31,7 +39,7 @@ src/main/java/com/usac/contacto3d/
 ├── constructores/            parse tree de cada lenguaje → AST común
 ├── semantico/                imports, validaciones de tipos y asignación de memoria
 ├── simbolos/                 ámbitos, símbolos, offsets de stack y heap
-├── ui/                       tema, panel de errores y base de los coloreadores
+├── ui/                       ventana, árbol de trabajo, editor, coloreadores propios y paneles
 ├── c3d/                      cuartetas: generador e intérprete de referencia
 └── generador/                TraductorC: cuartetas → C
 ```

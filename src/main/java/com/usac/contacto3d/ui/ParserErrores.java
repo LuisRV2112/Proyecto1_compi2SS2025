@@ -71,6 +71,13 @@ public class ParserErrores extends AbstractParser {
 
             int inicio = Math.min(inicioLinea + Math.max(0, error.getColumna() - 1), finLinea);
             int largo = error.getLexema().isEmpty() ? finLinea - inicio : error.getLexema().length();
+
+            // Algunos errores se ubican en la declaracion pero hablan de otra palabra de la
+            // linea (el tipo no declarado de un campo): se subraya esa palabra, la mas cercana
+            int encontrado = buscarEnLinea(documento, inicioLinea, finLinea, error.getLexema(), inicio);
+            if (encontrado >= 0) {
+                inicio = encontrado;
+            }
             largo = Math.max(1, Math.min(largo, finLinea - inicio));
 
             DefaultParserNotice aviso = new DefaultParserNotice(
@@ -85,6 +92,27 @@ public class ParserErrores extends AbstractParser {
             resultado.addNotice(aviso);
         }
         return resultado;
+    }
+
+    /** Posicion de la aparicion del lexema mas cercana a 'cerca', o -1 si no esta en la linea. */
+    private static int buscarEnLinea(RSyntaxDocument documento, int inicioLinea, int finLinea,
+                                     String lexema, int cerca) {
+        if (lexema.isBlank() || lexema.startsWith("<")) {
+            return -1;   // "<fin de linea>" y compania no son texto de la linea
+        }
+        try {
+            String texto = documento.getText(inicioLinea, finLinea - inicioLinea);
+            int mejor = -1;
+            for (int i = texto.indexOf(lexema); i >= 0; i = texto.indexOf(lexema, i + 1)) {
+                int posicion = inicioLinea + i;
+                if (mejor < 0 || Math.abs(posicion - cerca) < Math.abs(mejor - cerca)) {
+                    mejor = posicion;
+                }
+            }
+            return mejor;
+        } catch (javax.swing.text.BadLocationException e) {
+            return -1;
+        }
     }
 
     private Color colorDe(TipoError tipo) {
