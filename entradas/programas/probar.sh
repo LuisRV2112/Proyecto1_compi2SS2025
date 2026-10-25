@@ -24,6 +24,10 @@ for pig in entradas/programas/*.pig; do
                  | sed -n '/^-- salida --$/,/^-- fin --$/p' | sed '1d;$d')
     comparar "$pig (interprete)" "$interprete" "$esperado"
 
+    riscv=$(java -cp "$JAR" com.usac.contacto3d.Compilador --riscv "salida/$base.s" --simular "$pig" < "$entrada" \
+            | sed -n '/^-- salida --$/,/^-- fin --$/p' | sed '1d;$d')
+    comparar "$pig (RISC-V simulado)" "$riscv" "$esperado"
+
     java -cp "$JAR" com.usac.contacto3d.Compilador --c "salida/$base.c" "$pig" > /dev/null
     if gcc -std=c11 -Wall -Wextra -Werror "salida/$base.c" -o "salida/$base" 2> "salida/$base.gcc"; then
         comparar "$pig (C con gcc)" "$("./salida/$base" < "$entrada")" "$esperado"

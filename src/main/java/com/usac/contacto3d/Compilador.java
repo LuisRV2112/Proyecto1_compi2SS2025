@@ -10,6 +10,7 @@ import com.usac.contacto3d.constructores.ConstructorAstPig;
 import com.usac.contacto3d.constructores.ConstructorAstY;
 import com.usac.contacto3d.constructores.ConstructorAstZ;
 import com.usac.contacto3d.errores.ErrorCompilacion;
+import com.usac.contacto3d.generador.GeneradorRiscV;
 import com.usac.contacto3d.generador.TraductorC;
 import com.usac.contacto3d.errores.ErroresLexicos;
 import com.usac.contacto3d.errores.ErroresSintacticos;
@@ -21,6 +22,7 @@ import com.usac.contacto3d.parser.PigLatinLexer;
 import com.usac.contacto3d.parser.PigLatinParser;
 import com.usac.contacto3d.parser.ZetarianoLexer;
 import com.usac.contacto3d.parser.ZetarianoParser;
+import com.usac.contacto3d.riscv.Simulador;
 import com.usac.contacto3d.semantico.AnalizadorSemantico;
 import com.usac.contacto3d.semantico.ResolvedorImports;
 import com.usac.contacto3d.semantico.ResultadoSemantico;
@@ -111,6 +113,10 @@ public class Compilador {
         return new TraductorC().traducir(cuartetas);
     }
 
+    public String generarRiscV(ListaCuartetas cuartetas) {
+        return new GeneradorRiscV().generar(cuartetas);
+    }
+
     private Lexer crearLexer(String nombre, CharStream entrada) {
         Lexer lexer;
         if (nombre.endsWith(".y")) {
@@ -141,13 +147,17 @@ public class Compilador {
         boolean verTabla = false;
         boolean verC3d = false;
         boolean ejecutar = false;
+        boolean simular = false;
         Path salidaC = null;
+        Path salidaRiscV = null;
         List<Path> archivos = new ArrayList<>();
 
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
             switch (arg) {
                 case "--c" -> salidaC = Path.of(args[++i]);
+                case "--riscv" -> salidaRiscV = Path.of(args[++i]);
+                case "--simular" -> simular = true;
                 case "--tokens" -> verTokens = true;
                 case "--arbol" -> verArbol = true;
                 case "--ast" -> verAst = true;
@@ -158,7 +168,7 @@ public class Compilador {
             }
         }
         if (archivos.isEmpty()) {
-            System.err.println("Uso: Compilador [--tokens] [--arbol] [--ast] [--tabla] [--c3d] [--ejecutar] [--c salida.c] archivo...");
+            System.err.println("Uso: Compilador [--tokens] [--arbol] [--ast] [--tabla] [--c3d] [--ejecutar] [--c salida.c] [--riscv salida.s] [--simular] archivo...");
             System.exit(2);
         }
 
@@ -184,7 +194,7 @@ public class Compilador {
             if (verTabla && resultado != null) {
                 imprimirTabla(resultado);
             }
-            if ((verC3d || ejecutar || salidaC != null) && resultado != null && !compilador.getErrores().hayErrores()) {
+            if ((verC3d || ejecutar || simular || salidaC != null || salidaRiscV != null) && resultado != null && !compilador.getErrores().hayErrores()) {
                 ListaCuartetas cuartetas = compilador.generarCuartetas(resultado);
                 if (verC3d) {
                     System.out.print(cuartetas);
@@ -196,8 +206,23 @@ public class Compilador {
                     java.nio.file.Files.writeString(salidaC, compilador.traducirAC(cuartetas));
                     System.out.println("C generado en " + salidaC);
                 }
+                String entrada = ejecutar || simular ? new String(System.in.readAllBytes()) : "";
+                if (salidaRiscV != null || simular) {
+                    String ensamblador = compilador.generarRiscV(cuartetas);
+                    if (salidaRiscV != null) {
+                        if (salidaRiscV.getParent() != null) {
+                            java.nio.file.Files.createDirectories(salidaRiscV.getParent());
+                        }
+                        java.nio.file.Files.writeString(salidaRiscV, ensamblador);
+                        System.out.println("RISC-V generado en " + salidaRiscV);
+                    }
+                    if (simular) {
+                        System.out.println("-- salida --");
+                        System.out.print(Simulador.ejecutar(ensamblador, entrada));
+                        System.out.println("-- fin --");
+                    }
+                }
                 if (ejecutar) {
-                    String entrada = new String(System.in.readAllBytes());
                     System.out.println("-- salida --");
                     System.out.print(InterpreteCuartetas.ejecutar(cuartetas, entrada));
                     System.out.println("-- fin --");
