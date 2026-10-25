@@ -74,6 +74,20 @@ definir elegirCaso(entero n):
             imprimir("otro")
     }
 
+// la misma seleccion, con dos puntos y sangria en vez de llaves
+definir elegirSangria(entero n):
+    elegir(n) :
+        caso 1:
+            imprimir("uno")
+            romper
+        caso 2:
+            imprimir("dos")
+        caso 3:
+            imprimir("tres")
+            romper
+        siempre:
+            imprimir("otro")
+
 definir fibonacci(entero n) -> entero:
     si (n < 2) entonces
         retornar n

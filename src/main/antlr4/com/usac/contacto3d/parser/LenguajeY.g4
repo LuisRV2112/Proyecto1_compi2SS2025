@@ -124,9 +124,10 @@ ramaContrario
     ;
 
 sentenciaElegir
-    : ELEGIR PAR_A expr PAR_C LLAVE_A NUEVA_LINEA
-      (INDENT caso* casoSiempre? DEDENT)?
-      LLAVE_C NUEVA_LINEA
+    : ELEGIR PAR_A expr PAR_C
+      ( LLAVE_A NUEVA_LINEA (INDENT caso* casoSiempre? DEDENT)? LLAVE_C NUEVA_LINEA
+      | DOSP NUEVA_LINEA (INDENT caso* casoSiempre? DEDENT)?
+      )
     ;
 
 caso
