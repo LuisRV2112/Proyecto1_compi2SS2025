@@ -9,7 +9,9 @@
 #       RARS=/ruta/rars1_6.jar verificacion/verificar.sh
 cd "$(dirname "$0")/.." || exit 1
 JAR=target/contacto-3d-1.0.0.jar
-CASOS=${1:-$(ls -d drive-download-*/ 2>/dev/null | head -1)}
+# por defecto, las copias de verificacion/casos: los originales usan atributos sin modificador
+# fuera de su clase, que en el Proyecto 2 son private (ver verificacion/README.md)
+CASOS=${1:-verificacion/casos}
 DESTINO=verificacion/generado
 mkdir -p "$DESTINO"
 fallos=0

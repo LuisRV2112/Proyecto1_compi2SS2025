@@ -1,0 +1,5 @@
+// Sin constructores: el implicito llama a Hija(), que existe.
+public class Nieta extends Hija {
+    public void abuelo() { println("nieta"); }      // error: sobrescribe el de Base, falta @Override
+    @Override public void saludar() { println("nieta"); }   // valido
+}

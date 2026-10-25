@@ -1,0 +1,7 @@
+public class SinPadre {
+    public SinPadre() {
+        super();                    // error: no hereda de ninguna clase
+    }
+
+    @Override public void nada() { }    // error: @Override sin clase padre
+}

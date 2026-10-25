@@ -134,8 +134,26 @@ public class GeneradorCuartetas implements Visitante<String> {
 
     private void generarFuncion(SimboloFuncion funcion, List<Instruccion> cuerpo,
                                 List<DeclaracionVariable> atributos) {
+        generarFuncion(funcion, cuerpo, atributos, false);
+    }
+
+    /**
+     * En un constructor de una clase con padre, lo primero es el constructor del padre: el
+     * super(...) escrito o, si no hay, el del padre sin parametros. Despues van los
+     * inicializadores de los atributos propios y el resto del cuerpo.
+     */
+    private void generarFuncion(SimboloFuncion funcion, List<Instruccion> cuerpo,
+                                List<DeclaracionVariable> atributos, boolean esConstructor) {
         funcionActual = funcion;
         emitir(FUNCION, funcion.getEtiqueta(), null, null);
+        if (esConstructor && claseActual.getPadre() != null) {
+            if (!cuerpo.isEmpty() && cuerpo.get(0) instanceof LlamadaSuper llamada) {
+                llamada.aceptar(this);
+                cuerpo = cuerpo.subList(1, cuerpo.size());
+            } else {
+                llamar(constructorSinParametros(claseActual.getPadre()), List.of(), cargarThis());
+            }
+        }
         for (DeclaracionVariable atributo : atributos) {
             if (atributo.tieneValor()) {
                 Ubicacion ubicacion = new Ubicacion(true,
@@ -150,11 +168,11 @@ public class GeneradorCuartetas implements Visitante<String> {
     private void generarClase(DeclaracionClase clase) {
         claseActual = clase.getSimbolo();
         for (DeclaracionConstructor constructor : clase.getConstructores()) {
-            generarFuncion(constructor.getSimbolo(), constructor.getCuerpo(), clase.getAtributos());
+            generarFuncion(constructor.getSimbolo(), constructor.getCuerpo(), clase.getAtributos(), true);
         }
         SimboloFuncion implicito = constructoresImplicitos.get(clase.getNombre());
         if (implicito != null) {
-            generarFuncion(implicito, List.of(), clase.getAtributos());
+            generarFuncion(implicito, List.of(), clase.getAtributos(), true);
         }
         for (DeclaracionMetodo metodo : clase.getMetodos()) {
             generarFuncion(metodo.getSimbolo(), metodo.getCuerpo(), List.of());
@@ -556,14 +574,24 @@ public class GeneradorCuartetas implements Visitante<String> {
         return new Ubicacion(true, operar(SUMA, sumar(arreglo, rango), desplazamiento));
     }
 
+    // super nunca pasa por el despacho dinamico: llama directo al constructor o metodo del padre
     @Override
     public String visitarLlamadaSuper(LlamadaSuper nodo) {
-        throw new IllegalStateException("super(...) no se traduce todavia");
+        SimboloFuncion constructor = nodo.getConstructor() != null ? nodo.getConstructor()
+                : constructoresImplicitos.get(claseActual.getPadre().getNombre());
+        llamar(constructor, nodo.getArgumentos(), cargarThis());
+        return null;
+    }
+
+    /** El semantico ya garantizo que existe: el declarado sin parametros o el implicito. */
+    private SimboloFuncion constructorSinParametros(SimboloEstructura clase) {
+        SimboloFuncion declarado = clase.buscarConstructor(0);
+        return declarado != null ? declarado : constructoresImplicitos.get(clase.getNombre());
     }
 
     @Override
     public String visitarSuperMetodo(SuperMetodo nodo) {
-        throw new IllegalStateException("super." + nodo.getNombre() + "(...) no se traduce todavia");
+        return llamar(nodo.getFuncion(), nodo.getArgumentos(), cargarThis());
     }
 
     @Override

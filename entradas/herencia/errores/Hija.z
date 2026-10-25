@@ -1,0 +1,39 @@
+// Cada metodo comenta el error que debe reportar (o "valido" si no debe reportar nada).
+public class Hija extends Base {
+    int prot;                       // error: el campo ya existe en Base
+    @Override int marcado;          // error: @Override sobre un atributo
+
+    public Hija() {                 // error: Base no tiene constructor sin parametros
+        pub = 1;
+    }
+
+    public Hija(int x) {
+        pub = x;
+        super(x);                   // error: super no es la primera instruccion
+    }
+
+    public Hija(int x, int y) {
+        super(x + y);               // valido
+    }
+
+    public void accesos() {
+        prot = 1;                   // valido: protected desde la subclase
+        pub = 2;                    // valido
+        secreto = 3;                // error: private del padre, sin punto
+        this.secreto = 4;           // error: private del padre, con this
+        sinModificador = 5;         // error: sin modificador es private
+        oculto();                   // valido: llama al oculto() propio de Hija
+        super.noExiste();           // error: el padre no tiene ese metodo
+        super(1);                   // error: super(...) fuera de un constructor
+        Base b = new Hija(1, 2);    // valido: una Hija es una Base
+        Hija h = new Base(1);       // error: una Base no es una Hija
+    }
+
+    public void saludar() { println("hija"); }                  // error: falta @Override
+    @Override public void inventado() { println("x"); }         // error: @Override de mas
+    private void oculto() { println("otro"); }                  // valido: el del padre es private
+    @Override public Hija obtener() { return this; }            // valido: retorno covariante
+    @Override protected void publico() { println("menos"); }    // error: reduce la visibilidad
+    @Override public int nombre() { return 1; }                 // error: retorno incompatible
+    @Override public String nombreSuper() { return super.nombre(); }  // error: @Override de mas
+}

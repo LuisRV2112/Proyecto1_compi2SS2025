@@ -2,6 +2,8 @@ package com.usac.contacto3d.semantico;
 
 import com.usac.contacto3d.ast.Tipo;
 import com.usac.contacto3d.ast.expresiones.Operador;
+import com.usac.contacto3d.simbolos.SimboloEstructura;
+import com.usac.contacto3d.simbolos.TablaSimbolos;
 
 public final class Compatibilidad {
 
@@ -42,6 +44,35 @@ public final class Compatibilidad {
             return aceptaNulo(a) || aceptaNulo(b);
         }
         return a.equals(b);
+    }
+
+    /**
+     * Como {@link #asignable(Tipo, Tipo)}, y ademas un objeto de una subclase se puede guardar en
+     * una variable de la clase padre. Al reves no.
+     */
+    public static boolean asignable(Tipo destino, Tipo origen, TablaSimbolos tabla) {
+        return asignable(destino, origen) || esSubclaseDe(origen, destino, tabla);
+    }
+
+    /** Dos objetos se pueden comparar con == si uno es de la clase del otro o de una subclase. */
+    public static boolean comparables(Tipo a, Tipo b, TablaSimbolos tabla) {
+        return comparables(a, b) || esSubclaseDe(a, b, tabla) || esSubclaseDe(b, a, tabla);
+    }
+
+    public static Tipo binaria(Operador operador, Tipo a, Tipo b, TablaSimbolos tabla) {
+        if ((operador == Operador.IGUAL || operador == Operador.DIFERENTE) && comparables(a, b, tabla)) {
+            return Tipo.BOOLEANO;
+        }
+        return binaria(operador, a, b);
+    }
+
+    public static boolean esSubclaseDe(Tipo hijo, Tipo padre, TablaSimbolos tabla) {
+        if (!hijo.esObjeto() || !padre.esObjeto()) {
+            return false;
+        }
+        SimboloEstructura claseHijo = tabla.buscarTipo(hijo.getNombre());
+        SimboloEstructura clasePadre = tabla.buscarTipo(padre.getNombre());
+        return claseHijo != null && clasePadre != null && claseHijo.esSubclaseDe(clasePadre);
     }
 
     public static boolean asignable(Tipo destino, Tipo origen) {

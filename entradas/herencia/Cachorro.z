@@ -1,0 +1,24 @@
+// Tercer nivel: sobrescribe un metodo del abuelo (describir, de Animal) y uno del padre (comer).
+public class Cachorro extends Perro {
+    private int meses;
+
+    public Cachorro(String n, int m) {
+        super(n);
+        meses = m;
+    }
+
+    @Override
+    public void comer() {
+        super.comer();
+        println(nombre + " se duerme despues de comer.");
+    }
+
+    @Override
+    protected String describir() {
+        return super.describir() + " y " + meses + " meses";
+    }
+
+    public String ficha() {
+        return describir();
+    }
+}

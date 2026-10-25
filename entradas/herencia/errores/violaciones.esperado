@@ -1,0 +1,23 @@
+  [Semantico] CicloA.z linea 1, columna 14 -> Herencia circular: CicloA -> CicloB -> CicloA. Se esperaba que ninguna clase heredara, directa o indirectamente, de si misma
+  [Semantico] Hija.z linea 3, columna 9 -> El campo 'prot' ya existe en la clase padre 'Base'. Se esperaba un nombre distinto
+  [Semantico] Hija.z linea 4, columna 19 -> @Override no aplica al atributo 'marcado'. Se esperaba solo sobre un metodo que sobrescribe uno de la clase padre
+  [Semantico] Hija.z linea 6, columna 12 -> La clase 'Base' no tiene constructor sin parametros: el constructor de 'Hija' debe llamar a super(...) con argumentos
+  [Semantico] Hija.z linea 10, columna 12 -> La clase 'Base' no tiene constructor sin parametros: el constructor de 'Hija' debe llamar a super(...) con argumentos
+  [Semantico] Hija.z linea 12, columna 9 -> super(...) debe ser la primera instruccion del constructor de 'Hija'
+  [Semantico] Hija.z linea 22, columna 9 -> El atributo 'secreto' es private, asi que solo es accesible dentro de 'Base'; se uso desde 'Hija'
+  [Semantico] Hija.z linea 23, columna 14 -> El atributo 'secreto' es private, asi que solo es accesible dentro de 'Base'; se uso desde 'Hija'
+  [Semantico] Hija.z linea 24, columna 9 -> El atributo 'sinModificador' no tiene modificador, asi que solo es accesible dentro de 'Base'; se uso desde 'Hija'
+  [Semantico] Hija.z linea 26, columna 9 -> No existe el metodo 'noExiste' en la clase padre Base. Se esperaba una funcion o metodo declarado
+  [Semantico] Hija.z linea 27, columna 9 -> super(...) solo puede ir dentro de un constructor. Se esperaba super.metodo(...) para llamar a un metodo de la clase padre
+  [Semantico] Hija.z linea 29, columna 18 -> No se puede guardar un valor de tipo Base en 'h'. Se esperaba un valor de tipo Hija
+  [Semantico] Hija.z linea 32, columna 17 -> El metodo 'saludar' sobrescribe uno de la clase 'Base' y debe llevar @Override
+  [Semantico] Hija.z linea 33, columna 27 -> @Override de mas en 'inventado()': ninguna clase padre de 'Hija' tiene un metodo inventado(). Se esperaba quitar la anotacion
+  [Semantico] Hija.z linea 36, columna 30 -> 'publico()' es protected y el metodo que sobrescribe de 'Base' es public. Se esperaba no reducir la visibilidad
+  [Semantico] Hija.z linea 37, columna 26 -> 'nombre()' retorna entero y el metodo que sobrescribe de 'Base' retorna cadena. Se esperaba el mismo tipo o una subclase de el
+  [Semantico] Hija.z linea 38, columna 29 -> @Override de mas en 'nombreSuper()': ninguna clase padre de 'Hija' tiene un metodo nombreSuper(). Se esperaba quitar la anotacion
+  [Semantico] Nieta.z linea 3, columna 17 -> El metodo 'abuelo' sobrescribe uno de la clase 'Base' y debe llevar @Override
+  [Semantico] SinPadre.z linea 3, columna 9 -> 'SinPadre' no hereda de ninguna clase, asi que no tiene constructor padre al cual llamar con super(...)
+  [Semantico] SinPadre.z linea 6, columna 27 -> @Override de mas en 'nada()': 'SinPadre' no hereda de ninguna clase. Se esperaba quitar la anotacion
+  [Semantico] violaciones.pig linea 15, columna 6 -> El atributo 'prot' es protected, asi que solo es accesible dentro de 'Base' y sus subclases; se uso fuera de toda clase
+  [Semantico] violaciones.pig linea 16, columna 6 -> El atributo 'sinModificador' no tiene modificador, asi que solo es accesible dentro de 'Base'; se uso fuera de toda clase
+  [Semantico] violaciones.pig linea 18, columna 5 -> No se puede guardar un valor de tipo Base en 'h'. Se esperaba un valor de tipo Hija

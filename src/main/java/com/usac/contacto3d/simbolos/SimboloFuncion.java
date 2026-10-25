@@ -1,6 +1,7 @@
 package com.usac.contacto3d.simbolos;
 
 import com.usac.contacto3d.ast.Tipo;
+import com.usac.contacto3d.ast.declaraciones.Visibilidad;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ public class SimboloFuncion extends Simbolo {
 
     private int tamanioMarco = 0;
     private String etiqueta;
+    private Visibilidad visibilidad = Visibilidad.PUBLICO;   // las funciones de .y son publicas
 
     public SimboloFuncion(String nombre, Tipo tipoRetorno, List<SimboloVariable> parametros,
                           boolean esMetodo, String claseDuenia,
@@ -35,6 +37,8 @@ public class SimboloFuncion extends Simbolo {
     public int getTamanioMarco()                 { return tamanioMarco; }
     public void setTamanioMarco(int celdas)      { this.tamanioMarco = celdas; }
     public String getEtiqueta()                  { return etiqueta; }
+    public Visibilidad getVisibilidad()          { return visibilidad; }
+    public void setVisibilidad(Visibilidad v)    { this.visibilidad = v; }
     public void setEtiqueta(String etiqueta)     { this.etiqueta = etiqueta; }
 
     public boolean sinRetorno() {

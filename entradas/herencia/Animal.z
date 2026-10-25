@@ -4,6 +4,11 @@ public class Animal {
     private int edad;
     int patas = 4;
 
+    public Animal() {
+        nombre = "sin nombre";
+        edad = 0;
+    }
+
     public Animal(String n) {
         nombre = n;
         edad = 0;

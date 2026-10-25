@@ -15,6 +15,7 @@ import com.usac.contacto3d.ast.declaraciones.DeclaracionVariable;
 import com.usac.contacto3d.ast.declaraciones.Funcion;
 import com.usac.contacto3d.ast.declaraciones.Importacion;
 import com.usac.contacto3d.ast.declaraciones.Parametro;
+import com.usac.contacto3d.ast.declaraciones.Visibilidad;
 import com.usac.contacto3d.ast.expresiones.Acceso;
 import com.usac.contacto3d.ast.expresiones.Expresion;
 import com.usac.contacto3d.ast.expresiones.IncrementoDecremento;
@@ -59,6 +60,7 @@ import com.usac.contacto3d.simbolos.TablaSimbolos;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -72,9 +74,12 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
     private final Map<String, DeclaracionEstructura> declaracionesEstructura = new HashMap<>();
     private final Set<String> estructurasEnProceso = new HashSet<>();
     private final Set<String> estructurasCompletas = new HashSet<>();
+    private final Map<String, DeclaracionClase> declaracionesClase = new HashMap<>();
+    private final Set<String> clasesCompletas = new HashSet<>();
 
     private SimboloEstructura claseActual;
     private SimboloFuncion funcionActual;
+    private DeclaracionConstructor constructorActual;
     private int ciclosAbiertos;
     private int elegirAbiertos;
     private boolean declarandoGlobales;
@@ -96,11 +101,20 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
             modulo.getEstructuras().forEach(e -> completarEstructura(e.getNombre()));
         }
         for (Programa modulo : modulos) {
+            modulo.getClases().forEach(this::enlazarPadre);
+        }
+        for (Programa modulo : modulos) {
+            modulo.getClases().forEach(this::cortarCiclo);
+        }
+        for (Programa modulo : modulos) {
             modulo.getClases().forEach(this::completarClase);
         }
         for (Programa modulo : modulos) {
             modulo.getFunciones().forEach(this::registrarFuncion);
             modulo.getClases().forEach(this::registrarMiembros);
+        }
+        for (Programa modulo : modulos) {
+            modulo.getClases().forEach(this::validarHerencia);
         }
         for (Programa modulo : modulos) {
             if (modulo.getLenguaje() != Lenguaje.PIGLATIN) {
@@ -144,6 +158,43 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
                 declaracion.getArchivo(), declaracion.getLinea(), declaracion.getColumna());
         if (declararTipo(simbolo, declaracion)) {
             declaracion.setSimbolo(simbolo);
+            declaracionesClase.put(declaracion.getNombre(), declaracion);
+        }
+    }
+
+    private void enlazarPadre(DeclaracionClase declaracion) {
+        SimboloEstructura clase = declaracion.getSimbolo();
+        String nombrePadre = declaracion.getNombrePadre();
+        if (clase == null || nombrePadre == null) {
+            return;
+        }
+        SimboloEstructura padre = tabla.buscarTipo(nombrePadre);
+        if (padre == null) {
+            error(declaracion, nombrePadre, "La clase '" + clase.getNombre() + "' hereda de '" + nombrePadre
+                    + "', que no existe. Se esperaba una clase de un .z importado");
+        } else if (!padre.esClase()) {
+            error(declaracion, nombrePadre, "La clase '" + clase.getNombre() + "' no puede heredar de '"
+                    + nombrePadre + "': es una estructura. Se esperaba una clase");
+        } else {
+            clase.setPadre(padre);
+        }
+    }
+
+    /** A extends B y B extends A: se reporta y se corta el enlace para que nada mas se cuelgue. */
+    private void cortarCiclo(DeclaracionClase declaracion) {
+        SimboloEstructura clase = declaracion.getSimbolo();
+        if (clase == null) {
+            return;
+        }
+        Set<String> vistos = new LinkedHashSet<>();
+        for (SimboloEstructura actual = clase; actual != null; actual = actual.getPadre()) {
+            if (!vistos.add(actual.getNombre())) {
+                error(declaracion, declaracion.getNombrePadre(), "Herencia circular: "
+                        + String.join(" -> ", vistos) + " -> " + actual.getNombre()
+                        + ". Se esperaba que ninguna clase heredara, directa o indirectamente, de si misma");
+                clase.setPadre(null);
+                return;
+            }
         }
     }
 
@@ -187,24 +238,48 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         estructurasCompletas.add(nombre);
     }
 
+    /**
+     * Calcula el layout de la clase. El padre se completa primero, porque sus campos van al
+     * principio y en las mismas posiciones: asi un objeto del hijo es un objeto valido del padre.
+     */
     private void completarClase(DeclaracionClase declaracion) {
         SimboloEstructura clase = declaracion.getSimbolo();
-        if (clase == null) {
+        if (clase == null || !clasesCompletas.add(clase.getNombre())) {
             return;
+        }
+        if (clase.getPadre() != null) {
+            completarClase(declaracionesClase.get(clase.getPadre().getNombre()));
+            clase.heredarCampos();
         }
         tabla.abrirAmbito("clase " + clase.getNombre());
         for (DeclaracionVariable atributo : declaracion.getAtributos()) {
             Tipo tipo = resolverTipo(atributo.getTipo(), atributo);
             atributo.setTipo(tipo);
+            if (atributo.tieneOverride()) {
+                error(atributo, atributo.getNombre(), "@Override no aplica al atributo '" + atributo.getNombre()
+                        + "'. Se esperaba solo sobre un metodo que sobrescribe uno de la clase padre");
+            }
+            SimboloEstructura.Campo heredado = clase.getCampo(atributo.getNombre());
+            if (heredado != null && heredado.getDuenio() != clase) {
+                error(atributo, atributo.getNombre(), "El campo '" + atributo.getNombre()
+                        + "' ya existe en la clase padre '" + heredado.getDuenio().getNombre()
+                        + "'. Se esperaba un nombre distinto");
+                continue;
+            }
             atributo.setSimbolo(agregarCampo(clase, atributo.getNombre(), tipo, tamanio(tipo), atributo,
-                    Simbolo.Almacenamiento.HEAP));
+                    Simbolo.Almacenamiento.HEAP, atributo.getVisibilidad()));
         }
         tabla.cerrarAmbito();
     }
 
     private SimboloVariable agregarCampo(SimboloEstructura tipo, String nombre, Tipo tipoCampo, int celdas,
                                          Nodo nodo, Simbolo.Almacenamiento zona) {
-        if (!tipo.agregarCampo(nombre, tipoCampo, celdas)) {
+        return agregarCampo(tipo, nombre, tipoCampo, celdas, nodo, zona, Visibilidad.PUBLICO);
+    }
+
+    private SimboloVariable agregarCampo(SimboloEstructura tipo, String nombre, Tipo tipoCampo, int celdas,
+                                         Nodo nodo, Simbolo.Almacenamiento zona, Visibilidad visibilidad) {
+        if (!tipo.agregarCampo(nombre, tipoCampo, celdas, visibilidad)) {
             error(nodo, nombre, "El campo '" + nombre + "' esta repetido en '" + tipo.getNombre()
                     + "'. Se esperaba un nombre distinto para cada campo");
             return null;
@@ -241,6 +316,7 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
                     parametros(constructor.getParametros()), true, clase.getNombre(),
                     constructor.getArchivo(), constructor.getLinea(), constructor.getColumna());
             simbolo.setEtiqueta(etiqueta(clase.getNombre() + "_constructor"));
+            simbolo.setVisibilidad(constructor.getVisibilidad());
             constructor.setSimbolo(simbolo);
             if (constructor.getNombre().equals(clase.getNombre())) {
                 agregarMiembro(clase.getConstructores(), simbolo, constructor, "El constructor");
@@ -257,9 +333,129 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
                     parametros(metodo.getParametros()), true, clase.getNombre(),
                     metodo.getArchivo(), metodo.getLinea(), metodo.getColumna());
             simbolo.setEtiqueta(etiqueta(clase.getNombre() + "_" + metodo.getNombre()));
+            simbolo.setVisibilidad(metodo.getVisibilidad());
             metodo.setSimbolo(simbolo);
             agregarMiembro(clase.getMetodos(), simbolo, metodo, "El metodo");
         }
+    }
+
+    /**
+     * Reglas de la sobrescritura (el @Override es obligatorio, y de mas tambien es error) y de la
+     * llamada implicita al constructor del padre.
+     */
+    private void validarHerencia(DeclaracionClase declaracion) {
+        SimboloEstructura clase = declaracion.getSimbolo();
+        if (clase == null) {
+            return;
+        }
+        SimboloEstructura padre = clase.getPadre();
+        for (DeclaracionMetodo metodo : declaracion.getMetodos()) {
+            SimboloFuncion simbolo = metodo.getSimbolo();
+            SimboloFuncion enPadre = padre == null ? null : padre.buscarPorFirma(simbolo.getFirma());
+            boolean privadoEnPadre = enPadre != null && esPrivado(enPadre.getVisibilidad());
+            if (privadoEnPadre) {
+                enPadre = null;   // un private no se hereda: el del hijo es un metodo nuevo
+            }
+            if (enPadre == null) {
+                if (metodo.tieneOverride()) {
+                    String razon = privadoEnPadre
+                            ? "el de '" + padre.getNombre() + "' es private y no se hereda"
+                            : padre == null ? "'" + clase.getNombre() + "' no hereda de ninguna clase"
+                            : "ninguna clase padre de '" + clase.getNombre() + "' tiene un metodo " + simbolo.getFirma();
+                    error(metodo, metodo.getNombre(), "@Override de mas en '" + simbolo.getFirma() + "': " + razon
+                            + ". Se esperaba quitar la anotacion");
+                }
+                continue;
+            }
+            String clasePadre = enPadre.getClaseDuenia();
+            if (!metodo.tieneOverride()) {
+                error(metodo, metodo.getNombre(), "El metodo '" + metodo.getNombre() + "' sobrescribe uno de la clase '"
+                        + clasePadre + "' y debe llevar @Override");
+            }
+            if (!Compatibilidad.asignable(enPadre.getTipoRetorno(), simbolo.getTipoRetorno(), tabla)) {
+                error(metodo, metodo.getNombre(), "'" + simbolo.getFirma() + "' retorna " + simbolo.getTipoRetorno()
+                        + " y el metodo que sobrescribe de '" + clasePadre + "' retorna " + enPadre.getTipoRetorno()
+                        + ". Se esperaba el mismo tipo o una subclase de el");
+            }
+            if (rango(simbolo.getVisibilidad()) < rango(enPadre.getVisibilidad())) {
+                error(metodo, metodo.getNombre(), "'" + simbolo.getFirma() + "' es " + simbolo.getVisibilidad().getPalabra()
+                        + " y el metodo que sobrescribe de '" + clasePadre + "' es "
+                        + enPadre.getVisibilidad().getPalabra() + ". Se esperaba no reducir la visibilidad");
+            }
+        }
+        if (padre == null) {
+            return;
+        }
+        if (declaracion.getConstructores().isEmpty()) {
+            verificarSuperImplicito(declaracion, clase.getNombre(), padre, "el constructor implicito de '" + clase.getNombre() + "'");
+        }
+        for (DeclaracionConstructor constructor : declaracion.getConstructores()) {
+            List<Instruccion> cuerpo = constructor.getCuerpo();
+            if (cuerpo.isEmpty() || !(cuerpo.get(0) instanceof LlamadaSuper)) {
+                verificarSuperImplicito(constructor, constructor.getNombre(), padre, "el constructor de '" + clase.getNombre() + "'");
+            }
+        }
+    }
+
+    /** Sin super(...) escrito, se llama al constructor sin parametros del padre: tiene que existir. */
+    private void verificarSuperImplicito(Nodo nodo, String lexema, SimboloEstructura padre, String quien) {
+        if (padre.getConstructores().isEmpty()) {
+            return;
+        }
+        SimboloFuncion vacio = padre.buscarConstructor(0);
+        if (vacio == null) {
+            error(nodo, lexema, "La clase '" + padre.getNombre() + "' no tiene constructor sin parametros: "
+                    + quien + " debe llamar a super(...) con argumentos");
+        } else if (esPrivado(vacio.getVisibilidad())) {
+            error(nodo, lexema, "El constructor sin parametros de '" + padre.getNombre() + "' es "
+                    + vacio.getVisibilidad().getPalabra() + " y no se puede llamar desde la subclase: "
+                    + quien + " debe llamar a super(...) con otro constructor");
+        }
+    }
+
+    private static boolean esPrivado(Visibilidad visibilidad) {
+        return visibilidad == Visibilidad.PRIVADO || visibilidad == Visibilidad.PAQUETE;
+    }
+
+    private static int rango(Visibilidad visibilidad) {
+        return switch (visibilidad) {
+            case PUBLICO -> 2;
+            case PROTEGIDO -> 1;
+            case PRIVADO, PAQUETE -> 0;
+        };
+    }
+
+    /** Sin modificador cuenta como private. {@code desde} es null fuera de toda clase (.pig y .y). */
+    private static boolean puedeAcceder(SimboloEstructura duenio, Visibilidad visibilidad, SimboloEstructura desde) {
+        return switch (visibilidad) {
+            case PUBLICO -> true;
+            case PRIVADO, PAQUETE -> desde == duenio;
+            case PROTEGIDO -> desde != null && desde.esSubclaseDe(duenio);
+        };
+    }
+
+    private void verificarAcceso(Nodo nodo, String lexema, String que, SimboloEstructura duenio,
+                                 Visibilidad visibilidad) {
+        if (duenio == null || !duenio.esClase() || puedeAcceder(duenio, visibilidad, claseActual)) {
+            return;
+        }
+        String clase = duenio.getNombre();
+        String regla = switch (visibilidad) {
+            case PAQUETE -> " no tiene modificador, asi que solo es accesible dentro de '" + clase + "'";
+            case PRIVADO -> " es private, asi que solo es accesible dentro de '" + clase + "'";
+            default -> " es protected, asi que solo es accesible dentro de '" + clase + "' y sus subclases";
+        };
+        String desde = claseActual == null ? "fuera de toda clase" : "desde '" + claseActual.getNombre() + "'";
+        error(nodo, lexema, que + regla + "; se uso " + desde);
+    }
+
+    private void verificarAcceso(Nodo nodo, String lexema, SimboloFuncion funcion) {
+        if (funcion == null || !funcion.esMetodo()) {
+            return;
+        }
+        boolean esConstructor = funcion.getNombre().equals(funcion.getClaseDuenia());
+        String que = (esConstructor ? "El constructor '" : "El metodo '") + funcion.getFirma() + "'";
+        verificarAcceso(nodo, lexema, que, tabla.buscarTipo(funcion.getClaseDuenia()), funcion.getVisibilidad());
     }
 
     private Tipo retornoValido(Tipo retorno, Funcion funcion) {
@@ -320,8 +516,10 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         tabla.cerrarAmbito();
 
         for (DeclaracionConstructor constructor : declaracion.getConstructores()) {
+            constructorActual = constructor;
             analizarFuncion(constructor.getSimbolo(), constructor.getParametros(), constructor.getCuerpo(),
                     true, constructor);
+            constructorActual = null;
         }
         for (DeclaracionMetodo metodo : declaracion.getMetodos()) {
             analizarFuncion(metodo.getSimbolo(), metodo.getParametros(), metodo.getCuerpo(), true, metodo);
@@ -510,7 +708,7 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
             return validarLista(lista, esperado, destino);
         }
         Tipo tipo = valor.aceptar(this);
-        if (!Compatibilidad.asignable(esperado, tipo)) {
+        if (!Compatibilidad.asignable(esperado, tipo, tabla)) {
             if (Compatibilidad.pierdeInformacion(esperado, tipo)) {
                 error(valor, "No se puede guardar un valor " + tipo + " en '" + destino + "', de tipo " + esperado
                         + ": se perderia informacion. Se esperaba un valor " + esperado + " o de menor jerarquia");
@@ -623,7 +821,7 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
                 if (resultado == null) {
                     error(nodo, nombre, "No se puede aplicar '" + nodo.getEtiqueta() + "' entre " + tipoDestino
                             + " y " + tipoValor);
-                } else if (!Compatibilidad.asignable(tipoDestino, resultado)) {
+                } else if (!Compatibilidad.asignable(tipoDestino, resultado, tabla)) {
                     error(nodo, nombre, "El resultado de '" + nodo.getEtiqueta() + "' es " + resultado
                             + " y no cabe en '" + nombre + "', de tipo " + tipoDestino);
                 }
@@ -679,7 +877,7 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
             } else {
                 Expresion valor = caso.getValor();
                 Tipo tipoCaso = valor.aceptar(this);
-                if (!tipo.esError() && !tipoCaso.esError() && !Compatibilidad.comparables(tipo, tipoCaso)) {
+                if (!tipo.esError() && !tipoCaso.esError() && !Compatibilidad.comparables(tipo, tipoCaso, tabla)) {
                     error(valor, "El caso es de tipo " + tipoCaso + " y no se puede comparar con el valor evaluado, de tipo "
                             + tipo + ". Se esperaba un caso de tipo " + tipo);
                 }
@@ -776,7 +974,7 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         } else {
             Tipo esperado = funcionActual.getTipoRetorno();
             Tipo tipo = nodo.getValor().aceptar(this);
-            if (!Compatibilidad.asignable(esperado, tipo)) {
+            if (!Compatibilidad.asignable(esperado, tipo, tabla)) {
                 String perdida = Compatibilidad.pierdeInformacion(esperado, tipo) ? " (se perderia informacion)" : "";
                 error(nodo.getValor(), "'" + funcion + "' retorna " + esperado + " y se intento retornar un valor "
                         + tipo + perdida + ". Se esperaba un valor de tipo " + esperado);
@@ -812,7 +1010,7 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         Tipo b = nodo.getDerecha().aceptar(this);
         Tipo resultado = Tipo.ERROR;
         if (!a.esError() && !b.esError()) {
-            resultado = Compatibilidad.binaria(nodo.getOperador(), a, b);
+            resultado = Compatibilidad.binaria(nodo.getOperador(), a, b, tabla);
             if (resultado == null) {
                 error(nodo, nodo.getOperador().getSimbolo(), mensajeOperacion(nodo.getOperador(), a, b));
                 resultado = Tipo.ERROR;
@@ -880,6 +1078,7 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         }
         if (claseActual != null && claseActual.tieneCampo(nombre)) {
             SimboloEstructura.Campo campo = claseActual.getCampo(nombre);
+            verificarAcceso(nodo, nombre, "El atributo '" + nombre + "'", campo.getDuenio(), campo.getVisibilidad());
             nodo.setCampoImplicito(campo);
             return campo.getTipo();
         }
@@ -935,6 +1134,7 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
                     + String.join(", ", estructura.getCampos().keySet()));
             return Tipo.ERROR;
         }
+        verificarAcceso(atributo, nombre, "El atributo '" + nombre + "'", campo.getDuenio(), campo.getVisibilidad());
         atributo.setCampo(campo);
         return campo.getTipo();
     }
@@ -948,8 +1148,9 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
             return Tipo.ERROR;
         }
         SimboloEstructura clase = tabla.buscarTipo(tipo.getNombre());
-        SimboloFuncion metodo = resolver(conNombre(clase.getMetodos(), sufijo.getNombre()), argumentos, sufijo,
+        SimboloFuncion metodo = resolver(clase.metodosEnCadena(sufijo.getNombre()), argumentos, sufijo,
                 "el metodo '" + sufijo.getNombre() + "' de " + clase.getNombre());
+        verificarAcceso(sufijo, sufijo.getNombre(), metodo);
         sufijo.setMetodo(metodo);
         return metodo == null ? Tipo.ERROR : metodo.getTipoRetorno();
     }
@@ -991,17 +1192,62 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
 
     @Override
     public Tipo visitarLlamadaSuper(LlamadaSuper nodo) {
-        tipos(nodo.getArgumentos());
-        error(nodo, "super", "super(...) todavia no esta soportado");
-        return Tipo.VACIO;
+        List<Tipo> argumentos = tipos(nodo.getArgumentos());
+        if (constructorActual == null) {
+            error(nodo, "super", "super(...) solo puede ir dentro de un constructor. Se esperaba super."
+                    + "metodo(...) para llamar a un metodo de la clase padre");
+            return null;
+        }
+        String clase = claseActual.getNombre();
+        List<Instruccion> cuerpo = constructorActual.getCuerpo();
+        if (cuerpo.isEmpty() || cuerpo.get(0) != nodo) {
+            error(nodo, "super", "super(...) debe ser la primera instruccion del constructor de '" + clase + "'");
+        }
+        SimboloEstructura padre = claseActual.getPadre();
+        if (padre == null) {
+            error(nodo, "super", "'" + clase + "' no hereda de ninguna clase, asi que no tiene constructor padre "
+                    + "al cual llamar con super(...)");
+            return null;
+        }
+        if (padre.getConstructores().isEmpty()) {
+            if (!argumentos.isEmpty()) {
+                error(nodo, "super", "La clase '" + padre.getNombre() + "' no declara constructores. "
+                        + "Se esperaba super() sin argumentos");
+            }
+            return null;
+        }
+        SimboloFuncion constructor = resolver(padre.getConstructores(), argumentos, nodo,
+                "el constructor de " + padre.getNombre());
+        verificarAcceso(nodo, "super", constructor);
+        if (constructor != null) {
+            verificarReferencias(constructor, nodo.getArgumentos());
+        }
+        nodo.setConstructor(constructor);
+        return null;
     }
 
     @Override
     public Tipo visitarSuperMetodo(SuperMetodo nodo) {
-        tipos(nodo.getArgumentos());
-        error(nodo, "super", "super." + nodo.getNombre() + "(...) todavia no esta soportado");
-        nodo.setTipo(Tipo.ERROR);
-        return Tipo.ERROR;
+        List<Tipo> argumentos = tipos(nodo.getArgumentos());
+        Tipo tipo = Tipo.ERROR;
+        if (claseActual == null) {
+            error(nodo, "super", "super." + nodo.getNombre() + "(...) solo puede ir dentro de una clase");
+        } else if (claseActual.getPadre() == null) {
+            error(nodo, "super", "'" + claseActual.getNombre() + "' no hereda de ninguna clase, asi que super."
+                    + nodo.getNombre() + "(...) no tiene a que metodo llamar");
+        } else {
+            SimboloEstructura padre = claseActual.getPadre();
+            SimboloFuncion metodo = resolver(padre.metodosEnCadena(nodo.getNombre()), argumentos, nodo,
+                    "el metodo '" + nodo.getNombre() + "' en la clase padre " + padre.getNombre());
+            verificarAcceso(nodo, nodo.getNombre(), metodo);
+            if (metodo != null) {
+                verificarReferencias(metodo, nodo.getArgumentos());
+                tipo = metodo.getTipoRetorno();
+            }
+            nodo.setFuncion(metodo);
+        }
+        nodo.setTipo(tipo);
+        return tipo;
     }
 
     @Override
@@ -1009,8 +1255,9 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         List<Tipo> argumentos = tipos(nodo.getArgumentos());
         SimboloFuncion funcion;
         if (claseActual != null) {
-            funcion = resolver(conNombre(claseActual.getMetodos(), nodo.getNombre()), argumentos, nodo,
+            funcion = resolver(claseActual.metodosEnCadena(nodo.getNombre()), argumentos, nodo,
                     "el metodo '" + nodo.getNombre() + "' de " + claseActual.getNombre());
+            verificarAcceso(nodo, nodo.getNombre(), funcion);
         } else {
             funcion = resolver(conNombre(tabla.getFunciones().values(), nodo.getNombre()), argumentos, nodo,
                     "la funcion '" + nodo.getNombre() + "'");
@@ -1045,6 +1292,7 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
             } else {
                 SimboloFuncion constructor = resolver(clase.getConstructores(), argumentos, nodo,
                         "el constructor de " + clase.getNombre());
+                verificarAcceso(nodo, nodo.getClase(), constructor);
                 nodo.setConstructor(constructor);
             }
         }
@@ -1095,9 +1343,9 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
             tipo = Tipo.ERROR;
         } else if (a.esNumerico() && b.esNumerico()) {
             tipo = Tipo.dominante(a, b);
-        } else if (Compatibilidad.asignable(a, b)) {
+        } else if (Compatibilidad.asignable(a, b, tabla)) {
             tipo = a;
-        } else if (Compatibilidad.asignable(b, a)) {
+        } else if (Compatibilidad.asignable(b, a, tabla)) {
             tipo = b;
         } else {
             error(nodo, "Las dos opciones del ternario deben tener tipos compatibles; se obtuvo " + a + " y " + b);
@@ -1137,7 +1385,8 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
 
     private SimboloFuncion resolver(List<SimboloFuncion> candidatas, List<Tipo> argumentos, Nodo nodo, String que) {
         String lexema = nodo instanceof LlamadaFuncion l ? l.getNombre()
-                : nodo instanceof SufijoMetodo m ? m.getNombre() : lexema(nodo);
+                : nodo instanceof SufijoMetodo m ? m.getNombre()
+                : nodo instanceof SuperMetodo m ? m.getNombre() : lexema(nodo);
         if (candidatas.isEmpty()) {
             error(nodo, lexema, "No existe " + que + ". Se esperaba una funcion o metodo declarado");
             return null;
@@ -1188,11 +1437,11 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         }
     }
 
-    private static boolean calza(SimboloFuncion funcion, List<Tipo> argumentos, boolean exacto) {
+    private boolean calza(SimboloFuncion funcion, List<Tipo> argumentos, boolean exacto) {
         for (int i = 0; i < argumentos.size(); i++) {
             Tipo parametro = funcion.getParametros().get(i).getTipo();
             boolean ok = exacto ? parametro.equals(argumentos.get(i))
-                    : Compatibilidad.asignable(parametro, argumentos.get(i));
+                    : Compatibilidad.asignable(parametro, argumentos.get(i), tabla);
             if (!ok) {
                 return false;
             }

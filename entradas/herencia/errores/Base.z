@@ -1,0 +1,19 @@
+// Clase padre de las pruebas de error de herencia y encapsulamiento.
+public class Base {
+    private int secreto;
+    protected int prot;
+    int sinModificador;
+    public int pub;
+
+    public Base(int x) {
+        secreto = x;
+        sinModificador = x;
+    }
+
+    public void saludar() { println("base"); }
+    public void abuelo() { println("abuelo"); }
+    protected String nombre() { return "base"; }
+    private void oculto() { println("oculto"); }
+    public Base obtener() { return this; }
+    public void publico() { println("publico"); }
+}

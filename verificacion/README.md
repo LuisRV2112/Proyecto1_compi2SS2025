@@ -9,6 +9,7 @@ como referencia, porque no implementa la extensión D y espera el número de ser
 | Ruta | Qué es |
 |---|---|
 | `verificar.sh` | Genera el `.s` de cada caso de calificación, lo ejecuta y compara las salidas |
+| `casos/` | Copia de los casos de calificación del Proyecto 1, con `public` en los atributos sin modificador |
 | `entradas/` | La entrada de teclado de cada caso, una línea por lectura |
 | `generado/*.s` | El ensamblador generado |
 | `generado/*.esperado` | Salida del intérprete de cuartetas (la referencia) |
@@ -23,7 +24,18 @@ verificacion/verificar.sh ruta/a/los/casos              # simulador propio contr
 RARS=ruta/rars1_6.jar verificacion/verificar.sh ruta/a/los/casos   # además, RARS
 ```
 
-Sin argumento, el script busca la carpeta `drive-download-*` en la raíz del proyecto.
+Sin argumento, el script usa `verificacion/casos/`.
+
+### Por qué una copia de los casos
+
+En el Proyecto 2 un miembro sin modificador se trata como `private`: solo es accesible dentro de
+su propia clase (lo confirmó el auxiliar). Los casos de calificación del Proyecto 1 leen atributos
+sin modificador desde otras clases y desde el `.pig`, así que los originales ya no pasan el
+semántico: `02_lista_doble` da 60 errores de acceso, `03_laberinto` 28 y `04_ahorcado` 7.
+
+La copia agrega `public` a esos atributos, y es el único cambio: 34 declaraciones en los `.z`. Los
+`.pig` y los `.y` son idénticos. La salida esperada es la misma que la de los originales con el
+compilador del Proyecto 1.
 
 ## A mano, en RARS
 
