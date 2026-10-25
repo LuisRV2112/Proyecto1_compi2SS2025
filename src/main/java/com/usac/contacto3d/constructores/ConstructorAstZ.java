@@ -8,6 +8,7 @@ import com.usac.contacto3d.ast.declaraciones.DeclaracionConstructor;
 import com.usac.contacto3d.ast.declaraciones.DeclaracionMetodo;
 import com.usac.contacto3d.ast.declaraciones.DeclaracionVariable;
 import com.usac.contacto3d.ast.declaraciones.Parametro;
+import com.usac.contacto3d.ast.declaraciones.Visibilidad;
 import com.usac.contacto3d.ast.expresiones.Acceso;
 import com.usac.contacto3d.ast.expresiones.Expresion;
 import com.usac.contacto3d.ast.expresiones.IncrementoDecremento;
@@ -24,6 +25,7 @@ import com.usac.contacto3d.ast.expresiones.Sufijo;
 import com.usac.contacto3d.ast.expresiones.SufijoAtributo;
 import com.usac.contacto3d.ast.expresiones.SufijoIndice;
 import com.usac.contacto3d.ast.expresiones.SufijoMetodo;
+import com.usac.contacto3d.ast.expresiones.SuperMetodo;
 import com.usac.contacto3d.ast.expresiones.Ternario;
 import com.usac.contacto3d.ast.instrucciones.Asignacion;
 import com.usac.contacto3d.ast.instrucciones.Bloque;
@@ -33,6 +35,7 @@ import com.usac.contacto3d.ast.instrucciones.Elegir;
 import com.usac.contacto3d.ast.instrucciones.Hacer;
 import com.usac.contacto3d.ast.instrucciones.Imprimir;
 import com.usac.contacto3d.ast.instrucciones.Instruccion;
+import com.usac.contacto3d.ast.instrucciones.LlamadaSuper;
 import com.usac.contacto3d.ast.instrucciones.Mientras;
 import com.usac.contacto3d.ast.instrucciones.Para;
 import com.usac.contacto3d.ast.instrucciones.Rama;
@@ -73,22 +76,29 @@ public class ConstructorAstZ extends ZetarianoBaseVisitor<Nodo> {
             switch (miembro) {
                 case MiembroConstructorContext m -> constructores.add(new DeclaracionConstructor(
                         m.ID().getText(), parametros(m.listaParametros()), bloque(m.bloque()),
-                        linea(m.ID()), columna(m.ID())));
+                        visibilidadDe(m.modificador()), linea(m.ID()), columna(m.ID())));
                 case MiembroMetodoVoidContext m -> metodos.add(new DeclaracionMetodo(
                         m.ID().getText(), parametros(m.listaParametros()), Tipo.VACIO, bloque(m.bloque()),
-                        linea(m.ID()), columna(m.ID())));
+                        visibilidadDe(m.modificador()), m.anotacion() != null, linea(m.ID()), columna(m.ID())));
                 case MiembroConTipoContext m -> {
                     Tipo tipo = tipo(m.tipo());
+                    Visibilidad visibilidad = visibilidadDe(m.modificador());
                     switch (m.restoMiembro()) {
                         case RestoMetodoContext r -> metodos.add(new DeclaracionMetodo(
                                 m.ID().getText(), parametros(r.listaParametros()), tipo, bloque(r.bloque()),
-                                linea(m.ID()), columna(m.ID())));
+                                visibilidad, m.anotacion() != null, linea(m.ID()), columna(m.ID())));
                         case RestoAtributoContext r -> {
-                            atributos.add(new DeclaracionVariable(m.ID().getText(), tipo, expr(r.expr()),
-                                    linea(m.ID()), columna(m.ID())));
+                            List<DeclaracionVariable> declarados = new ArrayList<>();
+                            declarados.add(new DeclaracionVariable(m.ID().getText(), tipo, expr(r.expr()), false,
+                                    visibilidad, linea(m.ID()), columna(m.ID())));
                             for (DeclaradorContext d : r.declarador()) {
-                                atributos.add(declarador(tipo, d));
+                                declarados.add(new DeclaracionVariable(d.ID().getText(), tipo, expr(d.expr()), false,
+                                        visibilidad, linea(d.ID()), columna(d.ID())));
                             }
+                            if (m.anotacion() != null) {
+                                declarados.forEach(DeclaracionVariable::marcarConOverride);
+                            }
+                            atributos.addAll(declarados);
                         }
                         default -> throw new IllegalStateException("Miembro no contemplado: " + m.getText());
                     }
@@ -96,8 +106,14 @@ public class ConstructorAstZ extends ZetarianoBaseVisitor<Nodo> {
                 default -> throw new IllegalStateException("Miembro no contemplado: " + miembro.getText());
             }
         }
-        return new DeclaracionClase(ctx.ID().getText(), atributos, constructores, metodos,
-                linea(ctx.ID()), columna(ctx.ID()));
+        // con extends hay dos ID: el de la clase es siempre el primero
+        String nombrePadre = ctx.EXTENDS() != null ? ctx.ID(1).getText() : null;
+        return new DeclaracionClase(ctx.ID(0).getText(), nombrePadre, atributos, constructores, metodos,
+                linea(ctx.ID(0)), columna(ctx.ID(0)));
+    }
+
+    private Visibilidad visibilidadDe(ModificadorContext ctx) {
+        return ctx == null ? Visibilidad.PAQUETE : Visibilidad.desde(ctx.getText());
     }
 
     private List<Parametro> parametros(ListaParametrosContext ctx) {
@@ -174,6 +190,17 @@ public class ConstructorAstZ extends ZetarianoBaseVisitor<Nodo> {
     @Override
     public Nodo visitInstLlamada(InstLlamadaContext ctx) {
         return visit(ctx.acceso());
+    }
+
+    @Override
+    public Nodo visitInstSuper(InstSuperContext ctx) {
+        return switch (ctx.llamadaSuper()) {
+            case SuperConstructorContext s -> new LlamadaSuper(expresiones(s.listaExpresiones()),
+                    linea(s), columna(s));
+            case SuperMetodoContext s -> new SuperMetodo(s.ID().getText(), expresiones(s.listaExpresiones()),
+                    linea(s), columna(s));
+            default -> throw new IllegalStateException("Llamada a super no contemplada: " + ctx.getText());
+        };
     }
 
     @Override
@@ -372,6 +399,11 @@ public class ConstructorAstZ extends ZetarianoBaseVisitor<Nodo> {
     @Override
     public Nodo visitExprAcceso(ExprAccesoContext ctx) {
         return visit(ctx.acceso());
+    }
+
+    @Override
+    public Nodo visitExprSuperMetodo(ExprSuperMetodoContext ctx) {
+        return new SuperMetodo(ctx.ID().getText(), expresiones(ctx.listaExpresiones()), linea(ctx), columna(ctx));
     }
 
     @Override

@@ -1,0 +1,15 @@
+// Hereda de Animal sin llamar a super: el constructor del padre se invoca de forma implicita.
+public class Perro extends Animal {
+    public Perro(String n) {
+        nombre = n;
+    }
+
+    public void ladrar() {
+        println(nombre + " esta ladrando: Guau, guau!");
+    }
+
+    @Override
+    public void comer() {
+        println(nombre + " devora su comida.");
+    }
+}

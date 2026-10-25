@@ -1,0 +1,19 @@
+// Clase base del ejemplo del enunciado.
+public class Animal {
+    protected String nombre;
+    private int edad;
+    int patas = 4;
+
+    public Animal(String n) {
+        nombre = n;
+        edad = 0;
+    }
+
+    public void comer() {
+        println(nombre + " esta comiendo.");
+    }
+
+    protected String describir() {
+        return nombre + " tiene " + patas + " patas";
+    }
+}

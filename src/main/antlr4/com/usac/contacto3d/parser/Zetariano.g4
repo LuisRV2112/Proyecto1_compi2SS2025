@@ -5,18 +5,23 @@ programa
     ;
 
 clase
-    : modificador? CLASS ID LLAVE_A miembro* LLAVE_C
+    : modificador? CLASS ID (EXTENDS ID)? LLAVE_A miembro* LLAVE_C
     ;
 
 modificador
     : PUBLIC                                # modPublico
     | PRIVATE                               # modPrivado
+    | PROTECTED                             # modProtegido
+    ;
+
+anotacion
+    : ARROBA OVERRIDE
     ;
 
 miembro
     : modificador? ID PAR_A listaParametros? PAR_C bloque                  # miembroConstructor
-    | modificador? VOID ID PAR_A listaParametros? PAR_C bloque             # miembroMetodoVoid
-    | modificador? tipo ID restoMiembro                                    # miembroConTipo
+    | anotacion? modificador? VOID ID PAR_A listaParametros? PAR_C bloque  # miembroMetodoVoid
+    | anotacion? modificador? tipo ID restoMiembro                         # miembroConTipo
     ;
 
 restoMiembro
@@ -55,6 +60,7 @@ instruccion
     | asignacion PUNTOYCOMA                 # instAsignacion
     | incremento PUNTOYCOMA                 # instIncremento
     | acceso PUNTOYCOMA                     # instLlamada
+    | llamadaSuper PUNTOYCOMA               # instSuper
     | sentenciaIf                           # instIf
     | sentenciaSwitch                       # instSwitch
     | sentenciaFor                          # instFor
@@ -83,6 +89,11 @@ asignacion
 incremento
     : acceso (INCREMENTO | DECREMENTO)      # incrementoPostfijo
     | (INCREMENTO | DECREMENTO) acceso      # incrementoPrefijo
+    ;
+
+llamadaSuper
+    : SUPER PAR_A listaExpresiones? PAR_C            # superConstructor
+    | SUPER PUNTO ID PAR_A listaExpresiones? PAR_C   # superMetodo
     ;
 
 sentenciaIf
@@ -137,6 +148,7 @@ expr
     | <assoc=right> expr INTERROGACION expr DOSP expr       # exprTernario
     | literal                                               # exprLiteral
     | acceso                                                # exprAcceso
+    | SUPER PUNTO ID PAR_A listaExpresiones? PAR_C          # exprSuperMetodo
     | NEW ID PAR_A listaExpresiones? PAR_C                  # exprNuevoObjeto
     | NEW tipoBase (CORCH_A expr CORCH_C)+                  # exprNuevoArreglo
     | LLAVE_A listaExpresiones? LLAVE_C                     # exprArregloLiteral
@@ -181,6 +193,10 @@ VOID     : 'void' ;
 
 PUBLIC   : 'public' ;
 PRIVATE  : 'private' ;
+PROTECTED : 'protected' ;
+EXTENDS  : 'extends' ;
+SUPER    : 'super' ;
+OVERRIDE : 'Override' ;
 CLASS    : 'class' ;
 NEW      : 'new' ;
 THIS     : 'this' ;
@@ -234,6 +250,7 @@ PUNTO      : '.' ;
 COMA       : ',' ;
 DOSP       : ':' ;
 PUNTOYCOMA : ';' ;
+ARROBA     : '@' ;
 
 LIT_DECIMAL  : [0-9]+ '.' [0-9]+ ;
 LIT_ENTERO   : [0-9]+ ;

@@ -29,6 +29,7 @@ import com.usac.contacto3d.ast.expresiones.OperacionUnaria;
 import com.usac.contacto3d.ast.expresiones.Operador;
 import com.usac.contacto3d.ast.expresiones.Sufijo;
 import com.usac.contacto3d.ast.expresiones.SufijoAtributo;
+import com.usac.contacto3d.ast.expresiones.SuperMetodo;
 import com.usac.contacto3d.ast.expresiones.SufijoIndice;
 import com.usac.contacto3d.ast.expresiones.SufijoMetodo;
 import com.usac.contacto3d.ast.expresiones.Ternario;
@@ -39,6 +40,7 @@ import com.usac.contacto3d.ast.instrucciones.ControlCiclo;
 import com.usac.contacto3d.ast.instrucciones.Elegir;
 import com.usac.contacto3d.ast.instrucciones.Hacer;
 import com.usac.contacto3d.ast.instrucciones.Imprimir;
+import com.usac.contacto3d.ast.instrucciones.LlamadaSuper;
 import com.usac.contacto3d.ast.instrucciones.Instruccion;
 import com.usac.contacto3d.ast.instrucciones.Mientras;
 import com.usac.contacto3d.ast.instrucciones.Para;
@@ -552,6 +554,16 @@ public class GeneradorCuartetas implements Visitante<String> {
         String desplazamiento = tamanioElemento == 1 ? posicion
                 : operar(MULTIPLICACION, posicion, String.valueOf(tamanioElemento));
         return new Ubicacion(true, operar(SUMA, sumar(arreglo, rango), desplazamiento));
+    }
+
+    @Override
+    public String visitarLlamadaSuper(LlamadaSuper nodo) {
+        throw new IllegalStateException("super(...) no se traduce todavia");
+    }
+
+    @Override
+    public String visitarSuperMetodo(SuperMetodo nodo) {
+        throw new IllegalStateException("super." + nodo.getNombre() + "(...) no se traduce todavia");
     }
 
     @Override

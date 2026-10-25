@@ -29,6 +29,7 @@ import com.usac.contacto3d.ast.expresiones.OperacionUnaria;
 import com.usac.contacto3d.ast.expresiones.Operador;
 import com.usac.contacto3d.ast.expresiones.Sufijo;
 import com.usac.contacto3d.ast.expresiones.SufijoAtributo;
+import com.usac.contacto3d.ast.expresiones.SuperMetodo;
 import com.usac.contacto3d.ast.expresiones.SufijoIndice;
 import com.usac.contacto3d.ast.expresiones.SufijoMetodo;
 import com.usac.contacto3d.ast.expresiones.Ternario;
@@ -39,6 +40,7 @@ import com.usac.contacto3d.ast.instrucciones.ControlCiclo;
 import com.usac.contacto3d.ast.instrucciones.Elegir;
 import com.usac.contacto3d.ast.instrucciones.Hacer;
 import com.usac.contacto3d.ast.instrucciones.Imprimir;
+import com.usac.contacto3d.ast.instrucciones.LlamadaSuper;
 import com.usac.contacto3d.ast.instrucciones.Instruccion;
 import com.usac.contacto3d.ast.instrucciones.Mientras;
 import com.usac.contacto3d.ast.instrucciones.Para;
@@ -985,6 +987,21 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
             sufijo.setTipo(resultado);
         }
         return resultado;
+    }
+
+    @Override
+    public Tipo visitarLlamadaSuper(LlamadaSuper nodo) {
+        tipos(nodo.getArgumentos());
+        error(nodo, "super", "super(...) todavia no esta soportado");
+        return Tipo.VACIO;
+    }
+
+    @Override
+    public Tipo visitarSuperMetodo(SuperMetodo nodo) {
+        tipos(nodo.getArgumentos());
+        error(nodo, "super", "super." + nodo.getNombre() + "(...) todavia no esta soportado");
+        nodo.setTipo(Tipo.ERROR);
+        return Tipo.ERROR;
     }
 
     @Override

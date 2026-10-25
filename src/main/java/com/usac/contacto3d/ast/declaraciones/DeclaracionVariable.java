@@ -15,14 +15,21 @@ public class DeclaracionVariable extends Nodo implements Instruccion {
     private Tipo tipo;
     private final Expresion valor;
     private final boolean tipoImplicito;
+    private final Visibilidad visibilidad;
 
     public DeclaracionVariable(String nombre, Tipo tipo, Expresion valor, boolean tipoImplicito,
-                               int linea, int columna) {
+                               Visibilidad visibilidad, int linea, int columna) {
         super(linea, columna);
         this.nombre = nombre;
         this.tipo = tipo;
         this.valor = valor;
         this.tipoImplicito = tipoImplicito;
+        this.visibilidad = visibilidad;
+    }
+
+    public DeclaracionVariable(String nombre, Tipo tipo, Expresion valor, boolean tipoImplicito,
+                               int linea, int columna) {
+        this(nombre, tipo, valor, tipoImplicito, Visibilidad.PAQUETE, linea, columna);
     }
 
     public DeclaracionVariable(String nombre, Tipo tipo, Expresion valor, int linea, int columna) {
@@ -35,6 +42,13 @@ public class DeclaracionVariable extends Nodo implements Instruccion {
     public Expresion getValor()      { return valor; }
     public boolean tieneValor()      { return valor != null; }
     public boolean esTipoImplicito() { return tipoImplicito; }
+    public Visibilidad getVisibilidad() { return visibilidad; }
+
+    // un atributo con @Override parsea pero no tiene sentido; se guarda para que el semantico lo rechace
+    private boolean conOverride;
+
+    public boolean tieneOverride()   { return conOverride; }
+    public void marcarConOverride()  { this.conOverride = true; }
 
     private SimboloVariable simbolo;
 
@@ -43,7 +57,7 @@ public class DeclaracionVariable extends Nodo implements Instruccion {
 
     @Override
     public String getEtiqueta() {
-        return "Declaracion " + nombre + " : " + tipo + (tipoImplicito ? " (implicito)" : "");
+        return "Declaracion " + visibilidad.prefijo() + nombre + " : " + tipo + (tipoImplicito ? " (implicito)" : "");
     }
 
     @Override

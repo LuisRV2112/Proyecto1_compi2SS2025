@@ -8,14 +8,19 @@ import java.util.List;
 
 public class DeclaracionConstructor extends Funcion {
 
-    public DeclaracionConstructor(String nombre, List<Parametro> parametros,
-                                  List<Instruccion> cuerpo, int linea, int columna) {
+    private final Visibilidad visibilidad;
+
+    public DeclaracionConstructor(String nombre, List<Parametro> parametros, List<Instruccion> cuerpo,
+                                  Visibilidad visibilidad, int linea, int columna) {
         super(nombre, parametros, Tipo.VACIO, cuerpo, linea, columna);
+        this.visibilidad = visibilidad;
     }
+
+    public Visibilidad getVisibilidad() { return visibilidad; }
 
     @Override
     public String getEtiqueta() {
-        return "Constructor " + getNombre();
+        return "Constructor " + visibilidad.prefijo() + getNombre();
     }
 
     @Override

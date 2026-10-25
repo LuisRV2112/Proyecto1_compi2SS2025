@@ -17,8 +17,9 @@ public class ColoreadorZ extends ColoreadorBase {
         return switch (tipo) {
             case ZetarianoLexer.INT, ZetarianoLexer.DOUBLE, ZetarianoLexer.CHAR, ZetarianoLexer.BOOLEAN,
                  ZetarianoLexer.STRING, ZetarianoLexer.VOID -> Token.DATA_TYPE;
-            case ZetarianoLexer.PUBLIC, ZetarianoLexer.PRIVATE, ZetarianoLexer.CLASS -> Token.PREPROCESSOR;
-            case ZetarianoLexer.NEW, ZetarianoLexer.THIS, ZetarianoLexer.IF, ZetarianoLexer.ELSE,
+            case ZetarianoLexer.PUBLIC, ZetarianoLexer.PRIVATE, ZetarianoLexer.PROTECTED, ZetarianoLexer.CLASS,
+                 ZetarianoLexer.EXTENDS, ZetarianoLexer.ARROBA, ZetarianoLexer.OVERRIDE -> Token.PREPROCESSOR;
+            case ZetarianoLexer.NEW, ZetarianoLexer.THIS, ZetarianoLexer.SUPER, ZetarianoLexer.IF, ZetarianoLexer.ELSE,
                  ZetarianoLexer.SWITCH, ZetarianoLexer.CASE, ZetarianoLexer.DEFAULT, ZetarianoLexer.BREAK,
                  ZetarianoLexer.CONTINUE, ZetarianoLexer.RETURN, ZetarianoLexer.FOR, ZetarianoLexer.WHILE,
                  ZetarianoLexer.DO -> Token.RESERVED_WORD;

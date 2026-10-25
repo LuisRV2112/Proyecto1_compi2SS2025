@@ -21,6 +21,7 @@ import com.usac.contacto3d.ast.expresiones.NuevoObjeto;
 import com.usac.contacto3d.ast.expresiones.OperacionBinaria;
 import com.usac.contacto3d.ast.expresiones.OperacionUnaria;
 import com.usac.contacto3d.ast.expresiones.SufijoAtributo;
+import com.usac.contacto3d.ast.expresiones.SuperMetodo;
 import com.usac.contacto3d.ast.expresiones.SufijoIndice;
 import com.usac.contacto3d.ast.expresiones.SufijoMetodo;
 import com.usac.contacto3d.ast.expresiones.Ternario;
@@ -31,6 +32,7 @@ import com.usac.contacto3d.ast.instrucciones.ControlCiclo;
 import com.usac.contacto3d.ast.instrucciones.Elegir;
 import com.usac.contacto3d.ast.instrucciones.Hacer;
 import com.usac.contacto3d.ast.instrucciones.Imprimir;
+import com.usac.contacto3d.ast.instrucciones.LlamadaSuper;
 import com.usac.contacto3d.ast.instrucciones.Mientras;
 import com.usac.contacto3d.ast.instrucciones.Para;
 import com.usac.contacto3d.ast.instrucciones.Rama;
@@ -64,6 +66,7 @@ public interface Visitante<T> {
     T visitarControlCiclo(ControlCiclo nodo);
     T visitarRetorno(Retorno nodo);
     T visitarImprimir(Imprimir nodo);
+    T visitarLlamadaSuper(LlamadaSuper nodo);
 
     T visitarLiteral(Literal nodo);
     T visitarOperacionBinaria(OperacionBinaria nodo);
@@ -73,6 +76,7 @@ public interface Visitante<T> {
     T visitarSufijoIndice(SufijoIndice nodo);
     T visitarSufijoMetodo(SufijoMetodo nodo);
     T visitarLlamadaFuncion(LlamadaFuncion nodo);
+    T visitarSuperMetodo(SuperMetodo nodo);
     T visitarIncrementoDecremento(IncrementoDecremento nodo);
     T visitarTernario(Ternario nodo);
     T visitarNuevoObjeto(NuevoObjeto nodo);

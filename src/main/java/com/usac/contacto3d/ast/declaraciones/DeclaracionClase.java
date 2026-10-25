@@ -9,21 +9,24 @@ import java.util.List;
 public class DeclaracionClase extends Nodo {
 
     private final String nombre;
+    private final String nombrePadre;   // null si no hereda; se resuelve en el semantico
     private final List<DeclaracionVariable> atributos;
     private final List<DeclaracionConstructor> constructores;
     private final List<DeclaracionMetodo> metodos;
 
-    public DeclaracionClase(String nombre, List<DeclaracionVariable> atributos,
+    public DeclaracionClase(String nombre, String nombrePadre, List<DeclaracionVariable> atributos,
                             List<DeclaracionConstructor> constructores, List<DeclaracionMetodo> metodos,
                             int linea, int columna) {
         super(linea, columna);
         this.nombre = nombre;
+        this.nombrePadre = nombrePadre;
         this.atributos = List.copyOf(atributos);
         this.constructores = List.copyOf(constructores);
         this.metodos = List.copyOf(metodos);
     }
 
     public String getNombre()                           { return nombre; }
+    public String getNombrePadre()                      { return nombrePadre; }
     public List<DeclaracionVariable> getAtributos()     { return atributos; }
     public List<DeclaracionConstructor> getConstructores() { return constructores; }
     public List<DeclaracionMetodo> getMetodos()         { return metodos; }
@@ -35,7 +38,8 @@ public class DeclaracionClase extends Nodo {
 
     @Override
     public String getEtiqueta() {
-        return "Clase " + nombre;
+        return nombrePadre == null ? "Clase " + nombre
+                                   : "Clase " + nombre + " extends " + nombrePadre;
     }
 
     @Override

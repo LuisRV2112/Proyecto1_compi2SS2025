@@ -1,0 +1,25 @@
+// Hereda de Animal llamando explicitamente a super(...) y a super.metodo(...).
+public class Gato extends Animal {
+    private boolean dormido;
+
+    public Gato(String n) {
+        super(n);
+        dormido = false;
+    }
+
+    @Override
+    public void comer() {
+        super.comer();
+        println(nombre + " pide mas.");
+    }
+
+    @Override
+    protected String describir() {
+        String base = super.describir();
+        return base + " y maulla";
+    }
+
+    public String ficha() {
+        return describir();
+    }
+}

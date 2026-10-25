@@ -8,14 +8,24 @@ import java.util.List;
 
 public class DeclaracionMetodo extends Funcion {
 
+    private final Visibilidad visibilidad;
+    private final boolean tieneOverride;
+
     public DeclaracionMetodo(String nombre, List<Parametro> parametros, Tipo tipoRetorno,
-                             List<Instruccion> cuerpo, int linea, int columna) {
+                             List<Instruccion> cuerpo, Visibilidad visibilidad, boolean tieneOverride,
+                             int linea, int columna) {
         super(nombre, parametros, tipoRetorno, cuerpo, linea, columna);
+        this.visibilidad = visibilidad;
+        this.tieneOverride = tieneOverride;
     }
+
+    public Visibilidad getVisibilidad() { return visibilidad; }
+    public boolean tieneOverride()      { return tieneOverride; }
 
     @Override
     public String getEtiqueta() {
-        return "Metodo " + getNombre() + " -> " + getTipoRetorno();
+        return (tieneOverride ? "@Override " : "") + "Metodo " + visibilidad.prefijo()
+                + getNombre() + " -> " + getTipoRetorno();
     }
 
     @Override
