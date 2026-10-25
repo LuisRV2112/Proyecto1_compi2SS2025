@@ -125,6 +125,7 @@ public class PanelErrores extends JPanel {
         private static final Color COLOR_LEXICO     = new Color(0xF44747);
         private static final Color COLOR_SINTACTICO = new Color(0xFF8C42);
         private static final Color COLOR_SEMANTICO  = new Color(0xDCDCAA);
+        private static final Color COLOR_EJECUCION  = new Color(0xC586C0);
 
         @Override
         public Component getTableCellRendererComponent(JTable tabla, Object valor,
@@ -139,6 +140,7 @@ public class PanelErrores extends JPanel {
                 componente.setForeground(
                         tipo.equals(TipoError.LEXICO.getDescripcion())     ? COLOR_LEXICO :
                         tipo.equals(TipoError.SINTACTICO.getDescripcion()) ? COLOR_SINTACTICO :
+                        tipo.equals(TipoError.EJECUCION.getDescripcion())  ? COLOR_EJECUCION :
                                                                             COLOR_SEMANTICO);
             }
             return componente;

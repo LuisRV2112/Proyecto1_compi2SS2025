@@ -3,8 +3,11 @@ package com.usac.contacto3d.ui;
 import com.usac.contacto3d.Compilador;
 import com.usac.contacto3d.c3d.InterpreteCuartetas;
 import com.usac.contacto3d.c3d.ListaCuartetas;
+import com.usac.contacto3d.errores.ErrorCompilacion;
 import com.usac.contacto3d.errores.ListaErrores;
 import com.usac.contacto3d.errores.TipoError;
+import com.usac.contacto3d.riscv.Ensamblador;
+import com.usac.contacto3d.riscv.Simulador;
 import com.usac.contacto3d.semantico.ResultadoSemantico;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
@@ -45,6 +48,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.prefs.Preferences;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -54,10 +59,14 @@ public class VentanaPrincipal extends JFrame {
     private static final String PREFERENCIA_CARPETA = "ultimaCarpeta";
     private static final long SEGUNDOS_EJECUCION = 10;
 
-    private enum Accion { ANALIZAR, GENERAR_C, EJECUTAR, GCC }
+    // Mensajes que el propio programa imprime al abortar: "Error de ejecucion en Archivo.y linea 12: ..."
+    private static final Pattern ERROR_CON_LINEA = Pattern.compile("^Error de ejecucion en (\\S+) linea (\\d+): (.*)$");
+    private static final Pattern ERROR_SIN_LINEA = Pattern.compile("^Error de ejecucion: (.*)$");
+
+    private enum Accion { ANALIZAR, GENERAR_RISCV, EJECUTAR_RISCV, GENERAR_C, EJECUTAR, GCC }
 
     private record Compilacion(Path archivo, ListaErrores errores, ResultadoSemantico resultado,
-                               ListaCuartetas cuartetas, String codigoC) {
+                               ListaCuartetas cuartetas, String codigoC, String riscv) {
         boolean exitosa() {
             return cuartetas != null;
         }
@@ -70,6 +79,7 @@ public class VentanaPrincipal extends JFrame {
     private final PanelErrores panelErrores = new PanelErrores();
     private final RSyntaxTextArea areaCuartetas = areaSoloLectura();
     private final RSyntaxTextArea areaC = areaSoloLectura();
+    private final RSyntaxTextArea areaRiscV = areaSoloLectura();
     private final PanelTablaSimbolos panelTabla = new PanelTablaSimbolos();
     private final PanelConsola consola = new PanelConsola();
     private final JTabbedPane inferior = new JTabbedPane();
@@ -77,6 +87,7 @@ public class VentanaPrincipal extends JFrame {
 
     private Compilacion ultima;
     private boolean trabajando;
+    private volatile Simulador simulacion;
 
     public VentanaPrincipal() {
         super("Contacto 3xtrat3rr3str3D");
@@ -108,6 +119,7 @@ public class VentanaPrincipal extends JFrame {
     private JPanel crearContenido() {
         inferior.addTab("Errores", panelErrores);
         inferior.addTab("Cuartetas", conScroll(areaCuartetas));
+        inferior.addTab("RISC-V", conScroll(areaRiscV));
         inferior.addTab("Tabla de simbolos", panelTabla);
         inferior.addTab("Codigo C", conScroll(areaC));
         inferior.addTab("Consola", consola);
@@ -140,9 +152,9 @@ public class VentanaPrincipal extends JFrame {
         barra.add(boton("Guardar todo", this::guardarTodo));
         barra.addSeparator();
         barra.add(boton("Analizar (F5)", () -> compilar(Accion.ANALIZAR)));
-        barra.add(boton("Generar C (F6)", () -> compilar(Accion.GENERAR_C)));
-        barra.add(boton("Ejecutar (F7)", () -> compilar(Accion.EJECUTAR)));
-        barra.add(boton("gcc y ejecutar (F8)", () -> compilar(Accion.GCC)));
+        barra.add(boton("Generar RISC-V (F6)", () -> compilar(Accion.GENERAR_RISCV)));
+        barra.add(boton("Ejecutar RISC-V (F7)", () -> compilar(Accion.EJECUTAR_RISCV)));
+        barra.add(boton("Detener (F9)", this::detener));
         return barra;
     }
 
@@ -167,17 +179,27 @@ public class VentanaPrincipal extends JFrame {
 
         JMenu compilar = new JMenu("Compilar");
         compilar.add(item("Analizar", KeyEvent.VK_F5, 0, () -> compilar(Accion.ANALIZAR)));
-        compilar.add(item("Generar codigo C", KeyEvent.VK_F6, 0, () -> compilar(Accion.GENERAR_C)));
-        compilar.add(item("Ejecutar (interprete de cuartetas)", KeyEvent.VK_F7, 0, () -> compilar(Accion.EJECUTAR)));
-        compilar.add(item("Compilar con gcc y ejecutar", KeyEvent.VK_F8, 0, () -> compilar(Accion.GCC)));
+        compilar.add(item("Ver cuartetas", 0, 0, () -> verPestana("Cuartetas")));
+        compilar.add(item("Generar ensamblador RISC-V", KeyEvent.VK_F6, 0, () -> compilar(Accion.GENERAR_RISCV)));
+        compilar.add(item("Ejecutar ensamblador RISC-V", KeyEvent.VK_F7, 0, () -> compilar(Accion.EJECUTAR_RISCV)));
+        compilar.add(item("Detener ejecucion", KeyEvent.VK_F9, 0, this::detener));
         compilar.addSeparator();
-        compilar.add(item("Guardar codigo C como...", 0, 0, this::guardarCodigoC));
+        compilar.add(item("Guardar ensamblador como...", 0, 0, this::guardarRiscV));
+
+        JMenu proyecto1 = new JMenu("Proyecto 1");
+        proyecto1.add(item("Ejecutar con el interprete de cuartetas", 0, 0, () -> compilar(Accion.EJECUTAR)));
+        proyecto1.add(item("Generar codigo C", 0, 0, () -> compilar(Accion.GENERAR_C)));
+        proyecto1.add(item("Compilar con gcc y ejecutar", 0, 0, () -> compilar(Accion.GCC)));
+        proyecto1.add(item("Guardar codigo C como...", 0, 0, this::guardarCodigoC));
+        compilar.addSeparator();
+        compilar.add(proyecto1);
 
         JMenu ayuda = new JMenu("Ayuda");
         ayuda.add(item("Acerca de", 0, 0, () -> JOptionPane.showMessageDialog(this,
-                "Contacto 3xtrat3rr3str3D\nProyecto 1 - Organizacion de Lenguajes y Compiladores 2\n"
+                "Contacto 3xtrat3rr3str3D\nProyecto 2 - Organizacion de Lenguajes y Compiladores 2\n"
                         + "USAC, Centro Universitario de Occidente, 2026\n\n"
-                        + "Compila Y?, Zetariano y PigLatin a codigo de tres direcciones y a C.",
+                        + "Compila Y?, Zetariano y PigLatin a codigo de tres direcciones y a RISC-V (RV32IMD),\n"
+                        + "y ejecuta el ensamblador con un simulador propio.",
                 "Acerca de", JOptionPane.INFORMATION_MESSAGE)));
 
         JMenuBar barra = new JMenuBar();
@@ -444,12 +466,14 @@ public class VentanaPrincipal extends JFrame {
                 ResultadoSemantico resultado = compilador.compilar(archivo);
                 ListaCuartetas cuartetas = null;
                 String codigoC = null;
+                String riscv = null;
                 if (resultado != null && !compilador.getErrores().hayErrores()) {
                     cuartetas = compilador.generarCuartetas(resultado);
                     codigoC = compilador.traducirAC(cuartetas);
+                    riscv = compilador.generarRiscV(cuartetas);
                 }
                 compilador.getErrores().ordenar();
-                return new Compilacion(archivo, compilador.getErrores(), resultado, cuartetas, codigoC);
+                return new Compilacion(archivo, compilador.getErrores(), resultado, cuartetas, codigoC, riscv);
             }
 
             @Override
@@ -461,7 +485,8 @@ public class VentanaPrincipal extends JFrame {
                     estado(" Error interno al compilar: " + e.getCause());
                     return;
                 }
-                boolean ejecutar = accion == Accion.EJECUTAR || accion == Accion.GCC;
+                boolean ejecutar = accion == Accion.EJECUTAR || accion == Accion.GCC
+                        || accion == Accion.EJECUTAR_RISCV;
                 if (ejecutar && !ultima.exitosa()) {
                     consola.mostrar("No se ejecuto: hay " + ultima.errores().cantidad()
                             + " error(es). Corregilos (ver la pestana Errores) y volve a ejecutar.");
@@ -474,6 +499,8 @@ public class VentanaPrincipal extends JFrame {
                 } else if (ultima.exitosa()) {
                     switch (accion) {
                         case ANALIZAR -> { }
+                        case GENERAR_RISCV -> guardarRiscVEnSalida();
+                        case EJECUTAR_RISCV -> ejecutarRiscV();
                         case GENERAR_C -> guardarCodigoCEnSalida();
                         case EJECUTAR -> ejecutarConInterprete();
                         case GCC -> ejecutarConGcc();
@@ -493,6 +520,8 @@ public class VentanaPrincipal extends JFrame {
         areaCuartetas.setCaretPosition(0);
         areaC.setText(compilacion.exitosa() ? compilacion.codigoC() : "");
         areaC.setCaretPosition(0);
+        areaRiscV.setText(compilacion.exitosa() ? compilacion.riscv() : "");
+        areaRiscV.setCaretPosition(0);
 
         String archivo = compilacion.archivo().getFileName().toString();
         if (errores.hayErrores()) {
@@ -532,7 +561,7 @@ public class VentanaPrincipal extends JFrame {
             Files.createDirectories(destino.getParent());
             Files.writeString(destino, ultima.codigoC(), StandardCharsets.UTF_8);
             arbol.actualizar();
-            inferior.setSelectedIndex(3);
+            verPestana("Codigo C");
             estado(" Codigo C guardado en " + destino + "   (compilar: gcc " + destino.getFileName() + " -o programa)");
         } catch (IOException e) {
             estado(" No se pudo guardar el codigo C: " + e.getMessage());
@@ -554,6 +583,137 @@ public class VentanaPrincipal extends JFrame {
             } catch (IOException e) {
                 estado(" No se pudo guardar el codigo C: " + e.getMessage());
             }
+        }
+    }
+
+    private void guardarRiscVEnSalida() {
+        Path base = arbol.getRaiz() != null ? arbol.getRaiz() : ultima.archivo().toAbsolutePath().getParent();
+        Path destino = base.resolve("salida").resolve(nombreSinExtension(ultima.archivo()) + ".s");
+        try {
+            Files.createDirectories(destino.getParent());
+            Files.writeString(destino, ultima.riscv(), StandardCharsets.UTF_8);
+            arbol.actualizar();
+            verPestana("RISC-V");
+            estado(" Ensamblador RISC-V guardado en " + destino + "   (F7 para ejecutarlo)");
+        } catch (IOException e) {
+            estado(" No se pudo guardar el ensamblador: " + e.getMessage());
+        }
+    }
+
+    private void guardarRiscV() {
+        if (ultima == null || !ultima.exitosa()) {
+            estado(" Primero compila un programa sin errores (F5)");
+            return;
+        }
+        JFileChooser selector = selector();
+        selector.setSelectedFile(new java.io.File(nombreSinExtension(ultima.archivo()) + ".s"));
+        if (selector.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            try {
+                Files.writeString(selector.getSelectedFile().toPath(), ultima.riscv(), StandardCharsets.UTF_8);
+                arbol.actualizar();
+                estado(" Ensamblador guardado en " + selector.getSelectedFile());
+            } catch (IOException e) {
+                estado(" No se pudo guardar el ensamblador: " + e.getMessage());
+            }
+        }
+    }
+
+    private void ejecutarRiscV() {
+        String ensamblador = ultima.riscv();
+        String entrada = consola.getEntrada();
+        trabajando = true;
+        estado(" Ejecutando el ensamblador RISC-V en el simulador...   (F9 para detener)");
+        consola.mostrar("");
+        inferior.setSelectedComponent(consola);
+        new SwingWorker<Simulador, Void>() {
+            private String errorEnsamblado;
+
+            @Override
+            protected Simulador doInBackground() {
+                Ensamblador.Programa programa;
+                try {
+                    programa = Ensamblador.ensamblar(ensamblador);
+                } catch (Ensamblador.ErrorEnsamblado e) {
+                    errorEnsamblado = e.getMessage();
+                    return null;
+                }
+                Simulador simulador = new Simulador(programa, entrada);
+                simulacion = simulador;
+                simulador.ejecutar();
+                return simulador;
+            }
+
+            @Override
+            protected void done() {
+                trabajando = false;
+                simulacion = null;
+                Simulador simulador;
+                try {
+                    simulador = get();
+                } catch (Exception e) {
+                    consola.mostrar("Error: " + e.getCause());
+                    estado(" No se pudo ejecutar");
+                    return;
+                }
+                if (simulador == null) {
+                    consola.mostrar("Error de ensamblado: " + errorEnsamblado);
+                    mostrarErroresDeEjecucion("", "ensamblado, " + errorEnsamblado);
+                    return;
+                }
+                String salida = simulador.getSalida();
+                consola.mostrar(salida.isEmpty() ? "(el programa termino sin imprimir nada)" : salida);
+                inferior.setSelectedComponent(consola);
+                if (!mostrarErroresDeEjecucion(salida, simulador.getError())) {
+                    estado(String.format(" Ejecutado en el simulador RISC-V: %,d instrucciones",
+                            simulador.getInstruccionesEjecutadas()));
+                }
+            }
+        }.execute();
+    }
+
+    private void detener() {
+        Simulador simulador = simulacion;
+        if (simulador == null) {
+            estado(" No hay ninguna ejecucion RISC-V en curso");
+            return;
+        }
+        simulador.detener();
+        estado(" Deteniendo la ejecucion...");
+    }
+
+    /**
+     * Lleva al panel de errores los errores de ejecucion: los que imprime el propio programa
+     * y el que detuvo al simulador. Devuelve true si hubo alguno.
+     */
+    private boolean mostrarErroresDeEjecucion(String salida, String errorSimulador) {
+        String archivo = ultima.archivo().getFileName().toString();
+        ListaErrores lista = new ListaErrores();
+        for (String linea : salida.split("\n")) {
+            Matcher conLinea = ERROR_CON_LINEA.matcher(linea);
+            Matcher sinLinea = ERROR_SIN_LINEA.matcher(linea);
+            if (conLinea.matches()) {
+                lista.agregar(new ErrorCompilacion(TipoError.EJECUCION, conLinea.group(1), "",
+                        conLinea.group(3), Integer.parseInt(conLinea.group(2)), 1));
+            } else if (sinLinea.matches()) {
+                lista.agregar(new ErrorCompilacion(TipoError.EJECUCION, archivo, "", sinLinea.group(1), 0, 0));
+            }
+        }
+        if (errorSimulador != null) {
+            lista.agregar(new ErrorCompilacion(TipoError.EJECUCION, nombreSinExtension(ultima.archivo()) + ".s", "",
+                    "simulador RISC-V: " + errorSimulador, 0, 0));
+        }
+        if (!lista.hayErrores()) {
+            return false;
+        }
+        panelErrores.mostrar(lista);
+        estado(" La ejecucion termino con " + lista.cantidad() + " error(es): ver la pestana Errores");
+        return true;
+    }
+
+    private void verPestana(String titulo) {
+        int indice = inferior.indexOfTab(titulo);
+        if (indice >= 0) {
+            inferior.setSelectedIndex(indice);
         }
     }
 
@@ -622,6 +782,7 @@ public class VentanaPrincipal extends JFrame {
                     String salida = get();
                     consola.mostrar(salida.isEmpty() ? "(el programa termino sin imprimir nada)" : salida);
                     estado(" " + alTerminar);
+                    mostrarErroresDeEjecucion(salida, null);
                 } catch (Exception e) {
                     consola.mostrar("Error: " + e.getCause());
                     estado(" No se pudo ejecutar");

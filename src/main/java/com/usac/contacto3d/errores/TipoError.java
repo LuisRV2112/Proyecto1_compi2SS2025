@@ -3,7 +3,8 @@ package com.usac.contacto3d.errores;
 public enum TipoError {
     LEXICO("Lexico"),
     SINTACTICO("Sintactico"),
-    SEMANTICO("Semantico");
+    SEMANTICO("Semantico"),
+    EJECUCION("Ejecucion");
 
     private final String descripcion;
 

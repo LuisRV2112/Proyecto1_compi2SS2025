@@ -46,6 +46,7 @@ public class Simulador {
     private final BufferedReader entrada;
     private long instrucciones;
     private volatile boolean detenido;
+    private String error;
 
     public Simulador(Ensamblador.Programa programa, String entrada) {
         this.codigo = programa.instrucciones();
@@ -80,8 +81,14 @@ public class Simulador {
             correr();
         } catch (Fin fin) {
         } catch (ErrorEjecucion e) {
-            salida.append("\nError de ejecucion (RISC-V): ").append(e.getMessage()).append('\n');
+            error = e.getMessage();
+            salida.append("\nError de ejecucion (RISC-V): ").append(error).append('\n');
         }
+    }
+
+    /** El error que detuvo la simulacion, o null si el programa termino normalmente. */
+    public String getError() {
+        return error;
     }
 
     public void detener() {

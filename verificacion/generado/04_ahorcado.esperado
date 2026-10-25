@@ -1,0 +1,186 @@
+==============================
+     AHORCADO ZETARIANO       
+==============================
+Ingresa tu nombre:
+Elige una palabra (0 a 4):
+Pista: Lenguaje con nombre de serpiente
+  +---+
+  |   |
+      |
+      |
+      |
+      |
+=========
+Errores: 0/6 | Intentos restantes: 6
+Letras usadas: 
+_ _ _ _ _ _ 
+Ingresa una letra minuscula:
+Bien! La letra p esta en la palabra
+  +---+
+  |   |
+      |
+      |
+      |
+      |
+=========
+Errores: 0/6 | Intentos restantes: 6
+Letras usadas: p 
+p _ _ _ _ _ 
+Ingresa una letra minuscula:
+Bien! La letra y esta en la palabra
+  +---+
+  |   |
+      |
+      |
+      |
+      |
+=========
+Errores: 0/6 | Intentos restantes: 6
+Letras usadas: p y 
+p y _ _ _ _ 
+Ingresa una letra minuscula:
+Bien! La letra t esta en la palabra
+  +---+
+  |   |
+      |
+      |
+      |
+      |
+=========
+Errores: 0/6 | Intentos restantes: 6
+Letras usadas: p y t 
+p y t _ _ _ 
+Ingresa una letra minuscula:
+Bien! La letra h esta en la palabra
+  +---+
+  |   |
+      |
+      |
+      |
+      |
+=========
+Errores: 0/6 | Intentos restantes: 6
+Letras usadas: p y t h 
+p y t h _ _ 
+Ingresa una letra minuscula:
+Bien! La letra o esta en la palabra
+  +---+
+  |   |
+      |
+      |
+      |
+      |
+=========
+Errores: 0/6 | Intentos restantes: 6
+Letras usadas: p y t h o 
+p y t h o _ 
+Ingresa una letra minuscula:
+Bien! La letra n esta en la palabra
+GANASTE! La palabra era:
+  +---+
+  |   |
+      |
+      |
+      |
+      |
+=========
+p y t h o n 
+Puntaje de la partida: 110
+----- MARCADOR -----
+Partidas: 1 | Ganadas: 1 | Perdidas: 0
+Racha actual: 1 | Mejor racha: 1
+Victorias: 100.0%
+Jugar otra vez? (1 = si, 0 = no)
+Elige una palabra (0 a 4):
+Indice fuera de rango, se usa la palabra 0
+Pista: Lenguaje con nombre de serpiente
+  +---+
+  |   |
+      |
+      |
+      |
+      |
+=========
+Errores: 0/6 | Intentos restantes: 6
+Letras usadas: 
+_ _ _ _ _ _ 
+Ingresa una letra minuscula:
+Fallaste! La letra z no esta
+  +---+
+  |   |
+  O   |
+      |
+      |
+      |
+=========
+Errores: 1/6 | Intentos restantes: 5
+Letras usadas: z 
+_ _ _ _ _ _ 
+Ingresa una letra minuscula:
+Fallaste! La letra q no esta
+  +---+
+  |   |
+  O   |
+  |   |
+      |
+      |
+=========
+Errores: 2/6 | Intentos restantes: 4
+Letras usadas: z q 
+_ _ _ _ _ _ 
+Ingresa una letra minuscula:
+Fallaste! La letra c no esta
+  +---+
+  |   |
+  O   |
+ -|   |
+      |
+      |
+=========
+Errores: 3/6 | Intentos restantes: 3
+Letras usadas: z q c 
+_ _ _ _ _ _ 
+Ingresa una letra minuscula:
+Fallaste! La letra x no esta
+  +---+
+  |   |
+  O   |
+ -|-  |
+      |
+      |
+=========
+Errores: 4/6 | Intentos restantes: 2
+Letras usadas: z q c x 
+_ _ _ _ _ _ 
+Ingresa una letra minuscula:
+Fallaste! La letra w no esta
+  +---+
+  |   |
+  O   |
+ -|-  |
+ ^    |
+      |
+=========
+Errores: 5/6 | Intentos restantes: 1
+Letras usadas: z q c x w 
+_ _ _ _ _ _ 
+Ingresa una letra minuscula:
+Fallaste! La letra k no esta
+PERDISTE. La palabra era:
+  +---+
+  |   |
+  O   |
+ -|-  |
+ ^ ^  |
+      |
+=========
+p y t h o n 
+Puntaje de la partida: 0
+----- MARCADOR -----
+Partidas: 2 | Ganadas: 1 | Perdidas: 1
+Racha actual: 0 | Mejor racha: 1
+Victorias: 50.0%
+Jugar otra vez? (1 = si, 0 = no)
+Puntaje total: 110
+Titulo obtenido: Aprendiz
+Gracias por jugar, Luis

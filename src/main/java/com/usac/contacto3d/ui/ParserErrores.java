@@ -106,7 +106,7 @@ public class ParserErrores extends AbstractParser {
         return switch (tipo) {
             case LEXICO     -> COLOR_LEXICO;
             case SINTACTICO -> COLOR_SINTACTICO;
-            case SEMANTICO  -> COLOR_SEMANTICO;
+            case SEMANTICO, EJECUCION -> COLOR_SEMANTICO;
         };
     }
 }
