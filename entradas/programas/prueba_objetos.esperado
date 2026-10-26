@@ -15,4 +15,4 @@ iguales: true distintas: true
 true
 sin salto
 marcador: 7 m
-Error de ejecucion en prueba_objetos.pig linea 25: referencia nula
+Error de ejecucion en prueba_objetos.pig linea 25: referencia nula: se intento usar el metodo 'getSaldo()' sobre null

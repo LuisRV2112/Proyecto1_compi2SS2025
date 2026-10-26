@@ -1,0 +1,2 @@
+antes del acceso
+Error de ejecucion en prueba_acceso_nulo.pig linea 9: referencia nula: se intento usar el metodo 'getNombre()' sobre null

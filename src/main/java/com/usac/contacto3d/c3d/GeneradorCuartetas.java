@@ -800,7 +800,12 @@ public class GeneradorCuartetas implements Visitante<String> {
     private void verificarNulo(String puntero, Nodo nodo) {
         String seguir = etiqueta();
         emitir(IF_TRUE, operar(DIFERENTE, puntero, "0"), null, seguir);
-        errorEjecucion(nodo, "referencia nula");
+        String uso = switch (nodo) {
+            case SufijoAtributo a -> "el atributo '" + a.getNombre() + "'";
+            case SufijoMetodo m -> "el metodo '" + m.getNombre() + "()'";
+            default -> "un indice";
+        };
+        errorEjecucion(nodo, "referencia nula: se intento usar " + uso + " sobre null");
         emitir(ETIQUETA, null, null, seguir);
     }
 
