@@ -24,6 +24,7 @@ public class InterpreteCuartetas {
 
     private final List<Cuarteta> codigo;
     private final Map<String, Integer> funciones = new HashMap<>();
+    private final List<String> numeradas;
     private final Map<String, Integer> etiquetas = new HashMap<>();
     private final double[] stack = new double[CELDAS];
     private final double[] heap = new double[CELDAS];
@@ -37,6 +38,7 @@ public class InterpreteCuartetas {
 
     private InterpreteCuartetas(ListaCuartetas lista, String entrada) {
         this.codigo = lista.getCuartetas();
+        this.numeradas = lista.getFunciones();
         this.entrada = new BufferedReader(new StringReader(entrada == null ? "" : entrada));
         for (int i = 0; i < codigo.size(); i++) {
             Cuarteta c = codigo.get(i);
@@ -91,6 +93,14 @@ public class InterpreteCuartetas {
                     }
                 }
                 case CALL -> llamar(c.arg1());
+                case DIRECCION_FUNCION -> asignar(c.resultado(), numeradas.indexOf(c.arg1()), temporales);
+                case CALL_INDIRECTO -> {
+                    double numero = valor(c.arg1(), temporales);
+                    if (numero != Math.rint(numero) || numero < 0 || numero >= numeradas.size()) {
+                        abortar("llamada indirecta a una funcion inexistente (" + numero + ")");
+                    }
+                    llamar(numeradas.get((int) numero));
+                }
                 default -> ejecutar(c, temporales);
             }
         }

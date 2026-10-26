@@ -31,9 +31,12 @@ public class GeneradorRiscV {
     private final Map<String, String> imagenes = new LinkedHashMap<>();
     private Map<String, Integer> temporales = Map.of();
     private String funcionActual;
+    private List<String> numeradas = List.of();
+    private boolean hayIndirectas;
     private int contadorEtiquetas;
 
     public String generar(ListaCuartetas programa) {
+        numeradas = programa.getFunciones();
         arranque();
         for (Map.Entry<String, List<Cuarteta>> funcion : separarFunciones(programa.getCuartetas()).entrySet()) {
             traducirFuncion(funcion.getKey(), funcion.getValue());
@@ -48,6 +51,12 @@ public class GeneradorRiscV {
         s.append(DATOS);
         s.append(".align 2\n");
         imagenes.forEach((etiqueta, valores) -> s.append(etiqueta).append(": .word ").append(valores).append('\n'));
+        if (hayIndirectas) {
+            // el numero de una funcion es su posicion en esta tabla
+            s.append("_funciones: .word ")
+             .append(String.join(", ", numeradas.stream().map(GeneradorRiscV::etiquetaFuncion).toList()))
+             .append('\n');
+        }
         s.append("\n.text\n.globl _inicio\n");
         s.append(texto);
         return s.toString();
@@ -223,6 +232,20 @@ public class GeneradorRiscV {
                 texto.append(salto).append(":\n");
             }
             case CALL -> emitir("jal ra, " + etiquetaFuncion(a));
+            case DIRECCION_FUNCION -> {
+                cargar(String.valueOf(numeradas.indexOf(a)), "ft0");
+                guardar(r, "ft0");
+            }
+            case CALL_INDIRECTO -> {
+                hayIndirectas = true;
+                cargar(a, "ft0");
+                emitir("fcvt.w.d t0, ft0, rtz");
+                emitir("slli t0, t0, 2");
+                emitir("la t1, _funciones");
+                emitir("add t0, t0, t1");
+                emitir("lw t0, 0(t0)");
+                emitir("jalr ra, t0, 0");
+            }
             case RETURN -> emitir("j " + etiquetaFuncion(funcionActual) + "_fin");
             case HALT -> {
                 emitir("li a7, 10");

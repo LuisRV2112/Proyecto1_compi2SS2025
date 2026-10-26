@@ -32,6 +32,10 @@ public class Ensamblador {
     private final Map<String, Integer> etiquetas = new HashMap<>();
     private final ByteArrayOutputStream datos = new ByteArrayOutputStream();
     private final List<LineaTexto> texto = new ArrayList<>();
+    /** .word con una etiqueta que aun no aparece (por ejemplo una funcion de .text): se rellena al final. */
+    private final List<Pendiente> pendientes = new ArrayList<>();
+
+    private record Pendiente(int linea, int posicion, String etiqueta) { }
 
     public static Programa ensamblar(String fuente) {
         return new Ensamblador().procesar(fuente);
@@ -85,7 +89,17 @@ public class Ensamblador {
         for (int i = 0; i < texto.size(); i++) {
             instrucciones.add(decodificar(texto.get(i), BASE_TEXTO + 4 * i));
         }
-        return new Programa(instrucciones, datos.toByteArray(), Map.copyOf(etiquetas));
+        byte[] bytes = datos.toByteArray();
+        for (Pendiente pendiente : pendientes) {
+            Integer valor = etiquetas.get(pendiente.etiqueta());
+            if (valor == null) {
+                throw new ErrorEnsamblado(pendiente.linea(), "etiqueta no definida '" + pendiente.etiqueta() + "'");
+            }
+            for (int b = 0; b < 4; b++) {
+                bytes[pendiente.posicion() + b] = (byte) (valor >>> (8 * b));
+            }
+        }
+        return new Programa(instrucciones, bytes, Map.copyOf(etiquetas));
     }
 
     // ------------------------------------------------------------------ datos
@@ -116,7 +130,14 @@ public class Ensamblador {
             case ".word" -> {
                 alinear(4);
                 for (String v : separarOperandos(resto)) {
-                    escribir(etiquetas.containsKey(v) ? etiquetas.get(v) : entero(numero, v), 4);
+                    if (etiquetas.containsKey(v)) {
+                        escribir(etiquetas.get(v), 4);
+                    } else if (v.matches("[A-Za-z_.$][\\w.$]*")) {
+                        pendientes.add(new Pendiente(numero, datos.size(), v));
+                        escribir(0, 4);
+                    } else {
+                        escribir(entero(numero, v), 4);
+                    }
                 }
             }
             case ".double" -> {

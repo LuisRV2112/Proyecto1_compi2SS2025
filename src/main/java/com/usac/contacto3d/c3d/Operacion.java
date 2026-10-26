@@ -10,6 +10,8 @@ public enum Operacion {
     ETIQUETA, GOTO, IF_TRUE, IF_FALSE,
 
     FUNCION, FIN_FUNCION, CALL, RETURN, HALT,
+    // la "direccion" de una funcion es su numero: su posicion entre las funciones del programa
+    DIRECCION_FUNCION, CALL_INDIRECTO,
 
     IMPRIMIR, SALTO_LINEA, LEER_CADENA,
     CONCATENAR, A_CADENA, CONVERTIR_CADENA, IGUAL_CADENAS,

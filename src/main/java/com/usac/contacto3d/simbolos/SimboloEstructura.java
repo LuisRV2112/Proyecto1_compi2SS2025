@@ -46,6 +46,7 @@ public class SimboloEstructura extends Simbolo {
     private final Map<String, Campo> campos = new LinkedHashMap<>();
     private final List<SimboloFuncion> metodos = new ArrayList<>();
     private final List<SimboloFuncion> constructores = new ArrayList<>();
+    private final List<SimboloFuncion> vtable = new ArrayList<>();
     private final boolean esClase;
 
     private int tamanioTotal = 0;
@@ -151,6 +152,21 @@ public class SimboloEstructura extends Simbolo {
             }
         }
         return null;
+    }
+
+    /**
+     * Metodos virtuales en orden fijo: los heredados conservan su indice y los propios nuevos van
+     * al final, asi el mismo indice sirve para cualquier clase de la jerarquia.
+     */
+    public List<SimboloFuncion> getVtable() { return vtable; }
+
+    public int indiceEnVtable(SimboloFuncion metodo) {
+        for (int i = 0; i < vtable.size(); i++) {
+            if (vtable.get(i).getFirma().equals(metodo.getFirma())) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public SimboloFuncion buscarConstructor(int cantidadArgumentos) {

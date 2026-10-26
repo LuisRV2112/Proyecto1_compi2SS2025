@@ -23,6 +23,8 @@ public record Cuarteta(Operacion operacion, String arg1, String arg2, String res
             case FUNCION -> "funcion " + arg1 + ":";
             case FIN_FUNCION -> "fin " + arg1;
             case CALL -> "call " + arg1;
+            case DIRECCION_FUNCION -> resultado + " = &" + arg1;
+            case CALL_INDIRECTO -> "call_indirecto " + arg1;
             case RETURN -> "return";
             case HALT -> "halt";
             case IMPRIMIR -> "print " + arg1 + "  (" + arg2 + ")";

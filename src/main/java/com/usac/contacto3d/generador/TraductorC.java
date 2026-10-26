@@ -20,10 +20,13 @@ public class TraductorC {
             Operacion.ASIGNAR, Operacion.SUMA, Operacion.RESTA, Operacion.MULTIPLICACION,
             Operacion.NEGATIVO, Operacion.MENOR, Operacion.MAYOR, Operacion.MENOR_IGUAL,
             Operacion.MAYOR_IGUAL, Operacion.IGUAL, Operacion.DIFERENTE, Operacion.NOT,
-            Operacion.LEER_STACK, Operacion.LEER_HEAP, Operacion.IGUAL_CADENAS);
+            Operacion.LEER_STACK, Operacion.LEER_HEAP, Operacion.IGUAL_CADENAS, Operacion.DIRECCION_FUNCION);
+
+    private List<String> numeradas = List.of();
 
     public String traducir(ListaCuartetas programa) {
         Map<String, List<Cuarteta>> funciones = separarFunciones(programa.getCuartetas());
+        numeradas = programa.getFunciones();
 
         StringBuilder c = new StringBuilder(PLANTILLA);
         c.append("/* ------------------------------ prototipos ------------------------------ */\n\n");
@@ -32,12 +35,38 @@ public class TraductorC {
                 c.append("void ").append(nombreC(funcion)).append("(void);\n");
             }
         }
+        boolean hayIndirectas = programa.getCuartetas().stream()
+                .anyMatch(q -> q.operacion() == Operacion.CALL_INDIRECTO);
+        if (hayIndirectas) {
+            tablaDeFunciones(c);
+        }
         c.append("\n/* ------------------------------ programa ------------------------------- */\n");
         for (Map.Entry<String, List<Cuarteta>> funcion : funciones.entrySet()) {
             c.append('\n');
             traducirFuncion(funcion.getKey(), funcion.getValue(), c);
         }
         return c.toString();
+    }
+
+    /**
+     * El numero de una funcion es su posicion en el programa; la tabla traduce ese numero a la
+     * funcion de C. main no se llama nunca por numero, asi que su lugar queda en NULL.
+     */
+    private void tablaDeFunciones(StringBuilder c) {
+        c.append("\n/* ----------------------- llamadas por la vtable ------------------------ */\n\n");
+        c.append("static void (*const funciones[])(void) = {\n");
+        for (String funcion : numeradas) {
+            c.append(SANGRIA).append(funcion.equals("main") ? "NULL" : nombreC(funcion)).append(",\n");
+        }
+        c.append("};\n\n");
+        c.append("static void llamar_indirecto(double numero) {\n");
+        c.append(SANGRIA).append("int i = (int) numero;\n");
+        c.append(SANGRIA).append("if (i < 0 || i >= (int) (sizeof funciones / sizeof funciones[0]) || funciones[i] == NULL) {\n");
+        c.append(SANGRIA).append(SANGRIA).append("fprintf(stderr, \"llamada indirecta a una funcion inexistente\\n\");\n");
+        c.append(SANGRIA).append(SANGRIA).append("exit(1);\n");
+        c.append(SANGRIA).append("}\n");
+        c.append(SANGRIA).append("funciones[i]();\n");
+        c.append("}\n");
     }
 
     private static Map<String, List<Cuarteta>> separarFunciones(List<Cuarteta> cuartetas) {
@@ -136,6 +165,8 @@ public class TraductorC {
             case IF_TRUE -> "if (" + a + " != 0) goto " + r + ";";
             case IF_FALSE -> "if (" + a + " == 0) goto " + r + ";";
             case CALL -> nombreC(q.arg1()) + "();";
+            case DIRECCION_FUNCION -> asignacion(r, String.valueOf(numeradas.indexOf(q.arg1())));
+            case CALL_INDIRECTO -> "llamar_indirecto(" + a + ");";
             case RETURN -> "return;";
             case HALT -> esMain ? "return 0;" : "exit(0);";
             case IMPRIMIR -> imprimir(a, q.arg2());

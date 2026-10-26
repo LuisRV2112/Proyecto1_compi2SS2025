@@ -76,6 +76,7 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
     private final Set<String> estructurasCompletas = new HashSet<>();
     private final Map<String, DeclaracionClase> declaracionesClase = new HashMap<>();
     private final Set<String> clasesCompletas = new HashSet<>();
+    private final Set<String> vtablesCompletas = new HashSet<>();
 
     private SimboloEstructura claseActual;
     private SimboloFuncion funcionActual;
@@ -115,6 +116,9 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         }
         for (Programa modulo : modulos) {
             modulo.getClases().forEach(this::validarHerencia);
+        }
+        for (Programa modulo : modulos) {
+            modulo.getClases().forEach(c -> construirVtable(c.getSimbolo()));
         }
         for (Programa modulo : modulos) {
             if (modulo.getLenguaje() != Lenguaje.PIGLATIN) {
@@ -393,6 +397,32 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
             List<Instruccion> cuerpo = constructor.getCuerpo();
             if (cuerpo.isEmpty() || !(cuerpo.get(0) instanceof LlamadaSuper)) {
                 verificarSuperImplicito(constructor, constructor.getNombre(), padre, "el constructor de '" + clase.getNombre() + "'");
+            }
+        }
+    }
+
+    /**
+     * La tabla del padre se copia entera; cada metodo propio reemplaza al que sobrescribe (mismo
+     * indice) o se agrega al final. Los private no entran: no se sobrescriben y se llaman directo.
+     */
+    private void construirVtable(SimboloEstructura clase) {
+        if (clase == null || !vtablesCompletas.add(clase.getNombre())) {
+            return;
+        }
+        List<SimboloFuncion> vtable = clase.getVtable();
+        if (clase.getPadre() != null) {
+            construirVtable(clase.getPadre());
+            vtable.addAll(clase.getPadre().getVtable());
+        }
+        for (SimboloFuncion metodo : clase.getMetodos()) {
+            if (esPrivado(metodo.getVisibilidad())) {
+                continue;
+            }
+            int indice = clase.indiceEnVtable(metodo);
+            if (indice >= 0) {
+                vtable.set(indice, metodo);
+            } else {
+                vtable.add(metodo);
             }
         }
     }

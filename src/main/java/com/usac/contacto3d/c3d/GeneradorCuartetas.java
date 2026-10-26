@@ -85,9 +85,17 @@ public class GeneradorCuartetas implements Visitante<String> {
     private int siguienteLiteral = 1;
 
     private final Map<String, SimboloFuncion> constructoresImplicitos = new HashMap<>();
+    private final Map<String, Integer> vtables = new LinkedHashMap<>();
 
     public ListaCuartetas generar(ResultadoSemantico resultado) {
         tabla = resultado.tabla();
+        // las vtables van al principio del heap, antes de los literales: su direccion es fija
+        for (SimboloEstructura tipo : tabla.getTipos().values()) {
+            if (tipo.esClase()) {
+                vtables.put(tipo.getNombre(), siguienteLiteral);
+                siguienteLiteral += Math.max(1, tipo.getVtable().size());
+            }
+        }
 
         for (Programa modulo : resultado.modulos()) {
             for (DeclaracionClase clase : modulo.getClases()) {
@@ -122,6 +130,14 @@ public class GeneradorCuartetas implements Visitante<String> {
                 programa.agregar(ESCRIBIR_HEAP, String.valueOf(direccion + i), String.valueOf((int) texto.charAt(i)), null);
             }
             programa.agregar(ESCRIBIR_HEAP, String.valueOf(direccion + texto.length()), "-1", null);
+        }
+        for (Map.Entry<String, Integer> vtable : vtables.entrySet()) {
+            List<SimboloFuncion> metodos = tabla.buscarTipo(vtable.getKey()).getVtable();
+            for (int i = 0; i < metodos.size(); i++) {
+                String direccion = codigo.nuevoTemporal();
+                programa.agregar(DIRECCION_FUNCION, metodos.get(i).getEtiqueta(), null, direccion);
+                programa.agregar(ESCRIBIR_HEAP, String.valueOf(vtable.getValue() + i), direccion, null);
+            }
         }
         programa.agregar(ASIGNAR, String.valueOf(siguienteLiteral), null, "H");
         programa.agregar(ASIGNAR, String.valueOf(resultado.tamanioGlobales()), null, "P");
@@ -605,7 +621,9 @@ public class GeneradorCuartetas implements Visitante<String> {
         SimboloEstructura clase = nodo.getSimboloClase();
         String objeto = temporal();
         emitir(ASIGNAR, "H", null, objeto);
-        emitir(SUMA, "H", String.valueOf(Math.max(1, clase.getTamanio())), "H");
+        emitir(SUMA, "H", String.valueOf(clase.getTamanio()), "H");
+        emitir(ESCRIBIR_HEAP, sumar(objeto, SimboloEstructura.CELDA_VTABLE),
+                String.valueOf(vtables.get(clase.getNombre())), null);
         SimboloFuncion constructor = nodo.getConstructor() != null ? nodo.getConstructor()
                 : constructoresImplicitos.get(clase.getNombre());
         llamar(constructor, nodo.getArgumentos(), objeto);

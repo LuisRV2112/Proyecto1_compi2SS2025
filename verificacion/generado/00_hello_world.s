@@ -17,27 +17,27 @@ _txt_uno: .asciz "1"
 _txt_division: .asciz "Error de ejecucion: division entre cero\n"
 _buffer: .space 1024
 .align 2
-_imagen0: .word -1, 67, 97, 100, 101, 116, 101, -1, 72, 111, 108, 97, 32, 77, 117, 110
-.word 100, 111, 32, 100, 101, 115, 100, 101, 32, 80, 105, 103, 32, 76, 97, 116
-.word 105, 110, -1, 69, 114, 114, 111, 114, 32, 100, 101, 32, 101, 106, 101, 99
-.word 117, 99, 105, 111, 110, 32, 101, 110, 32, 72, 111, 108, 97, 77, 117, 110
-.word 100, 111, 46, 112, 105, 103, 32, 108, 105, 110, 101, 97, 32, 49, 53, 58
-.word 32, 114, 101, 102, 101, 114, 101, 110, 99, 105, 97, 32, 110, 117, 108, 97
-.word 58, 32, 115, 101, 32, 105, 110, 116, 101, 110, 116, 111, 32, 117, 115, 97
-.word 114, 32, 101, 108, 32, 109, 101, 116, 111, 100, 111, 32, 39, 100, 101, 99
-.word 105, 114, 40, 41, 39, 32, 115, 111, 98, 114, 101, 32, 110, 117, 108, 108
-.word -1, 50, 32, 43, 32, 51, 32, 61, 32, -1, 69, 108, 32, 100, 111, 98
-.word 108, 101, 32, 100, 101, 32, 50, 49, 32, 101, 115, 32, -1, 69, 114, 114
-.word 111, 114, 32, 100, 101, 32, 101, 106, 101, 99, 117, 99, 105, 111, 110, 32
-.word 101, 110, 32, 72, 111, 108, 97, 77, 117, 110, 100, 111, 46, 112, 105, 103
-.word 32, 108, 105, 110, 101, 97, 32, 49, 55, 58, 32, 114, 101, 102, 101, 114
-.word 101, 110, 99, 105, 97, 32, 110, 117, 108, 97, 58, 32, 115, 101, 32, 105
-.word 110, 116, 101, 110, 116, 111, 32, 117, 115, 97, 114, 32, 101, 108, 32, 109
-.word 101, 116, 111, 100, 111, 32, 39, 100, 111, 98, 108, 101, 40, 41, 39, 32
-.word 115, 111, 98, 114, 101, 32, 110, 117, 108, 108, -1, 72, 111, 108, 97, 32
-.word 77, 117, 110, 100, 111, 32, 100, 101, 115, 100, 101, 32, 89, 63, -1, 72
-.word 111, 108, 97, 32, -1, 72, 111, 108, 97, 32, 77, 117, 110, 100, 111, 32
-.word 100, 101, 115, 100, 101, 32, 90, 101, 116, 97, 114, 105, 97, 110, 111, -1
+_imagen0: .word 67, 97, 100, 101, 116, 101, -1, 72, 111, 108, 97, 32, 77, 117, 110, 100
+.word 111, 32, 100, 101, 115, 100, 101, 32, 80, 105, 103, 32, 76, 97, 116, 105
+.word 110, -1, 69, 114, 114, 111, 114, 32, 100, 101, 32, 101, 106, 101, 99, 117
+.word 99, 105, 111, 110, 32, 101, 110, 32, 72, 111, 108, 97, 77, 117, 110, 100
+.word 111, 46, 112, 105, 103, 32, 108, 105, 110, 101, 97, 32, 49, 53, 58, 32
+.word 114, 101, 102, 101, 114, 101, 110, 99, 105, 97, 32, 110, 117, 108, 97, 58
+.word 32, 115, 101, 32, 105, 110, 116, 101, 110, 116, 111, 32, 117, 115, 97, 114
+.word 32, 101, 108, 32, 109, 101, 116, 111, 100, 111, 32, 39, 100, 101, 99, 105
+.word 114, 40, 41, 39, 32, 115, 111, 98, 114, 101, 32, 110, 117, 108, 108, -1
+.word 50, 32, 43, 32, 51, 32, 61, 32, -1, 69, 108, 32, 100, 111, 98, 108
+.word 101, 32, 100, 101, 32, 50, 49, 32, 101, 115, 32, -1, 69, 114, 114, 111
+.word 114, 32, 100, 101, 32, 101, 106, 101, 99, 117, 99, 105, 111, 110, 32, 101
+.word 110, 32, 72, 111, 108, 97, 77, 117, 110, 100, 111, 46, 112, 105, 103, 32
+.word 108, 105, 110, 101, 97, 32, 49, 55, 58, 32, 114, 101, 102, 101, 114, 101
+.word 110, 99, 105, 97, 32, 110, 117, 108, 97, 58, 32, 115, 101, 32, 105, 110
+.word 116, 101, 110, 116, 111, 32, 117, 115, 97, 114, 32, 101, 108, 32, 109, 101
+.word 116, 111, 100, 111, 32, 39, 100, 111, 98, 108, 101, 40, 41, 39, 32, 115
+.word 111, 98, 114, 101, 32, 110, 117, 108, 108, -1, 72, 111, 108, 97, 32, 77
+.word 117, 110, 100, 111, 32, 100, 101, 115, 100, 101, 32, 89, 63, -1, 72, 111
+.word 108, 97, 32, -1, 72, 111, 108, 97, 32, 77, 117, 110, 100, 111, 32, 100
+.word 101, 115, 100, 101, 32, 90, 101, 116, 97, 114, 105, 97, 110, 111, -1
 
 .text
 .globl _inicio
@@ -63,25 +63,56 @@ _inicio:
     ecall
 
 F_main:
-    addi sp, sp, -16
+    addi sp, sp, -32
     sw ra, 0(sp)
     sw s0, 4(sp)
     mv s0, sp
-    # heap[0..335] = _imagen0
-    la t0, _imagen0
-    li t1, 0
-    add t1, t1, s1
-    li t2, 336
+    addi t0, s0, 8
+    li t1, 2
 _r0:
+    fsd fs0, 0(t0)
+    addi t0, t0, 8
+    addi t1, t1, -1
+    bnez t1, _r0
+    # heap[0] = -1
+    li t0, -1
+    fcvt.d.w ft1, t0
+    li t0, 0
+    add t0, t0, s1
+    fsd ft1, 0(t0)
+    # heap[3..337] = _imagen0
+    la t0, _imagen0
+    li t1, 24
+    add t1, t1, s1
+    li t2, 335
+_r1:
     lw t3, 0(t0)
     fcvt.d.w ft0, t3
     fsd ft0, 0(t1)
     addi t0, t0, 4
     addi t1, t1, 8
     addi t2, t2, -1
-    bnez t2, _r0
-    # H = 336
-    li s11, 336
+    bnez t2, _r1
+    # t39 = &Hola_decir
+    li t0, 6
+    fcvt.d.w ft0, t0
+    fsd ft0, 8(s0)
+    # heap[1] = t39
+    fld ft1, 8(s0)
+    li t0, 8
+    add t0, t0, s1
+    fsd ft1, 0(t0)
+    # t40 = &Hola_doble
+    li t0, 7
+    fcvt.d.w ft0, t0
+    fsd ft0, 16(s0)
+    # heap[2] = t40
+    fld ft1, 16(s0)
+    li t0, 16
+    add t0, t0, s1
+    fsd ft1, 0(t0)
+    # H = 338
+    li s11, 338
     # P = 2
     li s10, 2
     # call principal
@@ -93,7 +124,7 @@ F_main_fin:
     mv sp, s0
     lw ra, 0(sp)
     lw s0, 4(sp)
-    addi sp, sp, 16
+    addi sp, sp, 32
     ret
 
 F_principal:
@@ -103,16 +134,24 @@ F_principal:
     mv s0, sp
     addi t0, s0, 8
     li t1, 21
-_r1:
+_r2:
     fsd fs0, 0(t0)
     addi t0, t0, 8
     addi t1, t1, -1
-    bnez t1, _r1
+    bnez t1, _r2
     # t0 = H
     fcvt.d.w ft0, s11
     fsd ft0, 8(s0)
     # H = H + 2
     addi s11, s11, 2
+    # heap[t0] = 1
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fld ft0, 8(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s1
+    fsd ft1, 0(t0)
     # t1 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
@@ -143,14 +182,14 @@ _r1:
     li t0, 0
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # stack[1] = 1
-    li t0, 1
+    # stack[1] = 3
+    li t0, 3
     fcvt.d.w ft1, t0
     li t0, 8
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # print 8  (cadena)
-    li t0, 8
+    # print 10  (cadena)
+    li t0, 10
     fcvt.d.w ft0, t0
     fcvt.w.d a1, ft0, rtz
     jal ra, _emitir_cadena
@@ -214,11 +253,11 @@ _r1:
     # if t8 goto L0
     fld ft0, 72(s0)
     feq.d t0, ft0, fs0
-    bnez t0, _r2
+    bnez t0, _r3
     j L0
-_r2:
-    # error 35
-    li t0, 35
+_r3:
+    # error 37
+    li t0, 37
     fcvt.d.w ft0, t0
     fcvt.w.d a1, ft0, rtz
     j _error_ejecucion
@@ -249,8 +288,8 @@ L0:
     jal ra, F_Hola_decir
     # P = P - 1
     addi s10, s10, -1
-    # print 145  (cadena)
-    li t0, 145
+    # print 147  (cadena)
+    li t0, 147
     fcvt.d.w ft0, t0
     fcvt.w.d a1, ft0, rtz
     jal ra, _emitir_cadena
@@ -306,8 +345,8 @@ L0:
     # print_salto
     li a0, 10
     jal ra, _emitir_car
-    # print 154  (cadena)
-    li t0, 154
+    # print 156  (cadena)
+    li t0, 156
     fcvt.d.w ft0, t0
     fcvt.w.d a1, ft0, rtz
     jal ra, _emitir_cadena
@@ -326,11 +365,11 @@ L0:
     # if t16 goto L1
     fld ft0, 136(s0)
     feq.d t0, ft0, fs0
-    bnez t0, _r3
+    bnez t0, _r4
     j L1
-_r3:
-    # error 173
-    li t0, 173
+_r4:
+    # error 175
+    li t0, 175
     fcvt.d.w ft0, t0
     fcvt.w.d a1, ft0, rtz
     j _error_ejecucion
@@ -399,8 +438,8 @@ F_saludar:
     sw ra, 0(sp)
     sw s0, 4(sp)
     mv s0, sp
-    # print 283  (cadena)
-    li t0, 283
+    # print 285  (cadena)
+    li t0, 285
     fcvt.d.w ft0, t0
     fcvt.w.d a1, ft0, rtz
     jal ra, _emitir_cadena
@@ -421,11 +460,11 @@ F_saludarA:
     mv s0, sp
     addi t0, s0, 8
     li t1, 3
-_r4:
+_r5:
     fsd fs0, 0(t0)
     addi t0, t0, 8
     addi t1, t1, -1
-    bnez t1, _r4
+    bnez t1, _r5
     # t21 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
@@ -439,8 +478,8 @@ _r4:
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 16(s0)
-    # t23 = concatenar 303, t22
-    li t0, 303
+    # t23 = concatenar 305, t22
+    li t0, 305
     fcvt.d.w ft0, t0
     fcvt.w.d a1, ft0, rtz
     fld ft1, 16(s0)
@@ -469,11 +508,11 @@ F_sumar:
     mv s0, sp
     addi t0, s0, 8
     li t1, 5
-_r5:
+_r6:
     fsd fs0, 0(t0)
     addi t0, t0, 8
     addi t1, t1, -1
-    bnez t1, _r5
+    bnez t1, _r6
     # t24 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
@@ -526,11 +565,11 @@ F_Hola_constructor:
     mv s0, sp
     addi t0, s0, 8
     li t1, 3
-_r6:
+_r7:
     fsd fs0, 0(t0)
     addi t0, t0, 8
     addi t1, t1, -1
-    bnez t1, _r6
+    bnez t1, _r7
     # t29 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
@@ -550,8 +589,8 @@ _r6:
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 24(s0)
-    # heap[t31] = 309
-    li t0, 309
+    # heap[t31] = 311
+    li t0, 311
     fcvt.d.w ft1, t0
     fld ft0, 24(s0)
     fcvt.w.d t0, ft0, rtz
@@ -572,11 +611,11 @@ F_Hola_decir:
     mv s0, sp
     addi t0, s0, 8
     li t1, 4
-_r7:
+_r8:
     fsd fs0, 0(t0)
     addi t0, t0, 8
     addi t1, t1, -1
-    bnez t1, _r7
+    bnez t1, _r8
     # t32 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
@@ -624,11 +663,11 @@ F_Hola_doble:
     mv s0, sp
     addi t0, s0, 8
     li t1, 3
-_r8:
+_r9:
     fsd fs0, 0(t0)
     addi t0, t0, 8
     addi t1, t1, -1
-    bnez t1, _r8
+    bnez t1, _r9
     # t36 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
