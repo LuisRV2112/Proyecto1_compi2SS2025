@@ -1,0 +1,11 @@
+// Subclase de Persona para probar el tipo explicito de PigLatin.
+public class Profesor extends Persona {
+    private Persona alumno;
+
+    public Profesor(int e, Persona jefe, Persona a) {
+        super(e, "Profesor de " + jefe.getNombre());
+        alumno = a;
+    }
+
+    public String getAlumno() { return alumno.getNombre(); }
+}

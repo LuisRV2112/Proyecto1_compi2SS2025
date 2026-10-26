@@ -1,0 +1,5 @@
+  [Semantico] errores_tipo_explicito.pig linea 6, columna 13 -> No se puede guardar un valor de tipo null en 'malo'. Se esperaba un valor de tipo entero
+  [Semantico] errores_tipo_explicito.pig linea 7, columna 13 -> No se puede guardar un valor de tipo Persona en 'peor'. Se esperaba un valor de tipo Profesor
+  [Semantico] errores_tipo_explicito.pig linea 8, columna 6 -> El tipo 'Inexistente' no esta declarado. Se esperaba una estructura de un .y o una clase de un .z
+  [Semantico] errores_tipo_explicito.pig linea 9, columna 14 -> No se puede guardar un valor de tipo entero en 'texto'. Se esperaba un valor de tipo cadena
+  [Semantico] errores_tipo_explicito.pig linea 13, columna 9 -> No existe el metodo 'getAlumno' de Persona. Se esperaba una funcion o metodo declarado

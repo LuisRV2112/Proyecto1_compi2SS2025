@@ -30,6 +30,7 @@ declaracionVariable
     | ESTO ID DOSP ID listaValores PUNTOYCOMA?              # varEstructura
     | ESTO ID DOSP ID PUNTOYCOMA                            # varSinValor
     | ESTO ID DOSP nuevoObjeto PUNTOYCOMA                   # varObjeto
+    | ESTO ID DOSP expr DOSP tipo PUNTOYCOMA                # varTipoExplicito
     ;
 
 declaracionArreglo
