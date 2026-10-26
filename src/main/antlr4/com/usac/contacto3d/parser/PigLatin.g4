@@ -193,6 +193,7 @@ literal
     | LIT_CADENA                            # litCadena
     | LIT_CARACTER                          # litCaracter
     | (VERUM | FALSUS)                      # litBooleano
+    | NULL                                  # litNulo
     ;
 
 SEC_VARIABILES : 'VARIABILES>' ;
@@ -225,6 +226,7 @@ RATIO      : 'ratio' ;
 REDDERE    : 'reddere' ;
 VERUM      : 'verum' ;
 FALSUS     : 'falsus' ;
+NULL       : 'null' ;
 NON        : 'non' ;
 
 IMPRIMIR    : '>>' ;

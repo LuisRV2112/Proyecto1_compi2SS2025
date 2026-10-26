@@ -1,0 +1,6 @@
+  [Semantico] errores_null.pig linea 10, columna 5 -> No se puede guardar un valor de tipo null en 'n'. Se esperaba un valor de tipo entero
+  [Semantico] errores_null.pig linea 11, columna 5 -> No se puede guardar un valor de tipo null en 't'. Se esperaba un valor de tipo cadena
+  [Semantico] errores_null.pig linea 12, columna 9 -> No se puede aplicar '+' entre null y entero
+  [Semantico] errores_null.pig linea 13, columna 6 -> No se puede aplicar '*' entre Persona y null
+  [Semantico] errores_null.pig linea 14, columna 4 -> No se puede imprimir un valor de tipo null. Se esperaba un valor primitivo (entero, flotante, cadena, caracter o bool)
+  [Semantico] errores_null.pig linea 15, columna 7 -> No se puede comparar entero con null

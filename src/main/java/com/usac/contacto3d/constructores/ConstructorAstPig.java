@@ -437,6 +437,11 @@ public class ConstructorAstPig extends PigLatinBaseVisitor<Nodo> {
     }
 
     @Override
+    public Nodo visitLitNulo(LitNuloContext ctx) {
+        return new Literal(null, Tipo.NULO, linea(ctx), columna(ctx));
+    }
+
+    @Override
     protected Nodo aggregateResult(Nodo acumulado, Nodo siguiente) {
         return acumulado != null ? acumulado : siguiente;
     }

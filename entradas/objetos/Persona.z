@@ -1,0 +1,19 @@
+// Clase base de las pruebas de objetos en PigLatin.
+public class Persona {
+    protected int edad;
+    protected String nombre;
+    public Persona companero;
+
+    public Persona() {
+        edad = 0;
+        nombre = "anonimo";
+    }
+
+    public Persona(int e, String n) {
+        edad = e;
+        nombre = n;
+    }
+
+    public String getNombre() { return nombre; }
+    public int getEdad() { return edad; }
+}

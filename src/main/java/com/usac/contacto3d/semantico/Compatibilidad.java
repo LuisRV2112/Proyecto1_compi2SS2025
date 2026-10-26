@@ -41,7 +41,7 @@ public final class Compatibilidad {
             return true;
         }
         if (a.getBase() == Tipo.Base.NULO || b.getBase() == Tipo.Base.NULO) {
-            return aceptaNulo(a) || aceptaNulo(b);
+            return aceptaNulo(a) && aceptaNulo(b);
         }
         return a.equals(b);
     }
@@ -110,8 +110,8 @@ public final class Compatibilidad {
         return tipo.getBase() == Tipo.Base.BOOLEANO;
     }
 
+    /** null solo vale para referencias: objetos y arreglos. Ningun primitivo, ni siquiera la cadena. */
     private static boolean aceptaNulo(Tipo tipo) {
-        return tipo.esObjeto() || tipo.esArreglo() || tipo.getBase() == Tipo.Base.CADENA
-                || tipo.getBase() == Tipo.Base.NULO;
+        return tipo.esObjeto() || tipo.esArreglo() || tipo.getBase() == Tipo.Base.NULO;
     }
 }

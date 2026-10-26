@@ -1,0 +1,6 @@
+vacio == null: falsus
+vacio == null: verum
+p != null: verum
+companero nulo: verum
+companero: Beto
+sin companero

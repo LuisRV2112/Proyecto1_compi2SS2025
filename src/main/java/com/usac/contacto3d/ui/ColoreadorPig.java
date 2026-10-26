@@ -25,7 +25,7 @@ public class ColoreadorPig extends ColoreadorBase {
                  PigLatinLexer.RATIO, PigLatinLexer.REDDERE, PigLatinLexer.NON,
                  PigLatinLexer.STRUCTURA -> Token.RESERVED_WORD;
             case PigLatinLexer.IMPRIMIR, PigLatinLexer.LEER -> Token.FUNCTION;
-            case PigLatinLexer.VERUM, PigLatinLexer.FALSUS -> Token.LITERAL_BOOLEAN;
+            case PigLatinLexer.VERUM, PigLatinLexer.FALSUS, PigLatinLexer.NULL -> Token.LITERAL_BOOLEAN;
             case PigLatinLexer.LIT_ENTERO -> Token.LITERAL_NUMBER_DECIMAL_INT;
             case PigLatinLexer.LIT_DECIMAL -> Token.LITERAL_NUMBER_FLOAT;
             case PigLatinLexer.LIT_CADENA -> Token.LITERAL_STRING_DOUBLE_QUOTE;
