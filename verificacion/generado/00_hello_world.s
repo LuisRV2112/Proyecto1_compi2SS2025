@@ -111,8 +111,8 @@ _r1:
     # t0 = H
     fcvt.d.w ft0, s11
     fsd ft0, 8(s0)
-    # H = H + 1
-    addi s11, s11, 1
+    # H = H + 2
+    addi s11, s11, 2
     # t1 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
@@ -525,7 +525,7 @@ F_Hola_constructor:
     sw s0, 4(sp)
     mv s0, sp
     addi t0, s0, 8
-    li t1, 2
+    li t1, 3
 _r6:
     fsd fs0, 0(t0)
     addi t0, t0, 8
@@ -544,10 +544,16 @@ _r6:
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 16(s0)
-    # heap[t30] = 309
+    # t31 = t30 + 1
+    fld ft0, 16(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 24(s0)
+    # heap[t31] = 309
     li t0, 309
     fcvt.d.w ft1, t0
-    fld ft0, 16(s0)
+    fld ft0, 24(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
@@ -560,39 +566,45 @@ F_Hola_constructor_fin:
     ret
 
 F_Hola_decir:
-    addi sp, sp, -32
+    addi sp, sp, -48
     sw ra, 0(sp)
     sw s0, 4(sp)
     mv s0, sp
     addi t0, s0, 8
-    li t1, 3
+    li t1, 4
 _r7:
     fsd fs0, 0(t0)
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r7
-    # t31 = P + 1
+    # t32 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # t32 = stack[t31]
+    # t33 = stack[t32]
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 16(s0)
-    # t33 = heap[t32]
+    # t34 = t33 + 1
     fld ft0, 16(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 24(s0)
+    # t35 = heap[t34]
+    fld ft0, 24(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 24(s0)
-    # print t33  (cadena)
-    fld ft0, 24(s0)
+    fsd ft2, 32(s0)
+    # print t35  (cadena)
+    fld ft0, 32(s0)
     fcvt.w.d a1, ft0, rtz
     jal ra, _emitir_cadena
     # print_salto
@@ -602,7 +614,7 @@ F_Hola_decir_fin:
     mv sp, s0
     lw ra, 0(sp)
     lw s0, 4(sp)
-    addi sp, sp, 32
+    addi sp, sp, 48
     ret
 
 F_Hola_doble:
@@ -617,26 +629,26 @@ _r8:
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r8
-    # t34 = P + 2
+    # t36 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # t35 = stack[t34]
+    # t37 = stack[t36]
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 16(s0)
-    # t36 = t35 * 2
+    # t38 = t37 * 2
     fld ft0, 16(s0)
     li t0, 2
     fcvt.d.w ft1, t0
     fmul.d ft2, ft0, ft1
     fsd ft2, 24(s0)
-    # stack[P] = t36
+    # stack[P] = t38
     fld ft1, 24(s0)
     slli t0, s10, 3
     add t0, t0, s2

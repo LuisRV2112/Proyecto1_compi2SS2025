@@ -37,6 +37,12 @@ public class SimboloEstructura extends Simbolo {
         public SimboloEstructura getDuenio() { return duenio; }
     }
 
+    /**
+     * En un objeto, la celda 0 guarda el puntero a la tabla de metodos virtuales de su clase real,
+     * y los campos empiezan en la 1. Las estructuras de Y? no la tienen: sus campos empiezan en 0.
+     */
+    public static final int CELDA_VTABLE = 0;
+
     private final Map<String, Campo> campos = new LinkedHashMap<>();
     private final List<SimboloFuncion> metodos = new ArrayList<>();
     private final List<SimboloFuncion> constructores = new ArrayList<>();
@@ -51,6 +57,7 @@ public class SimboloEstructura extends Simbolo {
               esClase ? Tipo.objeto(nombre) : Tipo.estructura(nombre),
               archivo, linea, columna);
         this.esClase = esClase;
+        this.tamanioTotal = esClase ? CELDA_VTABLE + 1 : 0;
     }
 
     public boolean esClase() { return esClase; }

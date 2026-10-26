@@ -687,12 +687,12 @@ F_main_fin:
     ret
 
 F_principal:
-    addi sp, sp, -1952
+    addi sp, sp, -1968
     sw ra, 0(sp)
     sw s0, 4(sp)
     mv s0, sp
     addi t0, s0, 8
-    li t1, 242
+    li t1, 245
 _r1:
     fsd fs0, 0(t0)
     addi t0, t0, 8
@@ -726,8 +726,8 @@ _r1:
     # t0 = H
     fcvt.d.w ft0, s11
     fsd ft0, 8(s0)
-    # H = H + 3
-    addi s11, s11, 3
+    # H = H + 4
+    addi s11, s11, 4
     # t1 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
@@ -761,8 +761,8 @@ _r1:
     # t3 = H
     fcvt.d.w ft0, s11
     fsd ft0, 32(s0)
-    # H = H + 3
-    addi s11, s11, 3
+    # H = H + 4
+    addi s11, s11, 4
     # t4 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
@@ -3329,9 +3329,9 @@ _r42:
     j _error_ejecucion
     # L53:
 L53:
-    # t200 = t198 + 2
+    # t200 = t198 + 3
     fld ft0, 1592(s0)
-    li t0, 2
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 1608(s0)
@@ -3376,9 +3376,9 @@ _r43:
     j _error_ejecucion
     # L54:
 L54:
-    # t204 = t202 + 2
+    # t204 = t202 + 3
     fld ft0, 1624(s0)
-    li t0, 2
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 1640(s0)
@@ -3595,22 +3595,28 @@ _r46:
     j _error_ejecucion
     # L57:
 L57:
-    # t221 = heap[t219]
+    # t221 = t219 + 1
     fld ft0, 1760(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 1776(s0)
+    # t222 = heap[t221]
+    fld ft0, 1776(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 1776(s0)
-    # t222 = t221 != 0
-    fld ft0, 1776(s0)
+    fsd ft2, 1784(s0)
+    # t223 = t222 != 0
+    fld ft0, 1784(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 1784(s0)
-    # if t222 goto L58
-    fld ft0, 1784(s0)
+    fsd ft2, 1792(s0)
+    # if t223 goto L58
+    fld ft0, 1792(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r47
     j L58
@@ -3622,15 +3628,21 @@ _r47:
     j _error_ejecucion
     # L58:
 L58:
-    # t223 = heap[t221]
-    fld ft0, 1776(s0)
+    # t224 = t222 + 1
+    fld ft0, 1784(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 1800(s0)
+    # t225 = heap[t224]
+    fld ft0, 1800(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 1792(s0)
-    # print t223  (entero)
-    fld ft0, 1792(s0)
+    fsd ft2, 1808(s0)
+    # print t225  (entero)
+    fld ft0, 1808(s0)
     fmv.d fa0, ft0
     jal ra, _emitir_entero
     # print 3828  (cadena)
@@ -3638,20 +3650,20 @@ L58:
     fcvt.d.w ft0, t0
     fcvt.w.d a1, ft0, rtz
     jal ra, _emitir_cadena
-    # t224 = stack[5]
+    # t226 = stack[5]
     li t0, 40
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 1800(s0)
-    # t225 = t224 != 0
-    fld ft0, 1800(s0)
+    fsd ft2, 1816(s0)
+    # t227 = t226 != 0
+    fld ft0, 1816(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 1808(s0)
-    # if t225 goto L59
-    fld ft0, 1808(s0)
+    fsd ft2, 1824(s0)
+    # if t227 goto L59
+    fld ft0, 1824(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r48
     j L59
@@ -3663,28 +3675,28 @@ _r48:
     j _error_ejecucion
     # L59:
 L59:
-    # t226 = t224 + 1
-    fld ft0, 1800(s0)
-    li t0, 1
+    # t228 = t226 + 2
+    fld ft0, 1816(s0)
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 1816(s0)
-    # t227 = heap[t226]
-    fld ft0, 1816(s0)
+    fsd ft2, 1832(s0)
+    # t229 = heap[t228]
+    fld ft0, 1832(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 1824(s0)
-    # t228 = t227 != 0
-    fld ft0, 1824(s0)
+    fsd ft2, 1840(s0)
+    # t230 = t229 != 0
+    fld ft0, 1840(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 1832(s0)
-    # if t228 goto L60
-    fld ft0, 1832(s0)
+    fsd ft2, 1848(s0)
+    # if t230 goto L60
+    fld ft0, 1848(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r49
     j L60
@@ -3696,15 +3708,21 @@ _r49:
     j _error_ejecucion
     # L60:
 L60:
-    # t229 = heap[t227]
-    fld ft0, 1824(s0)
+    # t231 = t229 + 1
+    fld ft0, 1840(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 1856(s0)
+    # t232 = heap[t231]
+    fld ft0, 1856(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 1840(s0)
-    # print t229  (entero)
-    fld ft0, 1840(s0)
+    fsd ft2, 1864(s0)
+    # print t232  (entero)
+    fld ft0, 1864(s0)
     fmv.d fa0, ft0
     jal ra, _emitir_entero
     # print_salto
@@ -3716,38 +3734,38 @@ L50:
     j L11
     # L49:
 L49:
-    # t230 = stack[0]
+    # t233 = stack[0]
     li t0, 0
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 1848(s0)
-    # t231 = t230 == 13
-    fld ft0, 1848(s0)
+    fsd ft2, 1872(s0)
+    # t234 = t233 == 13
+    fld ft0, 1872(s0)
     li t0, 13
     fcvt.d.w ft1, t0
     feq.d t0, ft0, ft1
     fcvt.d.w ft2, t0
-    fsd ft2, 1856(s0)
-    # if_false t231 goto L61
-    fld ft0, 1856(s0)
+    fsd ft2, 1880(s0)
+    # if_false t234 goto L61
+    fld ft0, 1880(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r50
     j L61
 _r50:
-    # t232 = stack[5]
+    # t235 = stack[5]
     li t0, 40
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 1864(s0)
-    # t233 = t232 != 0
-    fld ft0, 1864(s0)
+    fsd ft2, 1888(s0)
+    # t236 = t235 != 0
+    fld ft0, 1888(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 1872(s0)
-    # if t233 goto L62
-    fld ft0, 1872(s0)
+    fsd ft2, 1896(s0)
+    # if t236 goto L62
+    fld ft0, 1896(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r51
     j L62
@@ -3759,21 +3777,21 @@ _r51:
     j _error_ejecucion
     # L62:
 L62:
-    # t234 = P + 2
+    # t237 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 1880(s0)
-    # t235 = t234 + 1
-    fld ft0, 1880(s0)
+    fsd ft2, 1904(s0)
+    # t238 = t237 + 1
+    fld ft0, 1904(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 1888(s0)
-    # stack[t235] = t232
-    fld ft1, 1864(s0)
-    fld ft0, 1888(s0)
+    fsd ft2, 1912(s0)
+    # stack[t238] = t235
+    fld ft1, 1888(s0)
+    fld ft0, 1912(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
@@ -3796,19 +3814,19 @@ L62:
     j L11
     # L61:
 L61:
-    # t236 = stack[0]
+    # t239 = stack[0]
     li t0, 0
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 1896(s0)
-    # t237 = t236 == 0
-    fld ft0, 1896(s0)
+    fsd ft2, 1920(s0)
+    # t240 = t239 == 0
+    fld ft0, 1920(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     fcvt.d.w ft2, t0
-    fsd ft2, 1904(s0)
-    # if_false t237 goto L63
-    fld ft0, 1904(s0)
+    fsd ft2, 1928(s0)
+    # if_false t240 goto L63
+    fld ft0, 1928(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r52
     j L63
@@ -3837,42 +3855,42 @@ L63:
 L11:
     # L9:
 L9:
-    # t238 = stack[0]
+    # t241 = stack[0]
     li t0, 0
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 1912(s0)
-    # t239 = t238 != 0
-    fld ft0, 1912(s0)
+    fsd ft2, 1936(s0)
+    # t242 = t241 != 0
+    fld ft0, 1936(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 1920(s0)
-    # if t239 goto L8
-    fld ft0, 1920(s0)
+    fsd ft2, 1944(s0)
+    # if t242 goto L8
+    fld ft0, 1944(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r53
     j L8
 _r53:
     # L10:
 L10:
-    # t240 = P + 2
+    # t243 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 1928(s0)
-    # t241 = t240 + 1
-    fld ft0, 1928(s0)
+    fsd ft2, 1952(s0)
+    # t244 = t243 + 1
+    fld ft0, 1952(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 1936(s0)
-    # stack[t241] = 7
+    fsd ft2, 1960(s0)
+    # stack[t244] = 7
     li t0, 7
     fcvt.d.w ft1, t0
-    fld ft0, 1936(s0)
+    fld ft0, 1960(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
@@ -3887,7 +3905,7 @@ F_principal_fin:
     mv sp, s0
     lw ra, 0(sp)
     lw s0, 4(sp)
-    addi sp, sp, 1952
+    addi sp, sp, 1968
     ret
 
 F_Nodo_constructor:
@@ -3896,93 +3914,99 @@ F_Nodo_constructor:
     sw s0, 4(sp)
     mv s0, sp
     addi t0, s0, 8
-    li t1, 10
+    li t1, 11
 _r54:
     fsd fs0, 0(t0)
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r54
-    # t242 = P + 1
+    # t245 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # t243 = stack[t242]
+    # t246 = stack[t245]
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 16(s0)
-    # t244 = P + 2
-    fcvt.d.w ft0, s10
-    li t0, 2
+    # t247 = t246 + 1
+    fld ft0, 16(s0)
+    li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 24(s0)
-    # t245 = stack[t244]
-    fld ft0, 24(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s2
-    fld ft2, 0(t0)
-    fsd ft2, 32(s0)
-    # heap[t243] = t245
-    fld ft1, 32(s0)
-    fld ft0, 16(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s1
-    fsd ft1, 0(t0)
-    # t246 = P + 1
+    # t248 = P + 2
     fcvt.d.w ft0, s10
-    li t0, 1
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 40(s0)
-    # t247 = stack[t246]
-    fld ft0, 40(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s2
-    fld ft2, 0(t0)
-    fsd ft2, 48(s0)
-    # t248 = t247 + 1
-    fld ft0, 48(s0)
-    li t0, 1
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 56(s0)
-    # heap[t248] = 0
-    fmv.d ft1, fs0
-    fld ft0, 56(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s1
-    fsd ft1, 0(t0)
-    # t249 = P + 1
-    fcvt.d.w ft0, s10
-    li t0, 1
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 64(s0)
-    # t250 = stack[t249]
-    fld ft0, 64(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s2
-    fld ft2, 0(t0)
-    fsd ft2, 72(s0)
-    # t251 = t250 + 2
-    fld ft0, 72(s0)
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 80(s0)
-    # heap[t251] = 0
+    fsd ft2, 32(s0)
+    # t249 = stack[t248]
+    fld ft0, 32(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s2
+    fld ft2, 0(t0)
+    fsd ft2, 40(s0)
+    # heap[t247] = t249
+    fld ft1, 40(s0)
+    fld ft0, 24(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s1
+    fsd ft1, 0(t0)
+    # t250 = P + 1
+    fcvt.d.w ft0, s10
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 48(s0)
+    # t251 = stack[t250]
+    fld ft0, 48(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s2
+    fld ft2, 0(t0)
+    fsd ft2, 56(s0)
+    # t252 = t251 + 2
+    fld ft0, 56(s0)
+    li t0, 2
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 64(s0)
+    # heap[t252] = 0
     fmv.d ft1, fs0
+    fld ft0, 64(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s1
+    fsd ft1, 0(t0)
+    # t253 = P + 1
+    fcvt.d.w ft0, s10
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 72(s0)
+    # t254 = stack[t253]
+    fld ft0, 72(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s2
+    fld ft2, 0(t0)
+    fsd ft2, 80(s0)
+    # t255 = t254 + 3
     fld ft0, 80(s0)
+    li t0, 3
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 88(s0)
+    # heap[t255] = 0
+    fmv.d ft1, fs0
+    fld ft0, 88(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
@@ -4000,80 +4024,86 @@ F_ListaDoble_constructor:
     sw s0, 4(sp)
     mv s0, sp
     addi t0, s0, 8
-    li t1, 8
+    li t1, 9
 _r55:
     fsd fs0, 0(t0)
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r55
-    # t252 = P + 1
+    # t256 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # t253 = stack[t252]
+    # t257 = stack[t256]
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 16(s0)
-    # heap[t253] = 0
-    fmv.d ft1, fs0
+    # t258 = t257 + 1
     fld ft0, 16(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s1
-    fsd ft1, 0(t0)
-    # t254 = P + 1
-    fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 24(s0)
-    # t255 = stack[t254]
-    fld ft0, 24(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s2
-    fld ft2, 0(t0)
-    fsd ft2, 32(s0)
-    # t256 = t255 + 1
-    fld ft0, 32(s0)
-    li t0, 1
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 40(s0)
-    # heap[t256] = 0
+    # heap[t258] = 0
     fmv.d ft1, fs0
-    fld ft0, 40(s0)
+    fld ft0, 24(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fsd ft1, 0(t0)
-    # t257 = P + 1
+    # t259 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 48(s0)
-    # t258 = stack[t257]
-    fld ft0, 48(s0)
+    fsd ft2, 32(s0)
+    # t260 = stack[t259]
+    fld ft0, 32(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 56(s0)
-    # t259 = t258 + 2
-    fld ft0, 56(s0)
+    fsd ft2, 40(s0)
+    # t261 = t260 + 2
+    fld ft0, 40(s0)
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 64(s0)
-    # heap[t259] = 0
+    fsd ft2, 48(s0)
+    # heap[t261] = 0
     fmv.d ft1, fs0
+    fld ft0, 48(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s1
+    fsd ft1, 0(t0)
+    # t262 = P + 1
+    fcvt.d.w ft0, s10
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 56(s0)
+    # t263 = stack[t262]
+    fld ft0, 56(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s2
+    fld ft2, 0(t0)
+    fsd ft2, 64(s0)
+    # t264 = t263 + 3
     fld ft0, 64(s0)
+    li t0, 3
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 72(s0)
+    # heap[t264] = 0
+    fmv.d ft1, fs0
+    fld ft0, 72(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
@@ -4086,85 +4116,39 @@ F_ListaDoble_constructor_fin:
     ret
 
 F_ListaDoble_constructor_2:
-    addi sp, sp, -128
+    addi sp, sp, -144
     sw ra, 0(sp)
     sw s0, 4(sp)
     mv s0, sp
     addi t0, s0, 8
-    li t1, 15
+    li t1, 16
 _r56:
     fsd fs0, 0(t0)
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r56
-    # t260 = P + 1
+    # t265 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # t261 = stack[t260]
+    # t266 = stack[t265]
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 16(s0)
-    # heap[t261] = 0
-    fmv.d ft1, fs0
+    # t267 = t266 + 1
     fld ft0, 16(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s1
-    fsd ft1, 0(t0)
-    # t262 = P + 1
-    fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 24(s0)
-    # t263 = stack[t262]
-    fld ft0, 24(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s2
-    fld ft2, 0(t0)
-    fsd ft2, 32(s0)
-    # t264 = t263 + 1
-    fld ft0, 32(s0)
-    li t0, 1
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 40(s0)
-    # heap[t264] = 0
-    fmv.d ft1, fs0
-    fld ft0, 40(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s1
-    fsd ft1, 0(t0)
-    # t265 = P + 1
-    fcvt.d.w ft0, s10
-    li t0, 1
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 48(s0)
-    # t266 = stack[t265]
-    fld ft0, 48(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s2
-    fld ft2, 0(t0)
-    fsd ft2, 56(s0)
-    # t267 = t266 + 2
-    fld ft0, 56(s0)
-    li t0, 2
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 64(s0)
     # heap[t267] = 0
     fmv.d ft1, fs0
-    fld ft0, 64(s0)
+    fld ft0, 24(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
@@ -4174,55 +4158,107 @@ _r56:
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 72(s0)
+    fsd ft2, 32(s0)
     # t269 = stack[t268]
-    fld ft0, 72(s0)
+    fld ft0, 32(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
+    fsd ft2, 40(s0)
+    # t270 = t269 + 2
+    fld ft0, 40(s0)
+    li t0, 2
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 48(s0)
+    # heap[t270] = 0
+    fmv.d ft1, fs0
+    fld ft0, 48(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s1
+    fsd ft1, 0(t0)
+    # t271 = P + 1
+    fcvt.d.w ft0, s10
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 56(s0)
+    # t272 = stack[t271]
+    fld ft0, 56(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s2
+    fld ft2, 0(t0)
+    fsd ft2, 64(s0)
+    # t273 = t272 + 3
+    fld ft0, 64(s0)
+    li t0, 3
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 72(s0)
+    # heap[t273] = 0
+    fmv.d ft1, fs0
+    fld ft0, 72(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s1
+    fsd ft1, 0(t0)
+    # t274 = P + 1
+    fcvt.d.w ft0, s10
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
     fsd ft2, 80(s0)
-    # t270 = P + 2
+    # t275 = stack[t274]
+    fld ft0, 80(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s2
+    fld ft2, 0(t0)
+    fsd ft2, 88(s0)
+    # t276 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 88(s0)
-    # t271 = stack[t270]
-    fld ft0, 88(s0)
+    fsd ft2, 96(s0)
+    # t277 = stack[t276]
+    fld ft0, 96(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 96(s0)
-    # t272 = P + 3
+    fsd ft2, 104(s0)
+    # t278 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 104(s0)
-    # t273 = t272 + 1
-    fld ft0, 104(s0)
+    fsd ft2, 112(s0)
+    # t279 = t278 + 1
+    fld ft0, 112(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 112(s0)
-    # stack[t273] = t269
-    fld ft1, 80(s0)
-    fld ft0, 112(s0)
+    fsd ft2, 120(s0)
+    # stack[t279] = t275
+    fld ft1, 88(s0)
+    fld ft0, 120(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t274 = t272 + 2
-    fld ft0, 104(s0)
+    # t280 = t278 + 2
+    fld ft0, 112(s0)
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 120(s0)
-    # stack[t274] = t271
-    fld ft1, 96(s0)
-    fld ft0, 120(s0)
+    fsd ft2, 128(s0)
+    # stack[t280] = t277
+    fld ft1, 104(s0)
+    fld ft0, 128(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
@@ -4237,7 +4273,7 @@ F_ListaDoble_constructor_2_fin:
     mv sp, s0
     lw ra, 0(sp)
     lw s0, 4(sp)
-    addi sp, sp, 128
+    addi sp, sp, 144
     ret
 
 F_ListaDoble_estaVacia:
@@ -4246,40 +4282,46 @@ F_ListaDoble_estaVacia:
     sw s0, 4(sp)
     mv s0, sp
     addi t0, s0, 8
-    li t1, 4
+    li t1, 5
 _r57:
     fsd fs0, 0(t0)
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r57
-    # t275 = P + 1
+    # t281 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # t276 = stack[t275]
+    # t282 = stack[t281]
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 16(s0)
-    # t277 = heap[t276]
+    # t283 = t282 + 1
     fld ft0, 16(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 24(s0)
+    # t284 = heap[t283]
+    fld ft0, 24(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 24(s0)
-    # t278 = t277 == 0
-    fld ft0, 24(s0)
+    fsd ft2, 32(s0)
+    # t285 = t284 == 0
+    fld ft0, 32(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     fcvt.d.w ft2, t0
-    fsd ft2, 32(s0)
-    # stack[P] = t278
-    fld ft1, 32(s0)
+    fsd ft2, 40(s0)
+    # stack[P] = t285
+    fld ft1, 40(s0)
     slli t0, s10, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
@@ -4293,67 +4335,67 @@ F_ListaDoble_estaVacia_fin:
     ret
 
 F_ListaDoble_insertarInicio:
-    addi sp, sp, -352
+    addi sp, sp, -400
     sw ra, 0(sp)
     sw s0, 4(sp)
     mv s0, sp
     addi t0, s0, 8
-    li t1, 43
+    li t1, 48
 _r58:
     fsd fs0, 0(t0)
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r58
-    # t279 = P + 3
+    # t286 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # t280 = H
+    # t287 = H
     fcvt.d.w ft0, s11
     fsd ft0, 16(s0)
-    # H = H + 3
-    addi s11, s11, 3
-    # t281 = P + 2
+    # H = H + 4
+    addi s11, s11, 4
+    # t288 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 24(s0)
-    # t282 = stack[t281]
+    # t289 = stack[t288]
     fld ft0, 24(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 32(s0)
-    # t283 = P + 4
+    # t290 = P + 4
     fcvt.d.w ft0, s10
     li t0, 4
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 40(s0)
-    # t284 = t283 + 1
+    # t291 = t290 + 1
     fld ft0, 40(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 48(s0)
-    # stack[t284] = t280
+    # stack[t291] = t287
     fld ft1, 16(s0)
     fld ft0, 48(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t285 = t283 + 2
+    # t292 = t290 + 2
     fld ft0, 40(s0)
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 56(s0)
-    # stack[t285] = t282
+    # stack[t292] = t289
     fld ft1, 32(s0)
     fld ft0, 56(s0)
     fcvt.w.d t0, ft0, rtz
@@ -4366,113 +4408,125 @@ _r58:
     jal ra, F_Nodo_constructor
     # P = P - 4
     addi s10, s10, -4
-    # stack[t279] = t280
+    # stack[t286] = t287
     fld ft1, 16(s0)
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t286 = P + 1
+    # t293 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 64(s0)
-    # t287 = stack[t286]
+    # t294 = stack[t293]
     fld ft0, 64(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 72(s0)
-    # t288 = heap[t287]
+    # t295 = t294 + 1
     fld ft0, 72(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 80(s0)
+    # t296 = heap[t295]
+    fld ft0, 80(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 80(s0)
-    # t289 = t288 == 0
-    fld ft0, 80(s0)
+    fsd ft2, 88(s0)
+    # t297 = t296 == 0
+    fld ft0, 88(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     fcvt.d.w ft2, t0
-    fsd ft2, 88(s0)
-    # if_false t289 goto L65
-    fld ft0, 88(s0)
+    fsd ft2, 96(s0)
+    # if_false t297 goto L65
+    fld ft0, 96(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r59
     j L65
 _r59:
-    # t290 = P + 1
+    # t298 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 96(s0)
-    # t291 = stack[t290]
-    fld ft0, 96(s0)
+    fsd ft2, 104(s0)
+    # t299 = stack[t298]
+    fld ft0, 104(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 104(s0)
-    # t292 = P + 3
+    fsd ft2, 112(s0)
+    # t300 = t299 + 1
+    fld ft0, 112(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 120(s0)
+    # t301 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 112(s0)
-    # t293 = stack[t292]
-    fld ft0, 112(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s2
-    fld ft2, 0(t0)
-    fsd ft2, 120(s0)
-    # heap[t291] = t293
-    fld ft1, 120(s0)
-    fld ft0, 104(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s1
-    fsd ft1, 0(t0)
-    # t294 = P + 1
-    fcvt.d.w ft0, s10
-    li t0, 1
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
     fsd ft2, 128(s0)
-    # t295 = stack[t294]
+    # t302 = stack[t301]
     fld ft0, 128(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 136(s0)
-    # t296 = t295 + 1
-    fld ft0, 136(s0)
+    # heap[t300] = t302
+    fld ft1, 136(s0)
+    fld ft0, 120(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s1
+    fsd ft1, 0(t0)
+    # t303 = P + 1
+    fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 144(s0)
-    # t297 = P + 3
-    fcvt.d.w ft0, s10
-    li t0, 3
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 152(s0)
-    # t298 = stack[t297]
-    fld ft0, 152(s0)
+    # t304 = stack[t303]
+    fld ft0, 144(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
+    fsd ft2, 152(s0)
+    # t305 = t304 + 2
+    fld ft0, 152(s0)
+    li t0, 2
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
     fsd ft2, 160(s0)
-    # heap[t296] = t298
-    fld ft1, 160(s0)
-    fld ft0, 144(s0)
+    # t306 = P + 3
+    fcvt.d.w ft0, s10
+    li t0, 3
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 168(s0)
+    # t307 = stack[t306]
+    fld ft0, 168(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s2
+    fld ft2, 0(t0)
+    fsd ft2, 176(s0)
+    # heap[t305] = t307
+    fld ft1, 176(s0)
+    fld ft0, 160(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
@@ -4481,28 +4535,28 @@ _r59:
     j L64
     # L65:
 L65:
-    # t299 = P + 3
+    # t308 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 168(s0)
-    # t300 = stack[t299]
-    fld ft0, 168(s0)
+    fsd ft2, 184(s0)
+    # t309 = stack[t308]
+    fld ft0, 184(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 176(s0)
-    # t301 = t300 != 0
-    fld ft0, 176(s0)
+    fsd ft2, 192(s0)
+    # t310 = t309 != 0
+    fld ft0, 192(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 184(s0)
-    # if t301 goto L66
-    fld ft0, 184(s0)
+    fsd ft2, 200(s0)
+    # if t310 goto L66
+    fld ft0, 200(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r60
     j L66
@@ -4514,68 +4568,80 @@ _r60:
     j _error_ejecucion
     # L66:
 L66:
-    # t302 = t300 + 1
-    fld ft0, 176(s0)
-    li t0, 1
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 192(s0)
-    # t303 = P + 1
-    fcvt.d.w ft0, s10
-    li t0, 1
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 200(s0)
-    # t304 = stack[t303]
-    fld ft0, 200(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s2
-    fld ft2, 0(t0)
-    fsd ft2, 208(s0)
-    # t305 = heap[t304]
-    fld ft0, 208(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s1
-    fld ft2, 0(t0)
-    fsd ft2, 216(s0)
-    # heap[t302] = t305
-    fld ft1, 216(s0)
+    # t311 = t309 + 2
     fld ft0, 192(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s1
-    fsd ft1, 0(t0)
-    # t306 = P + 1
+    li t0, 2
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 208(s0)
+    # t312 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 224(s0)
-    # t307 = stack[t306]
-    fld ft0, 224(s0)
+    fsd ft2, 216(s0)
+    # t313 = stack[t312]
+    fld ft0, 216(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
+    fsd ft2, 224(s0)
+    # t314 = t313 + 1
+    fld ft0, 224(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
     fsd ft2, 232(s0)
-    # t308 = heap[t307]
+    # t315 = heap[t314]
     fld ft0, 232(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
     fsd ft2, 240(s0)
-    # t309 = t308 != 0
-    fld ft0, 240(s0)
+    # heap[t311] = t315
+    fld ft1, 240(s0)
+    fld ft0, 208(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s1
+    fsd ft1, 0(t0)
+    # t316 = P + 1
+    fcvt.d.w ft0, s10
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 248(s0)
+    # t317 = stack[t316]
+    fld ft0, 248(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s2
+    fld ft2, 0(t0)
+    fsd ft2, 256(s0)
+    # t318 = t317 + 1
+    fld ft0, 256(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 264(s0)
+    # t319 = heap[t318]
+    fld ft0, 264(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s1
+    fld ft2, 0(t0)
+    fsd ft2, 272(s0)
+    # t320 = t319 != 0
+    fld ft0, 272(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 248(s0)
-    # if t309 goto L67
-    fld ft0, 248(s0)
+    fsd ft2, 280(s0)
+    # if t320 goto L67
+    fld ft0, 280(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r61
     j L67
@@ -4587,102 +4653,108 @@ _r61:
     j _error_ejecucion
     # L67:
 L67:
-    # t310 = t308 + 2
-    fld ft0, 240(s0)
-    li t0, 2
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 256(s0)
-    # t311 = P + 3
-    fcvt.d.w ft0, s10
+    # t321 = t319 + 3
+    fld ft0, 272(s0)
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 264(s0)
-    # t312 = stack[t311]
-    fld ft0, 264(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s2
-    fld ft2, 0(t0)
-    fsd ft2, 272(s0)
-    # heap[t310] = t312
-    fld ft1, 272(s0)
-    fld ft0, 256(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s1
-    fsd ft1, 0(t0)
-    # t313 = P + 1
-    fcvt.d.w ft0, s10
-    li t0, 1
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 280(s0)
-    # t314 = stack[t313]
-    fld ft0, 280(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s2
-    fld ft2, 0(t0)
     fsd ft2, 288(s0)
-    # t315 = P + 3
+    # t322 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 296(s0)
-    # t316 = stack[t315]
+    # t323 = stack[t322]
     fld ft0, 296(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 304(s0)
-    # heap[t314] = t316
+    # heap[t321] = t323
     fld ft1, 304(s0)
     fld ft0, 288(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fsd ft1, 0(t0)
-    # L64:
-L64:
-    # t317 = P + 1
+    # t324 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 312(s0)
-    # t318 = stack[t317]
+    # t325 = stack[t324]
     fld ft0, 312(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 320(s0)
-    # t319 = t318 + 2
+    # t326 = t325 + 1
     fld ft0, 320(s0)
-    li t0, 2
+    li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 328(s0)
-    # t320 = heap[t319]
+    # t327 = P + 3
+    fcvt.d.w ft0, s10
+    li t0, 3
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 336(s0)
+    # t328 = stack[t327]
+    fld ft0, 336(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s2
+    fld ft2, 0(t0)
+    fsd ft2, 344(s0)
+    # heap[t326] = t328
+    fld ft1, 344(s0)
     fld ft0, 328(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
-    fld ft2, 0(t0)
-    fsd ft2, 336(s0)
-    # t321 = t320 + 1
-    fld ft0, 336(s0)
+    fsd ft1, 0(t0)
+    # L64:
+L64:
+    # t329 = P + 1
+    fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 344(s0)
-    # heap[t319] = t321
-    fld ft1, 344(s0)
-    fld ft0, 328(s0)
+    fsd ft2, 352(s0)
+    # t330 = stack[t329]
+    fld ft0, 352(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s2
+    fld ft2, 0(t0)
+    fsd ft2, 360(s0)
+    # t331 = t330 + 3
+    fld ft0, 360(s0)
+    li t0, 3
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 368(s0)
+    # t332 = heap[t331]
+    fld ft0, 368(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s1
+    fld ft2, 0(t0)
+    fsd ft2, 376(s0)
+    # t333 = t332 + 1
+    fld ft0, 376(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 384(s0)
+    # heap[t331] = t333
+    fld ft1, 384(s0)
+    fld ft0, 368(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
@@ -4691,71 +4763,71 @@ F_ListaDoble_insertarInicio_fin:
     mv sp, s0
     lw ra, 0(sp)
     lw s0, 4(sp)
-    addi sp, sp, 352
+    addi sp, sp, 400
     ret
 
 F_ListaDoble_insertarFinal:
-    addi sp, sp, -384
+    addi sp, sp, -400
     sw ra, 0(sp)
     sw s0, 4(sp)
     mv s0, sp
     addi t0, s0, 8
-    li t1, 47
+    li t1, 48
 _r62:
     fsd fs0, 0(t0)
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r62
-    # t322 = P + 3
+    # t334 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # t323 = H
+    # t335 = H
     fcvt.d.w ft0, s11
     fsd ft0, 16(s0)
-    # H = H + 3
-    addi s11, s11, 3
-    # t324 = P + 2
+    # H = H + 4
+    addi s11, s11, 4
+    # t336 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 24(s0)
-    # t325 = stack[t324]
+    # t337 = stack[t336]
     fld ft0, 24(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 32(s0)
-    # t326 = P + 4
+    # t338 = P + 4
     fcvt.d.w ft0, s10
     li t0, 4
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 40(s0)
-    # t327 = t326 + 1
+    # t339 = t338 + 1
     fld ft0, 40(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 48(s0)
-    # stack[t327] = t323
+    # stack[t339] = t335
     fld ft1, 16(s0)
     fld ft0, 48(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t328 = t326 + 2
+    # t340 = t338 + 2
     fld ft0, 40(s0)
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 56(s0)
-    # stack[t328] = t325
+    # stack[t340] = t337
     fld ft1, 32(s0)
     fld ft0, 56(s0)
     fcvt.w.d t0, ft0, rtz
@@ -4768,119 +4840,125 @@ _r62:
     jal ra, F_Nodo_constructor
     # P = P - 4
     addi s10, s10, -4
-    # stack[t322] = t323
+    # stack[t334] = t335
     fld ft1, 16(s0)
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t329 = P + 1
+    # t341 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 64(s0)
-    # t330 = stack[t329]
+    # t342 = stack[t341]
     fld ft0, 64(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 72(s0)
-    # t331 = t330 + 1
+    # t343 = t342 + 2
     fld ft0, 72(s0)
-    li t0, 1
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 80(s0)
-    # t332 = heap[t331]
+    # t344 = heap[t343]
     fld ft0, 80(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
     fsd ft2, 88(s0)
-    # t333 = t332 == 0
+    # t345 = t344 == 0
     fld ft0, 88(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     fcvt.d.w ft2, t0
     fsd ft2, 96(s0)
-    # if_false t333 goto L69
+    # if_false t345 goto L69
     fld ft0, 96(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r63
     j L69
 _r63:
-    # t334 = P + 1
+    # t346 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 104(s0)
-    # t335 = stack[t334]
+    # t347 = stack[t346]
     fld ft0, 104(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 112(s0)
-    # t336 = P + 3
+    # t348 = t347 + 1
+    fld ft0, 112(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 120(s0)
+    # t349 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 120(s0)
-    # t337 = stack[t336]
-    fld ft0, 120(s0)
+    fsd ft2, 128(s0)
+    # t350 = stack[t349]
+    fld ft0, 128(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 128(s0)
-    # heap[t335] = t337
-    fld ft1, 128(s0)
-    fld ft0, 112(s0)
+    fsd ft2, 136(s0)
+    # heap[t348] = t350
+    fld ft1, 136(s0)
+    fld ft0, 120(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fsd ft1, 0(t0)
-    # t338 = P + 1
+    # t351 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 136(s0)
-    # t339 = stack[t338]
-    fld ft0, 136(s0)
+    fsd ft2, 144(s0)
+    # t352 = stack[t351]
+    fld ft0, 144(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 144(s0)
-    # t340 = t339 + 1
-    fld ft0, 144(s0)
-    li t0, 1
+    fsd ft2, 152(s0)
+    # t353 = t352 + 2
+    fld ft0, 152(s0)
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 152(s0)
-    # t341 = P + 3
+    fsd ft2, 160(s0)
+    # t354 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 160(s0)
-    # t342 = stack[t341]
-    fld ft0, 160(s0)
+    fsd ft2, 168(s0)
+    # t355 = stack[t354]
+    fld ft0, 168(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 168(s0)
-    # heap[t340] = t342
-    fld ft1, 168(s0)
-    fld ft0, 152(s0)
+    fsd ft2, 176(s0)
+    # heap[t353] = t355
+    fld ft1, 176(s0)
+    fld ft0, 160(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
@@ -4889,28 +4967,28 @@ _r63:
     j L68
     # L69:
 L69:
-    # t343 = P + 3
+    # t356 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 176(s0)
-    # t344 = stack[t343]
-    fld ft0, 176(s0)
+    fsd ft2, 184(s0)
+    # t357 = stack[t356]
+    fld ft0, 184(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 184(s0)
-    # t345 = t344 != 0
-    fld ft0, 184(s0)
+    fsd ft2, 192(s0)
+    # t358 = t357 != 0
+    fld ft0, 192(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 192(s0)
-    # if t345 goto L70
-    fld ft0, 192(s0)
+    fsd ft2, 200(s0)
+    # if t358 goto L70
+    fld ft0, 200(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r64
     j L70
@@ -4922,80 +5000,80 @@ _r64:
     j _error_ejecucion
     # L70:
 L70:
-    # t346 = t344 + 2
-    fld ft0, 184(s0)
-    li t0, 2
+    # t359 = t357 + 3
+    fld ft0, 192(s0)
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 200(s0)
-    # t347 = P + 1
+    fsd ft2, 208(s0)
+    # t360 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 208(s0)
-    # t348 = stack[t347]
-    fld ft0, 208(s0)
+    fsd ft2, 216(s0)
+    # t361 = stack[t360]
+    fld ft0, 216(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 216(s0)
-    # t349 = t348 + 1
-    fld ft0, 216(s0)
-    li t0, 1
+    fsd ft2, 224(s0)
+    # t362 = t361 + 2
+    fld ft0, 224(s0)
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 224(s0)
-    # t350 = heap[t349]
-    fld ft0, 224(s0)
+    fsd ft2, 232(s0)
+    # t363 = heap[t362]
+    fld ft0, 232(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 232(s0)
-    # heap[t346] = t350
-    fld ft1, 232(s0)
-    fld ft0, 200(s0)
+    fsd ft2, 240(s0)
+    # heap[t359] = t363
+    fld ft1, 240(s0)
+    fld ft0, 208(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fsd ft1, 0(t0)
-    # t351 = P + 1
+    # t364 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 240(s0)
-    # t352 = stack[t351]
-    fld ft0, 240(s0)
+    fsd ft2, 248(s0)
+    # t365 = stack[t364]
+    fld ft0, 248(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 248(s0)
-    # t353 = t352 + 1
-    fld ft0, 248(s0)
-    li t0, 1
+    fsd ft2, 256(s0)
+    # t366 = t365 + 2
+    fld ft0, 256(s0)
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 256(s0)
-    # t354 = heap[t353]
-    fld ft0, 256(s0)
+    fsd ft2, 264(s0)
+    # t367 = heap[t366]
+    fld ft0, 264(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 264(s0)
-    # t355 = t354 != 0
-    fld ft0, 264(s0)
+    fsd ft2, 272(s0)
+    # t368 = t367 != 0
+    fld ft0, 272(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 272(s0)
-    # if t355 goto L71
-    fld ft0, 272(s0)
+    fsd ft2, 280(s0)
+    # if t368 goto L71
+    fld ft0, 280(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r65
     j L71
@@ -5007,108 +5085,108 @@ _r65:
     j _error_ejecucion
     # L71:
 L71:
-    # t356 = t354 + 1
-    fld ft0, 264(s0)
-    li t0, 1
+    # t369 = t367 + 2
+    fld ft0, 272(s0)
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 280(s0)
-    # t357 = P + 3
+    fsd ft2, 288(s0)
+    # t370 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 288(s0)
-    # t358 = stack[t357]
-    fld ft0, 288(s0)
+    fsd ft2, 296(s0)
+    # t371 = stack[t370]
+    fld ft0, 296(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 296(s0)
-    # heap[t356] = t358
-    fld ft1, 296(s0)
-    fld ft0, 280(s0)
+    fsd ft2, 304(s0)
+    # heap[t369] = t371
+    fld ft1, 304(s0)
+    fld ft0, 288(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fsd ft1, 0(t0)
-    # t359 = P + 1
+    # t372 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 304(s0)
-    # t360 = stack[t359]
-    fld ft0, 304(s0)
+    fsd ft2, 312(s0)
+    # t373 = stack[t372]
+    fld ft0, 312(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 312(s0)
-    # t361 = t360 + 1
-    fld ft0, 312(s0)
-    li t0, 1
+    fsd ft2, 320(s0)
+    # t374 = t373 + 2
+    fld ft0, 320(s0)
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 320(s0)
-    # t362 = P + 3
+    fsd ft2, 328(s0)
+    # t375 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 328(s0)
-    # t363 = stack[t362]
-    fld ft0, 328(s0)
+    fsd ft2, 336(s0)
+    # t376 = stack[t375]
+    fld ft0, 336(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 336(s0)
-    # heap[t361] = t363
-    fld ft1, 336(s0)
-    fld ft0, 320(s0)
+    fsd ft2, 344(s0)
+    # heap[t374] = t376
+    fld ft1, 344(s0)
+    fld ft0, 328(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fsd ft1, 0(t0)
     # L68:
 L68:
-    # t364 = P + 1
+    # t377 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 344(s0)
-    # t365 = stack[t364]
-    fld ft0, 344(s0)
+    fsd ft2, 352(s0)
+    # t378 = stack[t377]
+    fld ft0, 352(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 352(s0)
-    # t366 = t365 + 2
-    fld ft0, 352(s0)
-    li t0, 2
+    fsd ft2, 360(s0)
+    # t379 = t378 + 3
+    fld ft0, 360(s0)
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 360(s0)
-    # t367 = heap[t366]
-    fld ft0, 360(s0)
+    fsd ft2, 368(s0)
+    # t380 = heap[t379]
+    fld ft0, 368(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 368(s0)
-    # t368 = t367 + 1
-    fld ft0, 368(s0)
+    fsd ft2, 376(s0)
+    # t381 = t380 + 1
+    fld ft0, 376(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 376(s0)
-    # heap[t366] = t368
-    fld ft1, 376(s0)
-    fld ft0, 360(s0)
+    fsd ft2, 384(s0)
+    # heap[t379] = t381
+    fld ft1, 384(s0)
+    fld ft0, 368(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
@@ -5117,7 +5195,7 @@ F_ListaDoble_insertarFinal_fin:
     mv sp, s0
     lw ra, 0(sp)
     lw s0, 4(sp)
-    addi sp, sp, 384
+    addi sp, sp, 400
     ret
 
 F_ListaDoble_insertarFinal_2:
@@ -5132,58 +5210,58 @@ _r66:
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r66
-    # t369 = P + 1
+    # t382 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # t370 = stack[t369]
+    # t383 = stack[t382]
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 16(s0)
-    # t371 = P + 2
+    # t384 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 24(s0)
-    # t372 = stack[t371]
+    # t385 = stack[t384]
     fld ft0, 24(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 32(s0)
-    # t373 = P + 4
+    # t386 = P + 4
     fcvt.d.w ft0, s10
     li t0, 4
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 40(s0)
-    # t374 = t373 + 1
+    # t387 = t386 + 1
     fld ft0, 40(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 48(s0)
-    # stack[t374] = t370
+    # stack[t387] = t383
     fld ft1, 16(s0)
     fld ft0, 48(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t375 = t373 + 2
+    # t388 = t386 + 2
     fld ft0, 40(s0)
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 56(s0)
-    # stack[t375] = t372
+    # stack[t388] = t385
     fld ft1, 32(s0)
     fld ft0, 56(s0)
     fcvt.w.d t0, ft0, rtz
@@ -5196,58 +5274,58 @@ _r66:
     jal ra, F_ListaDoble_insertarFinal
     # P = P - 4
     addi s10, s10, -4
-    # t376 = P + 1
+    # t389 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 64(s0)
-    # t377 = stack[t376]
+    # t390 = stack[t389]
     fld ft0, 64(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 72(s0)
-    # t378 = P + 3
+    # t391 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 80(s0)
-    # t379 = stack[t378]
+    # t392 = stack[t391]
     fld ft0, 80(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 88(s0)
-    # t380 = P + 4
+    # t393 = P + 4
     fcvt.d.w ft0, s10
     li t0, 4
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 96(s0)
-    # t381 = t380 + 1
+    # t394 = t393 + 1
     fld ft0, 96(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 104(s0)
-    # stack[t381] = t377
+    # stack[t394] = t390
     fld ft1, 72(s0)
     fld ft0, 104(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t382 = t380 + 2
+    # t395 = t393 + 2
     fld ft0, 96(s0)
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 112(s0)
-    # stack[t382] = t379
+    # stack[t395] = t392
     fld ft1, 88(s0)
     fld ft0, 112(s0)
     fcvt.w.d t0, ft0, rtz
@@ -5279,85 +5357,85 @@ _r67:
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r67
-    # t384 = P + 2
+    # t397 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # t385 = stack[t384]
+    # t398 = stack[t397]
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 16(s0)
-    # t386 = t385 < 0
+    # t399 = t398 < 0
     fld ft0, 16(s0)
     fmv.d ft1, fs0
     flt.d t0, ft0, ft1
     fcvt.d.w ft2, t0
     fsd ft2, 24(s0)
-    # t383 = t386
+    # t396 = t399
     fld ft0, 24(s0)
     fsd ft0, 32(s0)
-    # if t383 goto L74
+    # if t396 goto L74
     fld ft0, 32(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r68
     j L74
 _r68:
-    # t387 = P + 2
+    # t400 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 40(s0)
-    # t388 = stack[t387]
+    # t401 = stack[t400]
     fld ft0, 40(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 48(s0)
-    # t389 = P + 1
+    # t402 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 56(s0)
-    # t390 = stack[t389]
+    # t403 = stack[t402]
     fld ft0, 56(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 64(s0)
-    # t391 = t390 + 2
+    # t404 = t403 + 3
     fld ft0, 64(s0)
-    li t0, 2
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 72(s0)
-    # t392 = heap[t391]
+    # t405 = heap[t404]
     fld ft0, 72(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
     fsd ft2, 80(s0)
-    # t393 = t388 > t392
+    # t406 = t401 > t405
     fld ft0, 48(s0)
     fld ft1, 80(s0)
     flt.d t0, ft1, ft0
     fcvt.d.w ft2, t0
     fsd ft2, 88(s0)
-    # t383 = t393
+    # t396 = t406
     fld ft0, 88(s0)
     fsd ft0, 32(s0)
     # L74:
 L74:
-    # if_false t383 goto L73
+    # if_false t396 goto L73
     fld ft0, 32(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r69
@@ -5376,83 +5454,83 @@ _r69:
 L73:
     # L72:
 L72:
-    # t394 = P + 2
+    # t407 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 96(s0)
-    # t395 = stack[t394]
+    # t408 = stack[t407]
     fld ft0, 96(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 104(s0)
-    # t396 = t395 == 0
+    # t409 = t408 == 0
     fld ft0, 104(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     fcvt.d.w ft2, t0
     fsd ft2, 112(s0)
-    # if_false t396 goto L76
+    # if_false t409 goto L76
     fld ft0, 112(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r70
     j L76
 _r70:
-    # t397 = P + 1
+    # t410 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 120(s0)
-    # t398 = stack[t397]
+    # t411 = stack[t410]
     fld ft0, 120(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 128(s0)
-    # t399 = P + 3
+    # t412 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 136(s0)
-    # t400 = stack[t399]
+    # t413 = stack[t412]
     fld ft0, 136(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 144(s0)
-    # t401 = P + 6
+    # t414 = P + 6
     fcvt.d.w ft0, s10
     li t0, 6
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 152(s0)
-    # t402 = t401 + 1
+    # t415 = t414 + 1
     fld ft0, 152(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 160(s0)
-    # stack[t402] = t398
+    # stack[t415] = t411
     fld ft1, 128(s0)
     fld ft0, 160(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t403 = t401 + 2
+    # t416 = t414 + 2
     fld ft0, 152(s0)
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 168(s0)
-    # stack[t403] = t400
+    # stack[t416] = t413
     fld ft1, 144(s0)
     fld ft0, 168(s0)
     fcvt.w.d t0, ft0, rtz
@@ -5479,109 +5557,109 @@ _r70:
 L76:
     # L75:
 L75:
-    # t404 = P + 2
+    # t417 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 176(s0)
-    # t405 = stack[t404]
+    # t418 = stack[t417]
     fld ft0, 176(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 184(s0)
-    # t406 = P + 1
+    # t419 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 192(s0)
-    # t407 = stack[t406]
+    # t420 = stack[t419]
     fld ft0, 192(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 200(s0)
-    # t408 = t407 + 2
+    # t421 = t420 + 3
     fld ft0, 200(s0)
-    li t0, 2
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 208(s0)
-    # t409 = heap[t408]
+    # t422 = heap[t421]
     fld ft0, 208(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
     fsd ft2, 216(s0)
-    # t410 = t405 == t409
+    # t423 = t418 == t422
     fld ft0, 184(s0)
     fld ft1, 216(s0)
     feq.d t0, ft0, ft1
     fcvt.d.w ft2, t0
     fsd ft2, 224(s0)
-    # if_false t410 goto L78
+    # if_false t423 goto L78
     fld ft0, 224(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r71
     j L78
 _r71:
-    # t411 = P + 1
+    # t424 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 232(s0)
-    # t412 = stack[t411]
+    # t425 = stack[t424]
     fld ft0, 232(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 240(s0)
-    # t413 = P + 3
+    # t426 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 248(s0)
-    # t414 = stack[t413]
+    # t427 = stack[t426]
     fld ft0, 248(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 256(s0)
-    # t415 = P + 6
+    # t428 = P + 6
     fcvt.d.w ft0, s10
     li t0, 6
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 264(s0)
-    # t416 = t415 + 1
+    # t429 = t428 + 1
     fld ft0, 264(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 272(s0)
-    # stack[t416] = t412
+    # stack[t429] = t425
     fld ft1, 240(s0)
     fld ft0, 272(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t417 = t415 + 2
+    # t430 = t428 + 2
     fld ft0, 264(s0)
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 280(s0)
-    # stack[t417] = t414
+    # stack[t430] = t427
     fld ft1, 256(s0)
     fld ft0, 280(s0)
     fcvt.w.d t0, ft0, rtz
@@ -5608,64 +5686,64 @@ _r71:
 L78:
     # L77:
 L77:
-    # t418 = P + 4
+    # t431 = P + 4
     fcvt.d.w ft0, s10
     li t0, 4
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 288(s0)
-    # t419 = P + 1
+    # t432 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 296(s0)
-    # t420 = stack[t419]
+    # t433 = stack[t432]
     fld ft0, 296(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 304(s0)
-    # t421 = P + 2
+    # t434 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 312(s0)
-    # t422 = stack[t421]
+    # t435 = stack[t434]
     fld ft0, 312(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 320(s0)
-    # t423 = P + 6
+    # t436 = P + 6
     fcvt.d.w ft0, s10
     li t0, 6
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 328(s0)
-    # t424 = t423 + 1
+    # t437 = t436 + 1
     fld ft0, 328(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 336(s0)
-    # stack[t424] = t420
+    # stack[t437] = t433
     fld ft1, 304(s0)
     fld ft0, 336(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t425 = t423 + 2
+    # t438 = t436 + 2
     fld ft0, 328(s0)
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 344(s0)
-    # stack[t425] = t422
+    # stack[t438] = t435
     fld ft1, 320(s0)
     fld ft0, 344(s0)
     fcvt.w.d t0, ft0, rtz
@@ -5676,70 +5754,70 @@ L77:
     addi s10, s10, 6
     # call ListaDoble_obtenerNodo
     jal ra, F_ListaDoble_obtenerNodo
-    # t426 = stack[P]
+    # t439 = stack[P]
     slli t0, s10, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 352(s0)
     # P = P - 6
     addi s10, s10, -6
-    # stack[t418] = t426
+    # stack[t431] = t439
     fld ft1, 352(s0)
     fld ft0, 288(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t427 = P + 5
+    # t440 = P + 5
     fcvt.d.w ft0, s10
     li t0, 5
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 360(s0)
-    # t428 = H
+    # t441 = H
     fcvt.d.w ft0, s11
     fsd ft0, 368(s0)
-    # H = H + 3
-    addi s11, s11, 3
-    # t429 = P + 3
+    # H = H + 4
+    addi s11, s11, 4
+    # t442 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 376(s0)
-    # t430 = stack[t429]
+    # t443 = stack[t442]
     fld ft0, 376(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 384(s0)
-    # t431 = P + 6
+    # t444 = P + 6
     fcvt.d.w ft0, s10
     li t0, 6
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 392(s0)
-    # t432 = t431 + 1
+    # t445 = t444 + 1
     fld ft0, 392(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 400(s0)
-    # stack[t432] = t428
+    # stack[t445] = t441
     fld ft1, 368(s0)
     fld ft0, 400(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t433 = t431 + 2
+    # t446 = t444 + 2
     fld ft0, 392(s0)
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 408(s0)
-    # stack[t433] = t430
+    # stack[t446] = t443
     fld ft1, 384(s0)
     fld ft0, 408(s0)
     fcvt.w.d t0, ft0, rtz
@@ -5752,34 +5830,34 @@ L77:
     jal ra, F_Nodo_constructor
     # P = P - 6
     addi s10, s10, -6
-    # stack[t427] = t428
+    # stack[t440] = t441
     fld ft1, 368(s0)
     fld ft0, 360(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t434 = P + 5
+    # t447 = P + 5
     fcvt.d.w ft0, s10
     li t0, 5
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 416(s0)
-    # t435 = stack[t434]
+    # t448 = stack[t447]
     fld ft0, 416(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 424(s0)
-    # t436 = t435 != 0
+    # t449 = t448 != 0
     fld ft0, 424(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
     fsd ft2, 432(s0)
-    # if t436 goto L79
+    # if t449 goto L79
     fld ft0, 432(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r72
@@ -5792,33 +5870,33 @@ _r72:
     j _error_ejecucion
     # L79:
 L79:
-    # t437 = t435 + 2
+    # t450 = t448 + 3
     fld ft0, 424(s0)
-    li t0, 2
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 440(s0)
-    # t438 = P + 4
+    # t451 = P + 4
     fcvt.d.w ft0, s10
     li t0, 4
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 448(s0)
-    # t439 = stack[t438]
+    # t452 = stack[t451]
     fld ft0, 448(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 456(s0)
-    # t440 = t439 != 0
+    # t453 = t452 != 0
     fld ft0, 456(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
     fsd ft2, 464(s0)
-    # if t440 goto L80
+    # if t453 goto L80
     fld ft0, 464(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r73
@@ -5831,47 +5909,47 @@ _r73:
     j _error_ejecucion
     # L80:
 L80:
-    # t441 = t439 + 2
+    # t454 = t452 + 3
     fld ft0, 456(s0)
-    li t0, 2
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 472(s0)
-    # t442 = heap[t441]
+    # t455 = heap[t454]
     fld ft0, 472(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
     fsd ft2, 480(s0)
-    # heap[t437] = t442
+    # heap[t450] = t455
     fld ft1, 480(s0)
     fld ft0, 440(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fsd ft1, 0(t0)
-    # t443 = P + 5
+    # t456 = P + 5
     fcvt.d.w ft0, s10
     li t0, 5
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 488(s0)
-    # t444 = stack[t443]
+    # t457 = stack[t456]
     fld ft0, 488(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 496(s0)
-    # t445 = t444 != 0
+    # t458 = t457 != 0
     fld ft0, 496(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
     fsd ft2, 504(s0)
-    # if t445 goto L81
+    # if t458 goto L81
     fld ft0, 504(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r74
@@ -5884,53 +5962,53 @@ _r74:
     j _error_ejecucion
     # L81:
 L81:
-    # t446 = t444 + 1
+    # t459 = t457 + 2
     fld ft0, 496(s0)
-    li t0, 1
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 512(s0)
-    # t447 = P + 4
+    # t460 = P + 4
     fcvt.d.w ft0, s10
     li t0, 4
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 520(s0)
-    # t448 = stack[t447]
+    # t461 = stack[t460]
     fld ft0, 520(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 528(s0)
-    # heap[t446] = t448
+    # heap[t459] = t461
     fld ft1, 528(s0)
     fld ft0, 512(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fsd ft1, 0(t0)
-    # t449 = P + 4
+    # t462 = P + 4
     fcvt.d.w ft0, s10
     li t0, 4
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 536(s0)
-    # t450 = stack[t449]
+    # t463 = stack[t462]
     fld ft0, 536(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 544(s0)
-    # t451 = t450 != 0
+    # t464 = t463 != 0
     fld ft0, 544(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
     fsd ft2, 552(s0)
-    # if t451 goto L82
+    # if t464 goto L82
     fld ft0, 552(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r75
@@ -5943,27 +6021,27 @@ _r75:
     j _error_ejecucion
     # L82:
 L82:
-    # t452 = t450 + 2
+    # t465 = t463 + 3
     fld ft0, 544(s0)
-    li t0, 2
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 560(s0)
-    # t453 = heap[t452]
+    # t466 = heap[t465]
     fld ft0, 560(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
     fsd ft2, 568(s0)
-    # t454 = t453 != 0
+    # t467 = t466 != 0
     fld ft0, 568(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
     fsd ft2, 576(s0)
-    # if t454 goto L83
+    # if t467 goto L83
     fld ft0, 576(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r76
@@ -5976,53 +6054,53 @@ _r76:
     j _error_ejecucion
     # L83:
 L83:
-    # t455 = t453 + 1
+    # t468 = t466 + 2
     fld ft0, 568(s0)
-    li t0, 1
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 584(s0)
-    # t456 = P + 5
+    # t469 = P + 5
     fcvt.d.w ft0, s10
     li t0, 5
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 592(s0)
-    # t457 = stack[t456]
+    # t470 = stack[t469]
     fld ft0, 592(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 600(s0)
-    # heap[t455] = t457
+    # heap[t468] = t470
     fld ft1, 600(s0)
     fld ft0, 584(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fsd ft1, 0(t0)
-    # t458 = P + 4
+    # t471 = P + 4
     fcvt.d.w ft0, s10
     li t0, 4
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 608(s0)
-    # t459 = stack[t458]
+    # t472 = stack[t471]
     fld ft0, 608(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 616(s0)
-    # t460 = t459 != 0
+    # t473 = t472 != 0
     fld ft0, 616(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
     fsd ft2, 624(s0)
-    # if t460 goto L84
+    # if t473 goto L84
     fld ft0, 624(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r77
@@ -6035,65 +6113,65 @@ _r77:
     j _error_ejecucion
     # L84:
 L84:
-    # t461 = t459 + 2
+    # t474 = t472 + 3
     fld ft0, 616(s0)
-    li t0, 2
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 632(s0)
-    # t462 = P + 5
+    # t475 = P + 5
     fcvt.d.w ft0, s10
     li t0, 5
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 640(s0)
-    # t463 = stack[t462]
+    # t476 = stack[t475]
     fld ft0, 640(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 648(s0)
-    # heap[t461] = t463
+    # heap[t474] = t476
     fld ft1, 648(s0)
     fld ft0, 632(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fsd ft1, 0(t0)
-    # t464 = P + 1
+    # t477 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 656(s0)
-    # t465 = stack[t464]
+    # t478 = stack[t477]
     fld ft0, 656(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 664(s0)
-    # t466 = t465 + 2
+    # t479 = t478 + 3
     fld ft0, 664(s0)
-    li t0, 2
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 672(s0)
-    # t467 = heap[t466]
+    # t480 = heap[t479]
     fld ft0, 672(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
     fsd ft2, 680(s0)
-    # t468 = t467 + 1
+    # t481 = t480 + 1
     fld ft0, 680(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 688(s0)
-    # heap[t466] = t468
+    # heap[t479] = t481
     fld ft1, 688(s0)
     fld ft0, 672(s0)
     fcvt.w.d t0, ft0, rtz
@@ -6116,45 +6194,51 @@ F_ListaDoble_insertarEn_fin:
     ret
 
 F_ListaDoble_eliminarInicio:
-    addi sp, sp, -288
+    addi sp, sp, -336
     sw ra, 0(sp)
     sw s0, 4(sp)
     mv s0, sp
     addi t0, s0, 8
-    li t1, 35
+    li t1, 41
 _r78:
     fsd fs0, 0(t0)
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r78
-    # t469 = P + 1
+    # t482 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # t470 = stack[t469]
+    # t483 = stack[t482]
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 16(s0)
-    # t471 = heap[t470]
+    # t484 = t483 + 1
     fld ft0, 16(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 24(s0)
+    # t485 = heap[t484]
+    fld ft0, 24(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 24(s0)
-    # t472 = t471 == 0
-    fld ft0, 24(s0)
+    fsd ft2, 32(s0)
+    # t486 = t485 == 0
+    fld ft0, 32(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     fcvt.d.w ft2, t0
-    fsd ft2, 32(s0)
-    # if_false t472 goto L86
-    fld ft0, 32(s0)
+    fsd ft2, 40(s0)
+    # if_false t486 goto L86
+    fld ft0, 40(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r79
     j L86
@@ -6172,106 +6256,118 @@ _r79:
 L86:
     # L85:
 L85:
-    # t473 = P + 1
+    # t487 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 40(s0)
-    # t474 = stack[t473]
-    fld ft0, 40(s0)
+    fsd ft2, 48(s0)
+    # t488 = stack[t487]
+    fld ft0, 48(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 48(s0)
-    # t475 = heap[t474]
-    fld ft0, 48(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s1
-    fld ft2, 0(t0)
     fsd ft2, 56(s0)
-    # t476 = P + 1
-    fcvt.d.w ft0, s10
+    # t489 = t488 + 1
+    fld ft0, 56(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 64(s0)
-    # t477 = stack[t476]
+    # t490 = heap[t489]
     fld ft0, 64(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s2
-    fld ft2, 0(t0)
-    fsd ft2, 72(s0)
-    # t478 = t477 + 1
-    fld ft0, 72(s0)
-    li t0, 1
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 80(s0)
-    # t479 = heap[t478]
-    fld ft0, 80(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 88(s0)
-    # t480 = t475 == t479
-    fld ft0, 56(s0)
-    fld ft1, 88(s0)
-    feq.d t0, ft0, ft1
-    fcvt.d.w ft2, t0
-    fsd ft2, 96(s0)
-    # if_false t480 goto L88
-    fld ft0, 96(s0)
-    feq.d t0, ft0, fs0
-    beqz t0, _r80
-    j L88
-_r80:
-    # t481 = P + 1
+    fsd ft2, 72(s0)
+    # t491 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 104(s0)
-    # t482 = stack[t481]
-    fld ft0, 104(s0)
+    fsd ft2, 80(s0)
+    # t492 = stack[t491]
+    fld ft0, 80(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 112(s0)
-    # heap[t482] = 0
-    fmv.d ft1, fs0
-    fld ft0, 112(s0)
+    fsd ft2, 88(s0)
+    # t493 = t492 + 2
+    fld ft0, 88(s0)
+    li t0, 2
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 96(s0)
+    # t494 = heap[t493]
+    fld ft0, 96(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
-    fsd ft1, 0(t0)
-    # t483 = P + 1
+    fld ft2, 0(t0)
+    fsd ft2, 104(s0)
+    # t495 = t490 == t494
+    fld ft0, 72(s0)
+    fld ft1, 104(s0)
+    feq.d t0, ft0, ft1
+    fcvt.d.w ft2, t0
+    fsd ft2, 112(s0)
+    # if_false t495 goto L88
+    fld ft0, 112(s0)
+    feq.d t0, ft0, fs0
+    beqz t0, _r80
+    j L88
+_r80:
+    # t496 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 120(s0)
-    # t484 = stack[t483]
+    # t497 = stack[t496]
     fld ft0, 120(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 128(s0)
-    # t485 = t484 + 1
+    # t498 = t497 + 1
     fld ft0, 128(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 136(s0)
-    # heap[t485] = 0
+    # heap[t498] = 0
     fmv.d ft1, fs0
     fld ft0, 136(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s1
+    fsd ft1, 0(t0)
+    # t499 = P + 1
+    fcvt.d.w ft0, s10
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 144(s0)
+    # t500 = stack[t499]
+    fld ft0, 144(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s2
+    fld ft2, 0(t0)
+    fsd ft2, 152(s0)
+    # t501 = t500 + 2
+    fld ft0, 152(s0)
+    li t0, 2
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 160(s0)
+    # heap[t501] = 0
+    fmv.d ft1, fs0
+    fld ft0, 160(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
@@ -6280,48 +6376,60 @@ _r80:
     j L87
     # L88:
 L88:
-    # t486 = P + 1
+    # t502 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 144(s0)
-    # t487 = stack[t486]
-    fld ft0, 144(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s2
-    fld ft2, 0(t0)
-    fsd ft2, 152(s0)
-    # t488 = P + 1
-    fcvt.d.w ft0, s10
-    li t0, 1
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 160(s0)
-    # t489 = stack[t488]
-    fld ft0, 160(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s2
-    fld ft2, 0(t0)
     fsd ft2, 168(s0)
-    # t490 = heap[t489]
+    # t503 = stack[t502]
     fld ft0, 168(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s2
+    fld ft2, 0(t0)
+    fsd ft2, 176(s0)
+    # t504 = t503 + 1
+    fld ft0, 176(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 184(s0)
+    # t505 = P + 1
+    fcvt.d.w ft0, s10
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 192(s0)
+    # t506 = stack[t505]
+    fld ft0, 192(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s2
+    fld ft2, 0(t0)
+    fsd ft2, 200(s0)
+    # t507 = t506 + 1
+    fld ft0, 200(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 208(s0)
+    # t508 = heap[t507]
+    fld ft0, 208(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 176(s0)
-    # t491 = t490 != 0
-    fld ft0, 176(s0)
+    fsd ft2, 216(s0)
+    # t509 = t508 != 0
+    fld ft0, 216(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 184(s0)
-    # if t491 goto L89
-    fld ft0, 184(s0)
+    fsd ft2, 224(s0)
+    # if t509 goto L89
+    fld ft0, 224(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r81
     j L89
@@ -6333,55 +6441,61 @@ _r81:
     j _error_ejecucion
     # L89:
 L89:
-    # t492 = t490 + 1
-    fld ft0, 176(s0)
-    li t0, 1
+    # t510 = t508 + 2
+    fld ft0, 216(s0)
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 192(s0)
-    # t493 = heap[t492]
-    fld ft0, 192(s0)
+    fsd ft2, 232(s0)
+    # t511 = heap[t510]
+    fld ft0, 232(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 200(s0)
-    # heap[t487] = t493
-    fld ft1, 200(s0)
-    fld ft0, 152(s0)
+    fsd ft2, 240(s0)
+    # heap[t504] = t511
+    fld ft1, 240(s0)
+    fld ft0, 184(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fsd ft1, 0(t0)
-    # t494 = P + 1
+    # t512 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 208(s0)
-    # t495 = stack[t494]
-    fld ft0, 208(s0)
+    fsd ft2, 248(s0)
+    # t513 = stack[t512]
+    fld ft0, 248(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 216(s0)
-    # t496 = heap[t495]
-    fld ft0, 216(s0)
+    fsd ft2, 256(s0)
+    # t514 = t513 + 1
+    fld ft0, 256(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 264(s0)
+    # t515 = heap[t514]
+    fld ft0, 264(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 224(s0)
-    # t497 = t496 != 0
-    fld ft0, 224(s0)
+    fsd ft2, 272(s0)
+    # t516 = t515 != 0
+    fld ft0, 272(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 232(s0)
-    # if t497 goto L90
-    fld ft0, 232(s0)
+    fsd ft2, 280(s0)
+    # if t516 goto L90
+    fld ft0, 280(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r82
     j L90
@@ -6393,56 +6507,56 @@ _r82:
     j _error_ejecucion
     # L90:
 L90:
-    # t498 = t496 + 2
-    fld ft0, 224(s0)
-    li t0, 2
+    # t517 = t515 + 3
+    fld ft0, 272(s0)
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 240(s0)
-    # heap[t498] = 0
+    fsd ft2, 288(s0)
+    # heap[t517] = 0
     fmv.d ft1, fs0
-    fld ft0, 240(s0)
+    fld ft0, 288(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fsd ft1, 0(t0)
     # L87:
 L87:
-    # t499 = P + 1
+    # t518 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 248(s0)
-    # t500 = stack[t499]
-    fld ft0, 248(s0)
+    fsd ft2, 296(s0)
+    # t519 = stack[t518]
+    fld ft0, 296(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 256(s0)
-    # t501 = t500 + 2
-    fld ft0, 256(s0)
-    li t0, 2
+    fsd ft2, 304(s0)
+    # t520 = t519 + 3
+    fld ft0, 304(s0)
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 264(s0)
-    # t502 = heap[t501]
-    fld ft0, 264(s0)
+    fsd ft2, 312(s0)
+    # t521 = heap[t520]
+    fld ft0, 312(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 272(s0)
-    # t503 = t502 - 1
-    fld ft0, 272(s0)
+    fsd ft2, 320(s0)
+    # t522 = t521 - 1
+    fld ft0, 320(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fsub.d ft2, ft0, ft1
-    fsd ft2, 280(s0)
-    # heap[t501] = t503
-    fld ft1, 280(s0)
-    fld ft0, 264(s0)
+    fsd ft2, 328(s0)
+    # heap[t520] = t522
+    fld ft1, 328(s0)
+    fld ft0, 312(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
@@ -6459,54 +6573,54 @@ F_ListaDoble_eliminarInicio_fin:
     mv sp, s0
     lw ra, 0(sp)
     lw s0, 4(sp)
-    addi sp, sp, 288
+    addi sp, sp, 336
     ret
 
 F_ListaDoble_eliminarFinal:
-    addi sp, sp, -320
+    addi sp, sp, -336
     sw ra, 0(sp)
     sw s0, 4(sp)
     mv s0, sp
     addi t0, s0, 8
-    li t1, 39
+    li t1, 41
 _r83:
     fsd fs0, 0(t0)
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r83
-    # t504 = P + 1
+    # t523 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # t505 = stack[t504]
+    # t524 = stack[t523]
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 16(s0)
-    # t506 = t505 + 1
+    # t525 = t524 + 2
     fld ft0, 16(s0)
-    li t0, 1
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 24(s0)
-    # t507 = heap[t506]
+    # t526 = heap[t525]
     fld ft0, 24(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
     fsd ft2, 32(s0)
-    # t508 = t507 == 0
+    # t527 = t526 == 0
     fld ft0, 32(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     fcvt.d.w ft2, t0
     fsd ft2, 40(s0)
-    # if_false t508 goto L92
+    # if_false t527 goto L92
     fld ft0, 40(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r84
@@ -6525,106 +6639,118 @@ _r84:
 L92:
     # L91:
 L91:
-    # t509 = P + 1
+    # t528 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 48(s0)
-    # t510 = stack[t509]
+    # t529 = stack[t528]
     fld ft0, 48(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 56(s0)
-    # t511 = heap[t510]
+    # t530 = t529 + 1
     fld ft0, 56(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 64(s0)
+    # t531 = heap[t530]
+    fld ft0, 64(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 64(s0)
-    # t512 = P + 1
+    fsd ft2, 72(s0)
+    # t532 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 72(s0)
-    # t513 = stack[t512]
-    fld ft0, 72(s0)
+    fsd ft2, 80(s0)
+    # t533 = stack[t532]
+    fld ft0, 80(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 80(s0)
-    # t514 = t513 + 1
-    fld ft0, 80(s0)
-    li t0, 1
+    fsd ft2, 88(s0)
+    # t534 = t533 + 2
+    fld ft0, 88(s0)
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 88(s0)
-    # t515 = heap[t514]
-    fld ft0, 88(s0)
+    fsd ft2, 96(s0)
+    # t535 = heap[t534]
+    fld ft0, 96(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 96(s0)
-    # t516 = t511 == t515
-    fld ft0, 64(s0)
-    fld ft1, 96(s0)
+    fsd ft2, 104(s0)
+    # t536 = t531 == t535
+    fld ft0, 72(s0)
+    fld ft1, 104(s0)
     feq.d t0, ft0, ft1
     fcvt.d.w ft2, t0
-    fsd ft2, 104(s0)
-    # if_false t516 goto L94
-    fld ft0, 104(s0)
+    fsd ft2, 112(s0)
+    # if_false t536 goto L94
+    fld ft0, 112(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r85
     j L94
 _r85:
-    # t517 = P + 1
+    # t537 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 112(s0)
-    # t518 = stack[t517]
-    fld ft0, 112(s0)
+    fsd ft2, 120(s0)
+    # t538 = stack[t537]
+    fld ft0, 120(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 120(s0)
-    # heap[t518] = 0
+    fsd ft2, 128(s0)
+    # t539 = t538 + 1
+    fld ft0, 128(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 136(s0)
+    # heap[t539] = 0
     fmv.d ft1, fs0
-    fld ft0, 120(s0)
+    fld ft0, 136(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fsd ft1, 0(t0)
-    # t519 = P + 1
+    # t540 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 128(s0)
-    # t520 = stack[t519]
-    fld ft0, 128(s0)
+    fsd ft2, 144(s0)
+    # t541 = stack[t540]
+    fld ft0, 144(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 136(s0)
-    # t521 = t520 + 1
-    fld ft0, 136(s0)
-    li t0, 1
+    fsd ft2, 152(s0)
+    # t542 = t541 + 2
+    fld ft0, 152(s0)
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 144(s0)
-    # heap[t521] = 0
+    fsd ft2, 160(s0)
+    # heap[t542] = 0
     fmv.d ft1, fs0
-    fld ft0, 144(s0)
+    fld ft0, 160(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
@@ -6633,60 +6759,60 @@ _r85:
     j L93
     # L94:
 L94:
-    # t522 = P + 1
+    # t543 = P + 1
     fcvt.d.w ft0, s10
-    li t0, 1
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 152(s0)
-    # t523 = stack[t522]
-    fld ft0, 152(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s2
-    fld ft2, 0(t0)
-    fsd ft2, 160(s0)
-    # t524 = t523 + 1
-    fld ft0, 160(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 168(s0)
-    # t525 = P + 1
-    fcvt.d.w ft0, s10
-    li t0, 1
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 176(s0)
-    # t526 = stack[t525]
-    fld ft0, 176(s0)
+    # t544 = stack[t543]
+    fld ft0, 168(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
+    fsd ft2, 176(s0)
+    # t545 = t544 + 2
+    fld ft0, 176(s0)
+    li t0, 2
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
     fsd ft2, 184(s0)
-    # t527 = t526 + 1
-    fld ft0, 184(s0)
+    # t546 = P + 1
+    fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 192(s0)
-    # t528 = heap[t527]
+    # t547 = stack[t546]
     fld ft0, 192(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s2
+    fld ft2, 0(t0)
+    fsd ft2, 200(s0)
+    # t548 = t547 + 2
+    fld ft0, 200(s0)
+    li t0, 2
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 208(s0)
+    # t549 = heap[t548]
+    fld ft0, 208(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 200(s0)
-    # t529 = t528 != 0
-    fld ft0, 200(s0)
+    fsd ft2, 216(s0)
+    # t550 = t549 != 0
+    fld ft0, 216(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 208(s0)
-    # if t529 goto L95
-    fld ft0, 208(s0)
+    fsd ft2, 224(s0)
+    # if t550 goto L95
+    fld ft0, 224(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r86
     j L95
@@ -6698,61 +6824,61 @@ _r86:
     j _error_ejecucion
     # L95:
 L95:
-    # t530 = t528 + 2
-    fld ft0, 200(s0)
-    li t0, 2
+    # t551 = t549 + 3
+    fld ft0, 216(s0)
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 216(s0)
-    # t531 = heap[t530]
-    fld ft0, 216(s0)
+    fsd ft2, 232(s0)
+    # t552 = heap[t551]
+    fld ft0, 232(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 224(s0)
-    # heap[t524] = t531
-    fld ft1, 224(s0)
-    fld ft0, 168(s0)
+    fsd ft2, 240(s0)
+    # heap[t545] = t552
+    fld ft1, 240(s0)
+    fld ft0, 184(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fsd ft1, 0(t0)
-    # t532 = P + 1
+    # t553 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 232(s0)
-    # t533 = stack[t532]
-    fld ft0, 232(s0)
+    fsd ft2, 248(s0)
+    # t554 = stack[t553]
+    fld ft0, 248(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 240(s0)
-    # t534 = t533 + 1
-    fld ft0, 240(s0)
-    li t0, 1
+    fsd ft2, 256(s0)
+    # t555 = t554 + 2
+    fld ft0, 256(s0)
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 248(s0)
-    # t535 = heap[t534]
-    fld ft0, 248(s0)
+    fsd ft2, 264(s0)
+    # t556 = heap[t555]
+    fld ft0, 264(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 256(s0)
-    # t536 = t535 != 0
-    fld ft0, 256(s0)
+    fsd ft2, 272(s0)
+    # t557 = t556 != 0
+    fld ft0, 272(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 264(s0)
-    # if t536 goto L96
-    fld ft0, 264(s0)
+    fsd ft2, 280(s0)
+    # if t557 goto L96
+    fld ft0, 280(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r87
     j L96
@@ -6764,56 +6890,56 @@ _r87:
     j _error_ejecucion
     # L96:
 L96:
-    # t537 = t535 + 1
-    fld ft0, 256(s0)
-    li t0, 1
+    # t558 = t556 + 2
+    fld ft0, 272(s0)
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 272(s0)
-    # heap[t537] = 0
+    fsd ft2, 288(s0)
+    # heap[t558] = 0
     fmv.d ft1, fs0
-    fld ft0, 272(s0)
+    fld ft0, 288(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fsd ft1, 0(t0)
     # L93:
 L93:
-    # t538 = P + 1
+    # t559 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 280(s0)
-    # t539 = stack[t538]
-    fld ft0, 280(s0)
+    fsd ft2, 296(s0)
+    # t560 = stack[t559]
+    fld ft0, 296(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 288(s0)
-    # t540 = t539 + 2
-    fld ft0, 288(s0)
-    li t0, 2
+    fsd ft2, 304(s0)
+    # t561 = t560 + 3
+    fld ft0, 304(s0)
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 296(s0)
-    # t541 = heap[t540]
-    fld ft0, 296(s0)
+    fsd ft2, 312(s0)
+    # t562 = heap[t561]
+    fld ft0, 312(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 304(s0)
-    # t542 = t541 - 1
-    fld ft0, 304(s0)
+    fsd ft2, 320(s0)
+    # t563 = t562 - 1
+    fld ft0, 320(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fsub.d ft2, ft0, ft1
-    fsd ft2, 312(s0)
-    # heap[t540] = t542
-    fld ft1, 312(s0)
-    fld ft0, 296(s0)
+    fsd ft2, 328(s0)
+    # heap[t561] = t563
+    fld ft1, 328(s0)
+    fld ft0, 312(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
@@ -6830,7 +6956,7 @@ F_ListaDoble_eliminarFinal_fin:
     mv sp, s0
     lw ra, 0(sp)
     lw s0, 4(sp)
-    addi sp, sp, 320
+    addi sp, sp, 336
     ret
 
 F_ListaDoble_eliminarEn:
@@ -6845,85 +6971,85 @@ _r88:
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r88
-    # t544 = P + 2
+    # t565 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # t545 = stack[t544]
+    # t566 = stack[t565]
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 16(s0)
-    # t546 = t545 < 0
+    # t567 = t566 < 0
     fld ft0, 16(s0)
     fmv.d ft1, fs0
     flt.d t0, ft0, ft1
     fcvt.d.w ft2, t0
     fsd ft2, 24(s0)
-    # t543 = t546
+    # t564 = t567
     fld ft0, 24(s0)
     fsd ft0, 32(s0)
-    # if t543 goto L99
+    # if t564 goto L99
     fld ft0, 32(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r89
     j L99
 _r89:
-    # t547 = P + 2
+    # t568 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 40(s0)
-    # t548 = stack[t547]
+    # t569 = stack[t568]
     fld ft0, 40(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 48(s0)
-    # t549 = P + 1
+    # t570 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 56(s0)
-    # t550 = stack[t549]
+    # t571 = stack[t570]
     fld ft0, 56(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 64(s0)
-    # t551 = t550 + 2
+    # t572 = t571 + 3
     fld ft0, 64(s0)
-    li t0, 2
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 72(s0)
-    # t552 = heap[t551]
+    # t573 = heap[t572]
     fld ft0, 72(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
     fsd ft2, 80(s0)
-    # t553 = t548 >= t552
+    # t574 = t569 >= t573
     fld ft0, 48(s0)
     fld ft1, 80(s0)
     fle.d t0, ft1, ft0
     fcvt.d.w ft2, t0
     fsd ft2, 88(s0)
-    # t543 = t553
+    # t564 = t574
     fld ft0, 88(s0)
     fsd ft0, 32(s0)
     # L99:
 L99:
-    # if_false t543 goto L98
+    # if_false t564 goto L98
     fld ft0, 32(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r90
@@ -6942,57 +7068,57 @@ _r90:
 L98:
     # L97:
 L97:
-    # t554 = P + 2
+    # t575 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 96(s0)
-    # t555 = stack[t554]
+    # t576 = stack[t575]
     fld ft0, 96(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 104(s0)
-    # t556 = t555 == 0
+    # t577 = t576 == 0
     fld ft0, 104(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     fcvt.d.w ft2, t0
     fsd ft2, 112(s0)
-    # if_false t556 goto L101
+    # if_false t577 goto L101
     fld ft0, 112(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r91
     j L101
 _r91:
-    # t557 = P + 1
+    # t578 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 120(s0)
-    # t558 = stack[t557]
+    # t579 = stack[t578]
     fld ft0, 120(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 128(s0)
-    # t559 = P + 4
+    # t580 = P + 4
     fcvt.d.w ft0, s10
     li t0, 4
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 136(s0)
-    # t560 = t559 + 1
+    # t581 = t580 + 1
     fld ft0, 136(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 144(s0)
-    # stack[t560] = t558
+    # stack[t581] = t579
     fld ft1, 128(s0)
     fld ft0, 144(s0)
     fcvt.w.d t0, ft0, rtz
@@ -7003,14 +7129,14 @@ _r91:
     addi s10, s10, 4
     # call ListaDoble_eliminarInicio
     jal ra, F_ListaDoble_eliminarInicio
-    # t561 = stack[P]
+    # t582 = stack[P]
     slli t0, s10, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 152(s0)
     # P = P - 4
     addi s10, s10, -4
-    # stack[P] = t561
+    # stack[P] = t582
     fld ft1, 152(s0)
     slli t0, s10, 3
     add t0, t0, s2
@@ -7023,89 +7149,89 @@ _r91:
 L101:
     # L100:
 L100:
-    # t562 = P + 2
+    # t583 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 160(s0)
-    # t563 = stack[t562]
+    # t584 = stack[t583]
     fld ft0, 160(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 168(s0)
-    # t564 = P + 1
+    # t585 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 176(s0)
-    # t565 = stack[t564]
+    # t586 = stack[t585]
     fld ft0, 176(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 184(s0)
-    # t566 = t565 + 2
+    # t587 = t586 + 3
     fld ft0, 184(s0)
-    li t0, 2
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 192(s0)
-    # t567 = heap[t566]
+    # t588 = heap[t587]
     fld ft0, 192(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
     fsd ft2, 200(s0)
-    # t568 = t567 - 1
+    # t589 = t588 - 1
     fld ft0, 200(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fsub.d ft2, ft0, ft1
     fsd ft2, 208(s0)
-    # t569 = t563 == t568
+    # t590 = t584 == t589
     fld ft0, 168(s0)
     fld ft1, 208(s0)
     feq.d t0, ft0, ft1
     fcvt.d.w ft2, t0
     fsd ft2, 216(s0)
-    # if_false t569 goto L103
+    # if_false t590 goto L103
     fld ft0, 216(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r92
     j L103
 _r92:
-    # t570 = P + 1
+    # t591 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 224(s0)
-    # t571 = stack[t570]
+    # t592 = stack[t591]
     fld ft0, 224(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 232(s0)
-    # t572 = P + 4
+    # t593 = P + 4
     fcvt.d.w ft0, s10
     li t0, 4
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 240(s0)
-    # t573 = t572 + 1
+    # t594 = t593 + 1
     fld ft0, 240(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 248(s0)
-    # stack[t573] = t571
+    # stack[t594] = t592
     fld ft1, 232(s0)
     fld ft0, 248(s0)
     fcvt.w.d t0, ft0, rtz
@@ -7116,14 +7242,14 @@ _r92:
     addi s10, s10, 4
     # call ListaDoble_eliminarFinal
     jal ra, F_ListaDoble_eliminarFinal
-    # t574 = stack[P]
+    # t595 = stack[P]
     slli t0, s10, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 256(s0)
     # P = P - 4
     addi s10, s10, -4
-    # stack[P] = t574
+    # stack[P] = t595
     fld ft1, 256(s0)
     slli t0, s10, 3
     add t0, t0, s2
@@ -7136,64 +7262,64 @@ _r92:
 L103:
     # L102:
 L102:
-    # t575 = P + 3
+    # t596 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 264(s0)
-    # t576 = P + 1
+    # t597 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 272(s0)
-    # t577 = stack[t576]
+    # t598 = stack[t597]
     fld ft0, 272(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 280(s0)
-    # t578 = P + 2
+    # t599 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 288(s0)
-    # t579 = stack[t578]
+    # t600 = stack[t599]
     fld ft0, 288(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 296(s0)
-    # t580 = P + 4
+    # t601 = P + 4
     fcvt.d.w ft0, s10
     li t0, 4
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 304(s0)
-    # t581 = t580 + 1
+    # t602 = t601 + 1
     fld ft0, 304(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 312(s0)
-    # stack[t581] = t577
+    # stack[t602] = t598
     fld ft1, 280(s0)
     fld ft0, 312(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t582 = t580 + 2
+    # t603 = t601 + 2
     fld ft0, 304(s0)
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 320(s0)
-    # stack[t582] = t579
+    # stack[t603] = t600
     fld ft1, 296(s0)
     fld ft0, 320(s0)
     fcvt.w.d t0, ft0, rtz
@@ -7204,41 +7330,41 @@ L102:
     addi s10, s10, 4
     # call ListaDoble_obtenerNodo
     jal ra, F_ListaDoble_obtenerNodo
-    # t583 = stack[P]
+    # t604 = stack[P]
     slli t0, s10, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 328(s0)
     # P = P - 4
     addi s10, s10, -4
-    # stack[t575] = t583
+    # stack[t596] = t604
     fld ft1, 328(s0)
     fld ft0, 264(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t584 = P + 3
+    # t605 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 336(s0)
-    # t585 = stack[t584]
+    # t606 = stack[t605]
     fld ft0, 336(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 344(s0)
-    # t586 = t585 != 0
+    # t607 = t606 != 0
     fld ft0, 344(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
     fsd ft2, 352(s0)
-    # if t586 goto L104
+    # if t607 goto L104
     fld ft0, 352(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r93
@@ -7251,27 +7377,27 @@ _r93:
     j _error_ejecucion
     # L104:
 L104:
-    # t587 = t585 + 2
+    # t608 = t606 + 3
     fld ft0, 344(s0)
-    li t0, 2
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 360(s0)
-    # t588 = heap[t587]
+    # t609 = heap[t608]
     fld ft0, 360(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
     fsd ft2, 368(s0)
-    # t589 = t588 != 0
+    # t610 = t609 != 0
     fld ft0, 368(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
     fsd ft2, 376(s0)
-    # if t589 goto L105
+    # if t610 goto L105
     fld ft0, 376(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r94
@@ -7284,33 +7410,33 @@ _r94:
     j _error_ejecucion
     # L105:
 L105:
-    # t590 = t588 + 1
+    # t611 = t609 + 2
     fld ft0, 368(s0)
-    li t0, 1
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 384(s0)
-    # t591 = P + 3
+    # t612 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 392(s0)
-    # t592 = stack[t591]
+    # t613 = stack[t612]
     fld ft0, 392(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 400(s0)
-    # t593 = t592 != 0
+    # t614 = t613 != 0
     fld ft0, 400(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
     fsd ft2, 408(s0)
-    # if t593 goto L106
+    # if t614 goto L106
     fld ft0, 408(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r95
@@ -7323,47 +7449,47 @@ _r95:
     j _error_ejecucion
     # L106:
 L106:
-    # t594 = t592 + 1
+    # t615 = t613 + 2
     fld ft0, 400(s0)
-    li t0, 1
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 416(s0)
-    # t595 = heap[t594]
+    # t616 = heap[t615]
     fld ft0, 416(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
     fsd ft2, 424(s0)
-    # heap[t590] = t595
+    # heap[t611] = t616
     fld ft1, 424(s0)
     fld ft0, 384(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fsd ft1, 0(t0)
-    # t596 = P + 3
+    # t617 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 432(s0)
-    # t597 = stack[t596]
+    # t618 = stack[t617]
     fld ft0, 432(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 440(s0)
-    # t598 = t597 != 0
+    # t619 = t618 != 0
     fld ft0, 440(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
     fsd ft2, 448(s0)
-    # if t598 goto L107
+    # if t619 goto L107
     fld ft0, 448(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r96
@@ -7376,27 +7502,27 @@ _r96:
     j _error_ejecucion
     # L107:
 L107:
-    # t599 = t597 + 1
+    # t620 = t618 + 2
     fld ft0, 440(s0)
-    li t0, 1
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 456(s0)
-    # t600 = heap[t599]
+    # t621 = heap[t620]
     fld ft0, 456(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
     fsd ft2, 464(s0)
-    # t601 = t600 != 0
+    # t622 = t621 != 0
     fld ft0, 464(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
     fsd ft2, 472(s0)
-    # if t601 goto L108
+    # if t622 goto L108
     fld ft0, 472(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r97
@@ -7409,33 +7535,33 @@ _r97:
     j _error_ejecucion
     # L108:
 L108:
-    # t602 = t600 + 2
+    # t623 = t621 + 3
     fld ft0, 464(s0)
-    li t0, 2
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 480(s0)
-    # t603 = P + 3
+    # t624 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 488(s0)
-    # t604 = stack[t603]
+    # t625 = stack[t624]
     fld ft0, 488(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 496(s0)
-    # t605 = t604 != 0
+    # t626 = t625 != 0
     fld ft0, 496(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
     fsd ft2, 504(s0)
-    # if t605 goto L109
+    # if t626 goto L109
     fld ft0, 504(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r98
@@ -7448,59 +7574,59 @@ _r98:
     j _error_ejecucion
     # L109:
 L109:
-    # t606 = t604 + 2
+    # t627 = t625 + 3
     fld ft0, 496(s0)
-    li t0, 2
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 512(s0)
-    # t607 = heap[t606]
+    # t628 = heap[t627]
     fld ft0, 512(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
     fsd ft2, 520(s0)
-    # heap[t602] = t607
+    # heap[t623] = t628
     fld ft1, 520(s0)
     fld ft0, 480(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fsd ft1, 0(t0)
-    # t608 = P + 1
+    # t629 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 528(s0)
-    # t609 = stack[t608]
+    # t630 = stack[t629]
     fld ft0, 528(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 536(s0)
-    # t610 = t609 + 2
+    # t631 = t630 + 3
     fld ft0, 536(s0)
-    li t0, 2
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 544(s0)
-    # t611 = heap[t610]
+    # t632 = heap[t631]
     fld ft0, 544(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
     fsd ft2, 552(s0)
-    # t612 = t611 - 1
+    # t633 = t632 - 1
     fld ft0, 552(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fsub.d ft2, ft0, ft1
     fsd ft2, 560(s0)
-    # heap[t610] = t612
+    # heap[t631] = t633
     fld ft1, 560(s0)
     fld ft0, 544(s0)
     fcvt.w.d t0, ft0, rtz
@@ -7534,64 +7660,64 @@ _r99:
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r99
-    # t613 = P + 3
+    # t634 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # t614 = P + 1
+    # t635 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 16(s0)
-    # t615 = stack[t614]
+    # t636 = stack[t635]
     fld ft0, 16(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 24(s0)
-    # t616 = P + 2
+    # t637 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 32(s0)
-    # t617 = stack[t616]
+    # t638 = stack[t637]
     fld ft0, 32(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 40(s0)
-    # t618 = P + 4
+    # t639 = P + 4
     fcvt.d.w ft0, s10
     li t0, 4
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 48(s0)
-    # t619 = t618 + 1
+    # t640 = t639 + 1
     fld ft0, 48(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 56(s0)
-    # stack[t619] = t615
+    # stack[t640] = t636
     fld ft1, 24(s0)
     fld ft0, 56(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t620 = t618 + 2
+    # t641 = t639 + 2
     fld ft0, 48(s0)
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 64(s0)
-    # stack[t620] = t617
+    # stack[t641] = t638
     fld ft1, 40(s0)
     fld ft0, 64(s0)
     fcvt.w.d t0, ft0, rtz
@@ -7602,45 +7728,45 @@ _r99:
     addi s10, s10, 4
     # call ListaDoble_buscar
     jal ra, F_ListaDoble_buscar
-    # t621 = stack[P]
+    # t642 = stack[P]
     slli t0, s10, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 72(s0)
     # P = P - 4
     addi s10, s10, -4
-    # stack[t613] = t621
+    # stack[t634] = t642
     fld ft1, 72(s0)
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t622 = P + 3
+    # t643 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 80(s0)
-    # t623 = stack[t622]
+    # t644 = stack[t643]
     fld ft0, 80(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 88(s0)
-    # t624 = -1
+    # t645 = -1
     li t0, 1
     fcvt.d.w ft0, t0
     fneg.d ft2, ft0
     fsd ft2, 96(s0)
-    # t625 = t623 == t624
+    # t646 = t644 == t645
     fld ft0, 88(s0)
     fld ft1, 96(s0)
     feq.d t0, ft0, ft1
     fcvt.d.w ft2, t0
     fsd ft2, 104(s0)
-    # if_false t625 goto L111
+    # if_false t646 goto L111
     fld ft0, 104(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r100
@@ -7659,58 +7785,58 @@ _r100:
 L111:
     # L110:
 L110:
-    # t626 = P + 1
+    # t647 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 112(s0)
-    # t627 = stack[t626]
+    # t648 = stack[t647]
     fld ft0, 112(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 120(s0)
-    # t628 = P + 3
+    # t649 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 128(s0)
-    # t629 = stack[t628]
+    # t650 = stack[t649]
     fld ft0, 128(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 136(s0)
-    # t630 = P + 4
+    # t651 = P + 4
     fcvt.d.w ft0, s10
     li t0, 4
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 144(s0)
-    # t631 = t630 + 1
+    # t652 = t651 + 1
     fld ft0, 144(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 152(s0)
-    # stack[t631] = t627
+    # stack[t652] = t648
     fld ft1, 120(s0)
     fld ft0, 152(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t632 = t630 + 2
+    # t653 = t651 + 2
     fld ft0, 144(s0)
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 160(s0)
-    # stack[t632] = t629
+    # stack[t653] = t650
     fld ft1, 136(s0)
     fld ft0, 160(s0)
     fcvt.w.d t0, ft0, rtz
@@ -7721,14 +7847,14 @@ L110:
     addi s10, s10, 4
     # call ListaDoble_eliminarEn
     jal ra, F_ListaDoble_eliminarEn
-    # t633 = stack[P]
+    # t654 = stack[P]
     slli t0, s10, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 168(s0)
     # P = P - 4
     addi s10, s10, -4
-    # stack[P] = t633
+    # stack[P] = t654
     fld ft1, 168(s0)
     slli t0, s10, 3
     add t0, t0, s2
@@ -7748,80 +7874,86 @@ F_ListaDoble_vaciar:
     sw s0, 4(sp)
     mv s0, sp
     addi t0, s0, 8
-    li t1, 8
+    li t1, 9
 _r101:
     fsd fs0, 0(t0)
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r101
-    # t634 = P + 1
+    # t655 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # t635 = stack[t634]
+    # t656 = stack[t655]
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 16(s0)
-    # heap[t635] = 0
-    fmv.d ft1, fs0
+    # t657 = t656 + 1
     fld ft0, 16(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s1
-    fsd ft1, 0(t0)
-    # t636 = P + 1
-    fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 24(s0)
-    # t637 = stack[t636]
-    fld ft0, 24(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s2
-    fld ft2, 0(t0)
-    fsd ft2, 32(s0)
-    # t638 = t637 + 1
-    fld ft0, 32(s0)
-    li t0, 1
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 40(s0)
-    # heap[t638] = 0
+    # heap[t657] = 0
     fmv.d ft1, fs0
-    fld ft0, 40(s0)
+    fld ft0, 24(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fsd ft1, 0(t0)
-    # t639 = P + 1
+    # t658 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 48(s0)
-    # t640 = stack[t639]
-    fld ft0, 48(s0)
+    fsd ft2, 32(s0)
+    # t659 = stack[t658]
+    fld ft0, 32(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 56(s0)
-    # t641 = t640 + 2
-    fld ft0, 56(s0)
+    fsd ft2, 40(s0)
+    # t660 = t659 + 2
+    fld ft0, 40(s0)
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 64(s0)
-    # heap[t641] = 0
+    fsd ft2, 48(s0)
+    # heap[t660] = 0
     fmv.d ft1, fs0
+    fld ft0, 48(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s1
+    fsd ft1, 0(t0)
+    # t661 = P + 1
+    fcvt.d.w ft0, s10
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 56(s0)
+    # t662 = stack[t661]
+    fld ft0, 56(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s2
+    fld ft2, 0(t0)
+    fsd ft2, 64(s0)
+    # t663 = t662 + 3
     fld ft0, 64(s0)
+    li t0, 3
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 72(s0)
+    # heap[t663] = 0
+    fmv.d ft1, fs0
+    fld ft0, 72(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
@@ -7839,91 +7971,91 @@ F_ListaDoble_obtenerNodo:
     sw s0, 4(sp)
     mv s0, sp
     addi t0, s0, 8
-    li t1, 66
+    li t1, 67
 _r102:
     fsd fs0, 0(t0)
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r102
-    # t643 = P + 2
+    # t665 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # t644 = stack[t643]
+    # t666 = stack[t665]
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 16(s0)
-    # t645 = t644 < 0
+    # t667 = t666 < 0
     fld ft0, 16(s0)
     fmv.d ft1, fs0
     flt.d t0, ft0, ft1
     fcvt.d.w ft2, t0
     fsd ft2, 24(s0)
-    # t642 = t645
+    # t664 = t667
     fld ft0, 24(s0)
     fsd ft0, 32(s0)
-    # if t642 goto L114
+    # if t664 goto L114
     fld ft0, 32(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r103
     j L114
 _r103:
-    # t646 = P + 2
+    # t668 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 40(s0)
-    # t647 = stack[t646]
+    # t669 = stack[t668]
     fld ft0, 40(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 48(s0)
-    # t648 = P + 1
+    # t670 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 56(s0)
-    # t649 = stack[t648]
+    # t671 = stack[t670]
     fld ft0, 56(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 64(s0)
-    # t650 = t649 + 2
+    # t672 = t671 + 3
     fld ft0, 64(s0)
-    li t0, 2
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 72(s0)
-    # t651 = heap[t650]
+    # t673 = heap[t672]
     fld ft0, 72(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
     fsd ft2, 80(s0)
-    # t652 = t647 >= t651
+    # t674 = t669 >= t673
     fld ft0, 48(s0)
     fld ft1, 80(s0)
     fle.d t0, ft1, ft0
     fcvt.d.w ft2, t0
     fsd ft2, 88(s0)
-    # t642 = t652
+    # t664 = t674
     fld ft0, 88(s0)
     fsd ft0, 32(s0)
     # L114:
 L114:
-    # if_false t642 goto L113
+    # if_false t664 goto L113
     fld ft0, 32(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r104
@@ -7942,59 +8074,59 @@ _r104:
 L113:
     # L112:
 L112:
-    # t653 = P + 3
+    # t675 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 96(s0)
-    # stack[t653] = 0
+    # stack[t675] = 0
     fmv.d ft1, fs0
     fld ft0, 96(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t654 = P + 2
+    # t676 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 104(s0)
-    # t655 = stack[t654]
+    # t677 = stack[t676]
     fld ft0, 104(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 112(s0)
-    # t656 = P + 1
+    # t678 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 120(s0)
-    # t657 = stack[t656]
+    # t679 = stack[t678]
     fld ft0, 120(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 128(s0)
-    # t658 = t657 + 2
+    # t680 = t679 + 3
     fld ft0, 128(s0)
-    li t0, 2
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 136(s0)
-    # t659 = heap[t658]
+    # t681 = heap[t680]
     fld ft0, 136(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
     fsd ft2, 144(s0)
-    # t660 = t659 div 2
+    # t682 = t681 div 2
     fld ft0, 144(s0)
     li t0, 2
     fcvt.d.w ft1, t0
@@ -8007,132 +8139,138 @@ _r105:
     div t1, t1, t2
     fcvt.d.w ft2, t1
     fsd ft2, 152(s0)
-    # t661 = t655 < t660
+    # t683 = t677 < t682
     fld ft0, 112(s0)
     fld ft1, 152(s0)
     flt.d t0, ft0, ft1
     fcvt.d.w ft2, t0
     fsd ft2, 160(s0)
-    # if_false t661 goto L116
+    # if_false t683 goto L116
     fld ft0, 160(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r106
     j L116
 _r106:
-    # t662 = P + 3
+    # t684 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 168(s0)
-    # t663 = P + 1
+    # t685 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 176(s0)
-    # t664 = stack[t663]
+    # t686 = stack[t685]
     fld ft0, 176(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 184(s0)
-    # t665 = heap[t664]
+    # t687 = t686 + 1
     fld ft0, 184(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 192(s0)
+    # t688 = heap[t687]
+    fld ft0, 192(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 192(s0)
-    # stack[t662] = t665
-    fld ft1, 192(s0)
+    fsd ft2, 200(s0)
+    # stack[t684] = t688
+    fld ft1, 200(s0)
     fld ft0, 168(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t666 = P + 4
+    # t689 = P + 4
     fcvt.d.w ft0, s10
     li t0, 4
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 200(s0)
-    # stack[t666] = 0
+    fsd ft2, 208(s0)
+    # stack[t689] = 0
     fmv.d ft1, fs0
-    fld ft0, 200(s0)
+    fld ft0, 208(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
     # L117:
 L117:
-    # t667 = P + 4
+    # t690 = P + 4
     fcvt.d.w ft0, s10
     li t0, 4
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 208(s0)
-    # t668 = stack[t667]
-    fld ft0, 208(s0)
+    fsd ft2, 216(s0)
+    # t691 = stack[t690]
+    fld ft0, 216(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 216(s0)
-    # t669 = P + 2
+    fsd ft2, 224(s0)
+    # t692 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 224(s0)
-    # t670 = stack[t669]
-    fld ft0, 224(s0)
+    fsd ft2, 232(s0)
+    # t693 = stack[t692]
+    fld ft0, 232(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 232(s0)
-    # t671 = t668 < t670
-    fld ft0, 216(s0)
-    fld ft1, 232(s0)
+    fsd ft2, 240(s0)
+    # t694 = t691 < t693
+    fld ft0, 224(s0)
+    fld ft1, 240(s0)
     flt.d t0, ft0, ft1
     fcvt.d.w ft2, t0
-    fsd ft2, 240(s0)
-    # if_false t671 goto L119
-    fld ft0, 240(s0)
+    fsd ft2, 248(s0)
+    # if_false t694 goto L119
+    fld ft0, 248(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r107
     j L119
 _r107:
-    # t672 = P + 3
-    fcvt.d.w ft0, s10
-    li t0, 3
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 248(s0)
-    # t673 = P + 3
+    # t695 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 256(s0)
-    # t674 = stack[t673]
-    fld ft0, 256(s0)
+    # t696 = P + 3
+    fcvt.d.w ft0, s10
+    li t0, 3
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 264(s0)
+    # t697 = stack[t696]
+    fld ft0, 264(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 264(s0)
-    # t675 = t674 != 0
-    fld ft0, 264(s0)
+    fsd ft2, 272(s0)
+    # t698 = t697 != 0
+    fld ft0, 272(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 272(s0)
-    # if t675 goto L120
-    fld ft0, 272(s0)
+    fsd ft2, 280(s0)
+    # if t698 goto L120
+    fld ft0, 280(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r108
     j L120
@@ -8144,50 +8282,50 @@ _r108:
     j _error_ejecucion
     # L120:
 L120:
-    # t676 = t674 + 1
-    fld ft0, 264(s0)
-    li t0, 1
+    # t699 = t697 + 2
+    fld ft0, 272(s0)
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 280(s0)
-    # t677 = heap[t676]
-    fld ft0, 280(s0)
+    fsd ft2, 288(s0)
+    # t700 = heap[t699]
+    fld ft0, 288(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 288(s0)
-    # stack[t672] = t677
-    fld ft1, 288(s0)
-    fld ft0, 248(s0)
+    fsd ft2, 296(s0)
+    # stack[t695] = t700
+    fld ft1, 296(s0)
+    fld ft0, 256(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
     # L118:
 L118:
-    # t678 = P + 4
+    # t701 = P + 4
     fcvt.d.w ft0, s10
     li t0, 4
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 296(s0)
-    # t679 = stack[t678]
-    fld ft0, 296(s0)
+    fsd ft2, 304(s0)
+    # t702 = stack[t701]
+    fld ft0, 304(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 304(s0)
-    # t680 = t679 + 1
-    fld ft0, 304(s0)
+    fsd ft2, 312(s0)
+    # t703 = t702 + 1
+    fld ft0, 312(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 312(s0)
-    # stack[t678] = t680
-    fld ft1, 312(s0)
-    fld ft0, 296(s0)
+    fsd ft2, 320(s0)
+    # stack[t701] = t703
+    fld ft1, 320(s0)
+    fld ft0, 304(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
@@ -8200,158 +8338,158 @@ L119:
     j L115
     # L116:
 L116:
-    # t681 = P + 3
+    # t704 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 320(s0)
-    # t682 = P + 1
+    fsd ft2, 328(s0)
+    # t705 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 328(s0)
-    # t683 = stack[t682]
+    fsd ft2, 336(s0)
+    # t706 = stack[t705]
+    fld ft0, 336(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s2
+    fld ft2, 0(t0)
+    fsd ft2, 344(s0)
+    # t707 = t706 + 2
+    fld ft0, 344(s0)
+    li t0, 2
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 352(s0)
+    # t708 = heap[t707]
+    fld ft0, 352(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s1
+    fld ft2, 0(t0)
+    fsd ft2, 360(s0)
+    # stack[t704] = t708
+    fld ft1, 360(s0)
     fld ft0, 328(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
-    fld ft2, 0(t0)
-    fsd ft2, 336(s0)
-    # t684 = t683 + 1
-    fld ft0, 336(s0)
-    li t0, 1
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 344(s0)
-    # t685 = heap[t684]
-    fld ft0, 344(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s1
-    fld ft2, 0(t0)
-    fsd ft2, 352(s0)
-    # stack[t681] = t685
-    fld ft1, 352(s0)
-    fld ft0, 320(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s2
     fsd ft1, 0(t0)
-    # t686 = P + 4
+    # t709 = P + 4
     fcvt.d.w ft0, s10
     li t0, 4
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 360(s0)
-    # t687 = P + 1
+    fsd ft2, 368(s0)
+    # t710 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 368(s0)
-    # t688 = stack[t687]
-    fld ft0, 368(s0)
+    fsd ft2, 376(s0)
+    # t711 = stack[t710]
+    fld ft0, 376(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 376(s0)
-    # t689 = t688 + 2
-    fld ft0, 376(s0)
-    li t0, 2
+    fsd ft2, 384(s0)
+    # t712 = t711 + 3
+    fld ft0, 384(s0)
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 384(s0)
-    # t690 = heap[t689]
-    fld ft0, 384(s0)
+    fsd ft2, 392(s0)
+    # t713 = heap[t712]
+    fld ft0, 392(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 392(s0)
-    # t691 = t690 - 1
-    fld ft0, 392(s0)
+    fsd ft2, 400(s0)
+    # t714 = t713 - 1
+    fld ft0, 400(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fsub.d ft2, ft0, ft1
-    fsd ft2, 400(s0)
-    # stack[t686] = t691
-    fld ft1, 400(s0)
-    fld ft0, 360(s0)
+    fsd ft2, 408(s0)
+    # stack[t709] = t714
+    fld ft1, 408(s0)
+    fld ft0, 368(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
     # L121:
 L121:
-    # t692 = P + 4
+    # t715 = P + 4
     fcvt.d.w ft0, s10
     li t0, 4
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 408(s0)
-    # t693 = stack[t692]
-    fld ft0, 408(s0)
+    fsd ft2, 416(s0)
+    # t716 = stack[t715]
+    fld ft0, 416(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 416(s0)
-    # t694 = P + 2
+    fsd ft2, 424(s0)
+    # t717 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 424(s0)
-    # t695 = stack[t694]
-    fld ft0, 424(s0)
+    fsd ft2, 432(s0)
+    # t718 = stack[t717]
+    fld ft0, 432(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 432(s0)
-    # t696 = t693 > t695
-    fld ft0, 416(s0)
-    fld ft1, 432(s0)
+    fsd ft2, 440(s0)
+    # t719 = t716 > t718
+    fld ft0, 424(s0)
+    fld ft1, 440(s0)
     flt.d t0, ft1, ft0
     fcvt.d.w ft2, t0
-    fsd ft2, 440(s0)
-    # if_false t696 goto L123
-    fld ft0, 440(s0)
+    fsd ft2, 448(s0)
+    # if_false t719 goto L123
+    fld ft0, 448(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r109
     j L123
 _r109:
-    # t697 = P + 3
-    fcvt.d.w ft0, s10
-    li t0, 3
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 448(s0)
-    # t698 = P + 3
+    # t720 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 456(s0)
-    # t699 = stack[t698]
-    fld ft0, 456(s0)
+    # t721 = P + 3
+    fcvt.d.w ft0, s10
+    li t0, 3
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 464(s0)
+    # t722 = stack[t721]
+    fld ft0, 464(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 464(s0)
-    # t700 = t699 != 0
-    fld ft0, 464(s0)
+    fsd ft2, 472(s0)
+    # t723 = t722 != 0
+    fld ft0, 472(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 472(s0)
-    # if t700 goto L124
-    fld ft0, 472(s0)
+    fsd ft2, 480(s0)
+    # if t723 goto L124
+    fld ft0, 480(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r110
     j L124
@@ -8363,50 +8501,50 @@ _r110:
     j _error_ejecucion
     # L124:
 L124:
-    # t701 = t699 + 2
-    fld ft0, 464(s0)
-    li t0, 2
+    # t724 = t722 + 3
+    fld ft0, 472(s0)
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 480(s0)
-    # t702 = heap[t701]
-    fld ft0, 480(s0)
+    fsd ft2, 488(s0)
+    # t725 = heap[t724]
+    fld ft0, 488(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 488(s0)
-    # stack[t697] = t702
-    fld ft1, 488(s0)
-    fld ft0, 448(s0)
+    fsd ft2, 496(s0)
+    # stack[t720] = t725
+    fld ft1, 496(s0)
+    fld ft0, 456(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
     # L122:
 L122:
-    # t703 = P + 4
+    # t726 = P + 4
     fcvt.d.w ft0, s10
     li t0, 4
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 496(s0)
-    # t704 = stack[t703]
-    fld ft0, 496(s0)
+    fsd ft2, 504(s0)
+    # t727 = stack[t726]
+    fld ft0, 504(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 504(s0)
-    # t705 = t704 - 1
-    fld ft0, 504(s0)
+    fsd ft2, 512(s0)
+    # t728 = t727 - 1
+    fld ft0, 512(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fsub.d ft2, ft0, ft1
-    fsd ft2, 512(s0)
-    # stack[t703] = t705
-    fld ft1, 512(s0)
-    fld ft0, 496(s0)
+    fsd ft2, 520(s0)
+    # stack[t726] = t728
+    fld ft1, 520(s0)
+    fld ft0, 504(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
@@ -8417,21 +8555,21 @@ L122:
 L123:
     # L115:
 L115:
-    # t706 = P + 3
+    # t729 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 520(s0)
-    # t707 = stack[t706]
-    fld ft0, 520(s0)
+    fsd ft2, 528(s0)
+    # t730 = stack[t729]
+    fld ft0, 528(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 528(s0)
-    # stack[P] = t707
-    fld ft1, 528(s0)
+    fsd ft2, 536(s0)
+    # stack[P] = t730
+    fld ft1, 536(s0)
     slli t0, s10, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
@@ -8450,70 +8588,70 @@ F_ListaDoble_obtener:
     sw s0, 4(sp)
     mv s0, sp
     addi t0, s0, 8
-    li t1, 18
+    li t1, 19
 _r111:
     fsd fs0, 0(t0)
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r111
-    # t708 = P + 3
+    # t731 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # t709 = P + 1
+    # t732 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 16(s0)
-    # t710 = stack[t709]
+    # t733 = stack[t732]
     fld ft0, 16(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 24(s0)
-    # t711 = P + 2
+    # t734 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 32(s0)
-    # t712 = stack[t711]
+    # t735 = stack[t734]
     fld ft0, 32(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 40(s0)
-    # t713 = P + 4
+    # t736 = P + 4
     fcvt.d.w ft0, s10
     li t0, 4
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 48(s0)
-    # t714 = t713 + 1
+    # t737 = t736 + 1
     fld ft0, 48(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 56(s0)
-    # stack[t714] = t710
+    # stack[t737] = t733
     fld ft1, 24(s0)
     fld ft0, 56(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t715 = t713 + 2
+    # t738 = t736 + 2
     fld ft0, 48(s0)
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 64(s0)
-    # stack[t715] = t712
+    # stack[t738] = t735
     fld ft1, 40(s0)
     fld ft0, 64(s0)
     fcvt.w.d t0, ft0, rtz
@@ -8524,78 +8662,78 @@ _r111:
     addi s10, s10, 4
     # call ListaDoble_obtenerNodo
     jal ra, F_ListaDoble_obtenerNodo
-    # t716 = stack[P]
+    # t739 = stack[P]
     slli t0, s10, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 72(s0)
     # P = P - 4
     addi s10, s10, -4
-    # stack[t708] = t716
+    # stack[t731] = t739
     fld ft1, 72(s0)
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t718 = P + 3
+    # t741 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 80(s0)
-    # t719 = stack[t718]
+    # t742 = stack[t741]
     fld ft0, 80(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 88(s0)
-    # t720 = t719 == 0
+    # t743 = t742 == 0
     fld ft0, 88(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     fcvt.d.w ft2, t0
     fsd ft2, 96(s0)
-    # if_false t720 goto L125
+    # if_false t743 goto L125
     fld ft0, 96(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r112
     j L125
 _r112:
-    # t721 = -1
+    # t744 = -1
     li t0, 1
     fcvt.d.w ft0, t0
     fneg.d ft2, ft0
     fsd ft2, 104(s0)
-    # t717 = t721
+    # t740 = t744
     fld ft0, 104(s0)
     fsd ft0, 112(s0)
     # goto L126
     j L126
     # L125:
 L125:
-    # t722 = P + 3
+    # t745 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 120(s0)
-    # t723 = stack[t722]
+    # t746 = stack[t745]
     fld ft0, 120(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 128(s0)
-    # t724 = t723 != 0
+    # t747 = t746 != 0
     fld ft0, 128(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
     fsd ft2, 136(s0)
-    # if t724 goto L127
+    # if t747 goto L127
     fld ft0, 136(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r113
@@ -8608,19 +8746,25 @@ _r113:
     j _error_ejecucion
     # L127:
 L127:
-    # t725 = heap[t723]
+    # t748 = t746 + 1
     fld ft0, 128(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 144(s0)
+    # t749 = heap[t748]
+    fld ft0, 144(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 144(s0)
-    # t717 = t725
-    fld ft0, 144(s0)
+    fsd ft2, 152(s0)
+    # t740 = t749
+    fld ft0, 152(s0)
     fsd ft0, 112(s0)
     # L126:
 L126:
-    # stack[P] = t717
+    # stack[P] = t740
     fld ft1, 112(s0)
     slli t0, s10, 3
     add t0, t0, s2
@@ -8635,113 +8779,119 @@ F_ListaDoble_obtener_fin:
     ret
 
 F_ListaDoble_buscar:
-    addi sp, sp, -224
+    addi sp, sp, -240
     sw ra, 0(sp)
     sw s0, 4(sp)
     mv s0, sp
     addi t0, s0, 8
-    li t1, 27
+    li t1, 29
 _r114:
     fsd fs0, 0(t0)
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r114
-    # t726 = P + 3
+    # t750 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # t727 = P + 1
+    # t751 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 16(s0)
-    # t728 = stack[t727]
+    # t752 = stack[t751]
     fld ft0, 16(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 24(s0)
-    # t729 = heap[t728]
+    # t753 = t752 + 1
     fld ft0, 24(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 32(s0)
+    # t754 = heap[t753]
+    fld ft0, 32(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 32(s0)
-    # stack[t726] = t729
-    fld ft1, 32(s0)
+    fsd ft2, 40(s0)
+    # stack[t750] = t754
+    fld ft1, 40(s0)
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t730 = P + 4
+    # t755 = P + 4
     fcvt.d.w ft0, s10
     li t0, 4
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 40(s0)
-    # stack[t730] = 0
+    fsd ft2, 48(s0)
+    # stack[t755] = 0
     fmv.d ft1, fs0
-    fld ft0, 40(s0)
+    fld ft0, 48(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
     # L128:
 L128:
-    # t731 = P + 3
+    # t756 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 48(s0)
-    # t732 = stack[t731]
-    fld ft0, 48(s0)
+    fsd ft2, 56(s0)
+    # t757 = stack[t756]
+    fld ft0, 56(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 56(s0)
-    # t733 = t732 != 0
-    fld ft0, 56(s0)
+    fsd ft2, 64(s0)
+    # t758 = t757 != 0
+    fld ft0, 64(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 64(s0)
-    # if_false t733 goto L129
-    fld ft0, 64(s0)
+    fsd ft2, 72(s0)
+    # if_false t758 goto L129
+    fld ft0, 72(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r115
     j L129
 _r115:
-    # t734 = P + 3
+    # t759 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 72(s0)
-    # t735 = stack[t734]
-    fld ft0, 72(s0)
+    fsd ft2, 80(s0)
+    # t760 = stack[t759]
+    fld ft0, 80(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 80(s0)
-    # t736 = t735 != 0
-    fld ft0, 80(s0)
+    fsd ft2, 88(s0)
+    # t761 = t760 != 0
+    fld ft0, 88(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 88(s0)
-    # if t736 goto L132
-    fld ft0, 88(s0)
+    fsd ft2, 96(s0)
+    # if t761 goto L132
+    fld ft0, 96(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r116
     j L132
@@ -8753,53 +8903,59 @@ _r116:
     j _error_ejecucion
     # L132:
 L132:
-    # t737 = heap[t735]
-    fld ft0, 80(s0)
+    # t762 = t760 + 1
+    fld ft0, 88(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 104(s0)
+    # t763 = heap[t762]
+    fld ft0, 104(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 96(s0)
-    # t738 = P + 2
+    fsd ft2, 112(s0)
+    # t764 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 104(s0)
-    # t739 = stack[t738]
-    fld ft0, 104(s0)
+    fsd ft2, 120(s0)
+    # t765 = stack[t764]
+    fld ft0, 120(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 112(s0)
-    # t740 = t737 == t739
-    fld ft0, 96(s0)
-    fld ft1, 112(s0)
+    fsd ft2, 128(s0)
+    # t766 = t763 == t765
+    fld ft0, 112(s0)
+    fld ft1, 128(s0)
     feq.d t0, ft0, ft1
     fcvt.d.w ft2, t0
-    fsd ft2, 120(s0)
-    # if_false t740 goto L131
-    fld ft0, 120(s0)
+    fsd ft2, 136(s0)
+    # if_false t766 goto L131
+    fld ft0, 136(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r117
     j L131
 _r117:
-    # t741 = P + 4
+    # t767 = P + 4
     fcvt.d.w ft0, s10
     li t0, 4
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 128(s0)
-    # t742 = stack[t741]
-    fld ft0, 128(s0)
+    fsd ft2, 144(s0)
+    # t768 = stack[t767]
+    fld ft0, 144(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 136(s0)
-    # stack[P] = t742
-    fld ft1, 136(s0)
+    fsd ft2, 152(s0)
+    # stack[P] = t768
+    fld ft1, 152(s0)
     slli t0, s10, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
@@ -8811,34 +8967,34 @@ _r117:
 L131:
     # L130:
 L130:
-    # t743 = P + 3
+    # t769 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 144(s0)
-    # t744 = P + 3
+    fsd ft2, 160(s0)
+    # t770 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 152(s0)
-    # t745 = stack[t744]
-    fld ft0, 152(s0)
+    fsd ft2, 168(s0)
+    # t771 = stack[t770]
+    fld ft0, 168(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 160(s0)
-    # t746 = t745 != 0
-    fld ft0, 160(s0)
+    fsd ft2, 176(s0)
+    # t772 = t771 != 0
+    fld ft0, 176(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 168(s0)
-    # if t746 goto L133
-    fld ft0, 168(s0)
+    fsd ft2, 184(s0)
+    # if t772 goto L133
+    fld ft0, 184(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r118
     j L133
@@ -8850,48 +9006,48 @@ _r118:
     j _error_ejecucion
     # L133:
 L133:
-    # t747 = t745 + 1
-    fld ft0, 160(s0)
-    li t0, 1
+    # t773 = t771 + 2
+    fld ft0, 176(s0)
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 176(s0)
-    # t748 = heap[t747]
-    fld ft0, 176(s0)
+    fsd ft2, 192(s0)
+    # t774 = heap[t773]
+    fld ft0, 192(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 184(s0)
-    # stack[t743] = t748
-    fld ft1, 184(s0)
-    fld ft0, 144(s0)
+    fsd ft2, 200(s0)
+    # stack[t769] = t774
+    fld ft1, 200(s0)
+    fld ft0, 160(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t749 = P + 4
+    # t775 = P + 4
     fcvt.d.w ft0, s10
     li t0, 4
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 192(s0)
-    # t750 = stack[t749]
-    fld ft0, 192(s0)
+    fsd ft2, 208(s0)
+    # t776 = stack[t775]
+    fld ft0, 208(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 200(s0)
-    # t751 = t750 + 1
-    fld ft0, 200(s0)
+    fsd ft2, 216(s0)
+    # t777 = t776 + 1
+    fld ft0, 216(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 208(s0)
-    # stack[t749] = t751
-    fld ft1, 208(s0)
-    fld ft0, 192(s0)
+    fsd ft2, 224(s0)
+    # stack[t775] = t777
+    fld ft1, 224(s0)
+    fld ft0, 208(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
@@ -8900,13 +9056,13 @@ L133:
     j L128
     # L129:
 L129:
-    # t752 = -1
+    # t778 = -1
     li t0, 1
     fcvt.d.w ft0, t0
     fneg.d ft2, ft0
-    fsd ft2, 216(s0)
-    # stack[P] = t752
-    fld ft1, 216(s0)
+    fsd ft2, 232(s0)
+    # stack[P] = t778
+    fld ft1, 232(s0)
     slli t0, s10, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
@@ -8916,49 +9072,55 @@ F_ListaDoble_buscar_fin:
     mv sp, s0
     lw ra, 0(sp)
     lw s0, 4(sp)
-    addi sp, sp, 224
+    addi sp, sp, 240
     ret
 
 F_ListaDoble_maximo:
-    addi sp, sp, -336
+    addi sp, sp, -384
     sw ra, 0(sp)
     sw s0, 4(sp)
     mv s0, sp
     addi t0, s0, 8
-    li t1, 40
+    li t1, 46
 _r119:
     fsd fs0, 0(t0)
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r119
-    # t753 = P + 1
+    # t779 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # t754 = stack[t753]
+    # t780 = stack[t779]
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 16(s0)
-    # t755 = heap[t754]
+    # t781 = t780 + 1
     fld ft0, 16(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 24(s0)
+    # t782 = heap[t781]
+    fld ft0, 24(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 24(s0)
-    # t756 = t755 == 0
-    fld ft0, 24(s0)
+    fsd ft2, 32(s0)
+    # t783 = t782 == 0
+    fld ft0, 32(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     fcvt.d.w ft2, t0
-    fsd ft2, 32(s0)
-    # if_false t756 goto L135
-    fld ft0, 32(s0)
+    fsd ft2, 40(s0)
+    # if_false t783 goto L135
+    fld ft0, 40(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r120
     j L135
@@ -8976,41 +9138,47 @@ _r120:
 L135:
     # L134:
 L134:
-    # t757 = P + 2
+    # t784 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 40(s0)
-    # t758 = P + 1
+    fsd ft2, 48(s0)
+    # t785 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 48(s0)
-    # t759 = stack[t758]
-    fld ft0, 48(s0)
+    fsd ft2, 56(s0)
+    # t786 = stack[t785]
+    fld ft0, 56(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 56(s0)
-    # t760 = heap[t759]
-    fld ft0, 56(s0)
+    fsd ft2, 64(s0)
+    # t787 = t786 + 1
+    fld ft0, 64(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 72(s0)
+    # t788 = heap[t787]
+    fld ft0, 72(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 64(s0)
-    # t761 = t760 != 0
-    fld ft0, 64(s0)
+    fsd ft2, 80(s0)
+    # t789 = t788 != 0
+    fld ft0, 80(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 72(s0)
-    # if t761 goto L136
-    fld ft0, 72(s0)
+    fsd ft2, 88(s0)
+    # if t789 goto L136
+    fld ft0, 88(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r121
     j L136
@@ -9022,55 +9190,67 @@ _r121:
     j _error_ejecucion
     # L136:
 L136:
-    # t762 = heap[t760]
-    fld ft0, 64(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s1
-    fld ft2, 0(t0)
-    fsd ft2, 80(s0)
-    # stack[t757] = t762
-    fld ft1, 80(s0)
-    fld ft0, 40(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s2
-    fsd ft1, 0(t0)
-    # t763 = P + 3
-    fcvt.d.w ft0, s10
-    li t0, 3
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 88(s0)
-    # t764 = P + 1
-    fcvt.d.w ft0, s10
+    # t790 = t788 + 1
+    fld ft0, 80(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 96(s0)
-    # t765 = stack[t764]
+    # t791 = heap[t790]
     fld ft0, 96(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s2
-    fld ft2, 0(t0)
-    fsd ft2, 104(s0)
-    # t766 = heap[t765]
-    fld ft0, 104(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
+    fsd ft2, 104(s0)
+    # stack[t784] = t791
+    fld ft1, 104(s0)
+    fld ft0, 48(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s2
+    fsd ft1, 0(t0)
+    # t792 = P + 3
+    fcvt.d.w ft0, s10
+    li t0, 3
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
     fsd ft2, 112(s0)
-    # t767 = t766 != 0
-    fld ft0, 112(s0)
+    # t793 = P + 1
+    fcvt.d.w ft0, s10
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 120(s0)
+    # t794 = stack[t793]
+    fld ft0, 120(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s2
+    fld ft2, 0(t0)
+    fsd ft2, 128(s0)
+    # t795 = t794 + 1
+    fld ft0, 128(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 136(s0)
+    # t796 = heap[t795]
+    fld ft0, 136(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s1
+    fld ft2, 0(t0)
+    fsd ft2, 144(s0)
+    # t797 = t796 != 0
+    fld ft0, 144(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 120(s0)
-    # if t767 goto L137
-    fld ft0, 120(s0)
+    fsd ft2, 152(s0)
+    # if t797 goto L137
+    fld ft0, 152(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r122
     j L137
@@ -9082,76 +9262,76 @@ _r122:
     j _error_ejecucion
     # L137:
 L137:
-    # t768 = t766 + 1
-    fld ft0, 112(s0)
-    li t0, 1
+    # t798 = t796 + 2
+    fld ft0, 144(s0)
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 128(s0)
-    # t769 = heap[t768]
-    fld ft0, 128(s0)
+    fsd ft2, 160(s0)
+    # t799 = heap[t798]
+    fld ft0, 160(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 136(s0)
-    # stack[t763] = t769
-    fld ft1, 136(s0)
-    fld ft0, 88(s0)
+    fsd ft2, 168(s0)
+    # stack[t792] = t799
+    fld ft1, 168(s0)
+    fld ft0, 112(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
     # L138:
 L138:
-    # t770 = P + 3
+    # t800 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 144(s0)
-    # t771 = stack[t770]
-    fld ft0, 144(s0)
+    fsd ft2, 176(s0)
+    # t801 = stack[t800]
+    fld ft0, 176(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 152(s0)
-    # t772 = t771 != 0
-    fld ft0, 152(s0)
+    fsd ft2, 184(s0)
+    # t802 = t801 != 0
+    fld ft0, 184(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 160(s0)
-    # if_false t772 goto L139
-    fld ft0, 160(s0)
+    fsd ft2, 192(s0)
+    # if_false t802 goto L139
+    fld ft0, 192(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r123
     j L139
 _r123:
-    # t773 = P + 3
+    # t803 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 168(s0)
-    # t774 = stack[t773]
-    fld ft0, 168(s0)
+    fsd ft2, 200(s0)
+    # t804 = stack[t803]
+    fld ft0, 200(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 176(s0)
-    # t775 = t774 != 0
-    fld ft0, 176(s0)
+    fsd ft2, 208(s0)
+    # t805 = t804 != 0
+    fld ft0, 208(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 184(s0)
-    # if t775 goto L142
-    fld ft0, 184(s0)
+    fsd ft2, 216(s0)
+    # if t805 goto L142
+    fld ft0, 216(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r124
     j L142
@@ -9163,66 +9343,72 @@ _r124:
     j _error_ejecucion
     # L142:
 L142:
-    # t776 = heap[t774]
-    fld ft0, 176(s0)
+    # t806 = t804 + 1
+    fld ft0, 208(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 224(s0)
+    # t807 = heap[t806]
+    fld ft0, 224(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 192(s0)
-    # t777 = P + 2
+    fsd ft2, 232(s0)
+    # t808 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 200(s0)
-    # t778 = stack[t777]
-    fld ft0, 200(s0)
+    fsd ft2, 240(s0)
+    # t809 = stack[t808]
+    fld ft0, 240(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 208(s0)
-    # t779 = t776 > t778
-    fld ft0, 192(s0)
-    fld ft1, 208(s0)
+    fsd ft2, 248(s0)
+    # t810 = t807 > t809
+    fld ft0, 232(s0)
+    fld ft1, 248(s0)
     flt.d t0, ft1, ft0
     fcvt.d.w ft2, t0
-    fsd ft2, 216(s0)
-    # if_false t779 goto L141
-    fld ft0, 216(s0)
+    fsd ft2, 256(s0)
+    # if_false t810 goto L141
+    fld ft0, 256(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r125
     j L141
 _r125:
-    # t780 = P + 2
+    # t811 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 224(s0)
-    # t781 = P + 3
+    fsd ft2, 264(s0)
+    # t812 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 232(s0)
-    # t782 = stack[t781]
-    fld ft0, 232(s0)
+    fsd ft2, 272(s0)
+    # t813 = stack[t812]
+    fld ft0, 272(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 240(s0)
-    # t783 = t782 != 0
-    fld ft0, 240(s0)
+    fsd ft2, 280(s0)
+    # t814 = t813 != 0
+    fld ft0, 280(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 248(s0)
-    # if t783 goto L143
-    fld ft0, 248(s0)
+    fsd ft2, 288(s0)
+    # if t814 goto L143
+    fld ft0, 288(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r126
     j L143
@@ -9234,16 +9420,22 @@ _r126:
     j _error_ejecucion
     # L143:
 L143:
-    # t784 = heap[t782]
-    fld ft0, 240(s0)
+    # t815 = t813 + 1
+    fld ft0, 280(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 296(s0)
+    # t816 = heap[t815]
+    fld ft0, 296(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 256(s0)
-    # stack[t780] = t784
-    fld ft1, 256(s0)
-    fld ft0, 224(s0)
+    fsd ft2, 304(s0)
+    # stack[t811] = t816
+    fld ft1, 304(s0)
+    fld ft0, 264(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
@@ -9254,34 +9446,34 @@ L143:
 L141:
     # L140:
 L140:
-    # t785 = P + 3
+    # t817 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 264(s0)
-    # t786 = P + 3
+    fsd ft2, 312(s0)
+    # t818 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 272(s0)
-    # t787 = stack[t786]
-    fld ft0, 272(s0)
+    fsd ft2, 320(s0)
+    # t819 = stack[t818]
+    fld ft0, 320(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 280(s0)
-    # t788 = t787 != 0
-    fld ft0, 280(s0)
+    fsd ft2, 328(s0)
+    # t820 = t819 != 0
+    fld ft0, 328(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 288(s0)
-    # if t788 goto L144
-    fld ft0, 288(s0)
+    fsd ft2, 336(s0)
+    # if t820 goto L144
+    fld ft0, 336(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r127
     j L144
@@ -9293,22 +9485,22 @@ _r127:
     j _error_ejecucion
     # L144:
 L144:
-    # t789 = t787 + 1
-    fld ft0, 280(s0)
-    li t0, 1
+    # t821 = t819 + 2
+    fld ft0, 328(s0)
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 296(s0)
-    # t790 = heap[t789]
-    fld ft0, 296(s0)
+    fsd ft2, 344(s0)
+    # t822 = heap[t821]
+    fld ft0, 344(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 304(s0)
-    # stack[t785] = t790
-    fld ft1, 304(s0)
-    fld ft0, 264(s0)
+    fsd ft2, 352(s0)
+    # stack[t817] = t822
+    fld ft1, 352(s0)
+    fld ft0, 312(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
@@ -9317,21 +9509,21 @@ L144:
     j L138
     # L139:
 L139:
-    # t791 = P + 2
+    # t823 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 312(s0)
-    # t792 = stack[t791]
-    fld ft0, 312(s0)
+    fsd ft2, 360(s0)
+    # t824 = stack[t823]
+    fld ft0, 360(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 320(s0)
-    # stack[P] = t792
-    fld ft1, 320(s0)
+    fsd ft2, 368(s0)
+    # stack[P] = t824
+    fld ft1, 368(s0)
     slli t0, s10, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
@@ -9341,41 +9533,41 @@ F_ListaDoble_maximo_fin:
     mv sp, s0
     lw ra, 0(sp)
     lw s0, 4(sp)
-    addi sp, sp, 336
+    addi sp, sp, 384
     ret
 
 F_ListaDoble_sumaRecursiva:
-    addi sp, sp, -160
+    addi sp, sp, -176
     sw ra, 0(sp)
     sw s0, 4(sp)
     mv s0, sp
     addi t0, s0, 8
-    li t1, 19
+    li t1, 20
 _r128:
     fsd fs0, 0(t0)
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r128
-    # t793 = P + 2
+    # t825 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # t794 = stack[t793]
+    # t826 = stack[t825]
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 16(s0)
-    # t795 = t794 == 0
+    # t827 = t826 == 0
     fld ft0, 16(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     fcvt.d.w ft2, t0
     fsd ft2, 24(s0)
-    # if_false t795 goto L146
+    # if_false t827 goto L146
     fld ft0, 24(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r129
@@ -9394,27 +9586,27 @@ _r129:
 L146:
     # L145:
 L145:
-    # t796 = P + 2
+    # t828 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 32(s0)
-    # t797 = stack[t796]
+    # t829 = stack[t828]
     fld ft0, 32(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 40(s0)
-    # t798 = t797 != 0
+    # t830 = t829 != 0
     fld ft0, 40(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
     fsd ft2, 48(s0)
-    # if t798 goto L147
+    # if t830 goto L147
     fld ft0, 48(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r130
@@ -9427,48 +9619,54 @@ _r130:
     j _error_ejecucion
     # L147:
 L147:
-    # t799 = heap[t797]
+    # t831 = t829 + 1
     fld ft0, 40(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 56(s0)
+    # t832 = heap[t831]
+    fld ft0, 56(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 56(s0)
-    # t800 = P + 1
+    fsd ft2, 64(s0)
+    # t833 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 64(s0)
-    # t801 = stack[t800]
-    fld ft0, 64(s0)
+    fsd ft2, 72(s0)
+    # t834 = stack[t833]
+    fld ft0, 72(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 72(s0)
-    # t802 = P + 2
+    fsd ft2, 80(s0)
+    # t835 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 80(s0)
-    # t803 = stack[t802]
-    fld ft0, 80(s0)
+    fsd ft2, 88(s0)
+    # t836 = stack[t835]
+    fld ft0, 88(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 88(s0)
-    # t804 = t803 != 0
-    fld ft0, 88(s0)
+    fsd ft2, 96(s0)
+    # t837 = t836 != 0
+    fld ft0, 96(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 96(s0)
-    # if t804 goto L148
-    fld ft0, 96(s0)
+    fsd ft2, 104(s0)
+    # if t837 goto L148
+    fld ft0, 104(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r131
     j L148
@@ -9480,47 +9678,47 @@ _r131:
     j _error_ejecucion
     # L148:
 L148:
-    # t805 = t803 + 1
-    fld ft0, 88(s0)
-    li t0, 1
+    # t838 = t836 + 2
+    fld ft0, 96(s0)
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 104(s0)
-    # t806 = heap[t805]
-    fld ft0, 104(s0)
+    fsd ft2, 112(s0)
+    # t839 = heap[t838]
+    fld ft0, 112(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 112(s0)
-    # t807 = P + 3
+    fsd ft2, 120(s0)
+    # t840 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 120(s0)
-    # t808 = t807 + 1
-    fld ft0, 120(s0)
+    fsd ft2, 128(s0)
+    # t841 = t840 + 1
+    fld ft0, 128(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 128(s0)
-    # stack[t808] = t801
-    fld ft1, 72(s0)
-    fld ft0, 128(s0)
+    fsd ft2, 136(s0)
+    # stack[t841] = t834
+    fld ft1, 80(s0)
+    fld ft0, 136(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t809 = t807 + 2
-    fld ft0, 120(s0)
+    # t842 = t840 + 2
+    fld ft0, 128(s0)
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 136(s0)
-    # stack[t809] = t806
-    fld ft1, 112(s0)
-    fld ft0, 136(s0)
+    fsd ft2, 144(s0)
+    # stack[t842] = t839
+    fld ft1, 120(s0)
+    fld ft0, 144(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
@@ -9529,20 +9727,20 @@ L148:
     addi s10, s10, 3
     # call ListaDoble_sumaRecursiva
     jal ra, F_ListaDoble_sumaRecursiva
-    # t810 = stack[P]
+    # t843 = stack[P]
     slli t0, s10, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 144(s0)
+    fsd ft2, 152(s0)
     # P = P - 3
     addi s10, s10, -3
-    # t811 = t799 + t810
-    fld ft0, 56(s0)
-    fld ft1, 144(s0)
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 152(s0)
-    # stack[P] = t811
+    # t844 = t832 + t843
+    fld ft0, 64(s0)
     fld ft1, 152(s0)
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 160(s0)
+    # stack[P] = t844
+    fld ft1, 160(s0)
     slli t0, s10, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
@@ -9552,82 +9750,88 @@ F_ListaDoble_sumaRecursiva_fin:
     mv sp, s0
     lw ra, 0(sp)
     lw s0, 4(sp)
-    addi sp, sp, 160
+    addi sp, sp, 176
     ret
 
 F_ListaDoble_suma:
-    addi sp, sp, -80
+    addi sp, sp, -96
     sw ra, 0(sp)
     sw s0, 4(sp)
     mv s0, sp
     addi t0, s0, 8
-    li t1, 9
+    li t1, 10
 _r132:
     fsd fs0, 0(t0)
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r132
-    # t812 = P + 1
+    # t845 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # t813 = stack[t812]
+    # t846 = stack[t845]
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 16(s0)
-    # t814 = P + 1
+    # t847 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 24(s0)
-    # t815 = stack[t814]
+    # t848 = stack[t847]
     fld ft0, 24(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 32(s0)
-    # t816 = heap[t815]
+    # t849 = t848 + 1
     fld ft0, 32(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 40(s0)
+    # t850 = heap[t849]
+    fld ft0, 40(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 40(s0)
-    # t817 = P + 2
+    fsd ft2, 48(s0)
+    # t851 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 48(s0)
-    # t818 = t817 + 1
-    fld ft0, 48(s0)
+    fsd ft2, 56(s0)
+    # t852 = t851 + 1
+    fld ft0, 56(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 56(s0)
-    # stack[t818] = t813
+    fsd ft2, 64(s0)
+    # stack[t852] = t846
     fld ft1, 16(s0)
-    fld ft0, 56(s0)
+    fld ft0, 64(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t819 = t817 + 2
-    fld ft0, 48(s0)
+    # t853 = t851 + 2
+    fld ft0, 56(s0)
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 64(s0)
-    # stack[t819] = t816
-    fld ft1, 40(s0)
-    fld ft0, 64(s0)
+    fsd ft2, 72(s0)
+    # stack[t853] = t850
+    fld ft1, 48(s0)
+    fld ft0, 72(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
@@ -9636,15 +9840,15 @@ _r132:
     addi s10, s10, 2
     # call ListaDoble_sumaRecursiva
     jal ra, F_ListaDoble_sumaRecursiva
-    # t820 = stack[P]
+    # t854 = stack[P]
     slli t0, s10, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 72(s0)
+    fsd ft2, 80(s0)
     # P = P - 2
     addi s10, s10, -2
-    # stack[P] = t820
-    fld ft1, 72(s0)
+    # stack[P] = t854
+    fld ft1, 80(s0)
     slli t0, s10, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
@@ -9654,123 +9858,129 @@ F_ListaDoble_suma_fin:
     mv sp, s0
     lw ra, 0(sp)
     lw s0, 4(sp)
-    addi sp, sp, 80
+    addi sp, sp, 96
     ret
 
 F_ListaDoble_invertir:
-    addi sp, sp, -416
+    addi sp, sp, -432
     sw ra, 0(sp)
     sw s0, 4(sp)
     mv s0, sp
     addi t0, s0, 8
-    li t1, 50
+    li t1, 53
 _r133:
     fsd fs0, 0(t0)
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r133
-    # t821 = P + 2
+    # t855 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # t822 = P + 1
+    # t856 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 16(s0)
-    # t823 = stack[t822]
+    # t857 = stack[t856]
     fld ft0, 16(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 24(s0)
-    # t824 = heap[t823]
+    # t858 = t857 + 1
     fld ft0, 24(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 32(s0)
+    # t859 = heap[t858]
+    fld ft0, 32(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 32(s0)
-    # stack[t821] = t824
-    fld ft1, 32(s0)
+    fsd ft2, 40(s0)
+    # stack[t855] = t859
+    fld ft1, 40(s0)
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t825 = P + 3
+    # t860 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 40(s0)
-    # stack[t825] = 0
+    fsd ft2, 48(s0)
+    # stack[t860] = 0
     fmv.d ft1, fs0
-    fld ft0, 40(s0)
+    fld ft0, 48(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
     # L149:
 L149:
-    # t826 = P + 2
+    # t861 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 48(s0)
-    # t827 = stack[t826]
-    fld ft0, 48(s0)
+    fsd ft2, 56(s0)
+    # t862 = stack[t861]
+    fld ft0, 56(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 56(s0)
-    # t828 = t827 != 0
-    fld ft0, 56(s0)
+    fsd ft2, 64(s0)
+    # t863 = t862 != 0
+    fld ft0, 64(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 64(s0)
-    # if_false t828 goto L150
-    fld ft0, 64(s0)
+    fsd ft2, 72(s0)
+    # if_false t863 goto L150
+    fld ft0, 72(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r134
     j L150
 _r134:
-    # t829 = P + 3
+    # t864 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 72(s0)
-    # t830 = P + 2
+    fsd ft2, 80(s0)
+    # t865 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 80(s0)
-    # t831 = stack[t830]
-    fld ft0, 80(s0)
+    fsd ft2, 88(s0)
+    # t866 = stack[t865]
+    fld ft0, 88(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 88(s0)
-    # t832 = t831 != 0
-    fld ft0, 88(s0)
+    fsd ft2, 96(s0)
+    # t867 = t866 != 0
+    fld ft0, 96(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 96(s0)
-    # if t832 goto L151
-    fld ft0, 96(s0)
+    fsd ft2, 104(s0)
+    # if t867 goto L151
+    fld ft0, 104(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r135
     j L151
@@ -9782,48 +9992,48 @@ _r135:
     j _error_ejecucion
     # L151:
 L151:
-    # t833 = t831 + 2
-    fld ft0, 88(s0)
-    li t0, 2
+    # t868 = t866 + 3
+    fld ft0, 96(s0)
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 104(s0)
-    # t834 = heap[t833]
-    fld ft0, 104(s0)
+    fsd ft2, 112(s0)
+    # t869 = heap[t868]
+    fld ft0, 112(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 112(s0)
-    # stack[t829] = t834
-    fld ft1, 112(s0)
-    fld ft0, 72(s0)
+    fsd ft2, 120(s0)
+    # stack[t864] = t869
+    fld ft1, 120(s0)
+    fld ft0, 80(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t835 = P + 2
+    # t870 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 120(s0)
-    # t836 = stack[t835]
-    fld ft0, 120(s0)
+    fsd ft2, 128(s0)
+    # t871 = stack[t870]
+    fld ft0, 128(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 128(s0)
-    # t837 = t836 != 0
-    fld ft0, 128(s0)
+    fsd ft2, 136(s0)
+    # t872 = t871 != 0
+    fld ft0, 136(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 136(s0)
-    # if t837 goto L152
-    fld ft0, 136(s0)
+    fsd ft2, 144(s0)
+    # if t872 goto L152
+    fld ft0, 144(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r136
     j L152
@@ -9835,34 +10045,34 @@ _r136:
     j _error_ejecucion
     # L152:
 L152:
-    # t838 = t836 + 2
-    fld ft0, 128(s0)
-    li t0, 2
+    # t873 = t871 + 3
+    fld ft0, 136(s0)
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 144(s0)
-    # t839 = P + 2
+    fsd ft2, 152(s0)
+    # t874 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 152(s0)
-    # t840 = stack[t839]
-    fld ft0, 152(s0)
+    fsd ft2, 160(s0)
+    # t875 = stack[t874]
+    fld ft0, 160(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 160(s0)
-    # t841 = t840 != 0
-    fld ft0, 160(s0)
+    fsd ft2, 168(s0)
+    # t876 = t875 != 0
+    fld ft0, 168(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 168(s0)
-    # if t841 goto L153
-    fld ft0, 168(s0)
+    fsd ft2, 176(s0)
+    # if t876 goto L153
+    fld ft0, 176(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r137
     j L153
@@ -9874,48 +10084,48 @@ _r137:
     j _error_ejecucion
     # L153:
 L153:
-    # t842 = t840 + 1
-    fld ft0, 160(s0)
-    li t0, 1
+    # t877 = t875 + 2
+    fld ft0, 168(s0)
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 176(s0)
-    # t843 = heap[t842]
-    fld ft0, 176(s0)
+    fsd ft2, 184(s0)
+    # t878 = heap[t877]
+    fld ft0, 184(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 184(s0)
-    # heap[t838] = t843
-    fld ft1, 184(s0)
-    fld ft0, 144(s0)
+    fsd ft2, 192(s0)
+    # heap[t873] = t878
+    fld ft1, 192(s0)
+    fld ft0, 152(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fsd ft1, 0(t0)
-    # t844 = P + 2
+    # t879 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 192(s0)
-    # t845 = stack[t844]
-    fld ft0, 192(s0)
+    fsd ft2, 200(s0)
+    # t880 = stack[t879]
+    fld ft0, 200(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 200(s0)
-    # t846 = t845 != 0
-    fld ft0, 200(s0)
+    fsd ft2, 208(s0)
+    # t881 = t880 != 0
+    fld ft0, 208(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 208(s0)
-    # if t846 goto L154
-    fld ft0, 208(s0)
+    fsd ft2, 216(s0)
+    # if t881 goto L154
+    fld ft0, 216(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r138
     j L154
@@ -9927,60 +10137,60 @@ _r138:
     j _error_ejecucion
     # L154:
 L154:
-    # t847 = t845 + 1
-    fld ft0, 200(s0)
-    li t0, 1
+    # t882 = t880 + 2
+    fld ft0, 208(s0)
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 216(s0)
-    # t848 = P + 3
+    fsd ft2, 224(s0)
+    # t883 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 224(s0)
-    # t849 = stack[t848]
-    fld ft0, 224(s0)
+    fsd ft2, 232(s0)
+    # t884 = stack[t883]
+    fld ft0, 232(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 232(s0)
-    # heap[t847] = t849
-    fld ft1, 232(s0)
-    fld ft0, 216(s0)
+    fsd ft2, 240(s0)
+    # heap[t882] = t884
+    fld ft1, 240(s0)
+    fld ft0, 224(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fsd ft1, 0(t0)
-    # t850 = P + 2
-    fcvt.d.w ft0, s10
-    li t0, 2
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 240(s0)
-    # t851 = P + 2
+    # t885 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 248(s0)
-    # t852 = stack[t851]
-    fld ft0, 248(s0)
+    # t886 = P + 2
+    fcvt.d.w ft0, s10
+    li t0, 2
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 256(s0)
+    # t887 = stack[t886]
+    fld ft0, 256(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 256(s0)
-    # t853 = t852 != 0
-    fld ft0, 256(s0)
+    fsd ft2, 264(s0)
+    # t888 = t887 != 0
+    fld ft0, 264(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 264(s0)
-    # if t853 goto L155
-    fld ft0, 264(s0)
+    fsd ft2, 272(s0)
+    # if t888 goto L155
+    fld ft0, 272(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r139
     j L155
@@ -9992,22 +10202,22 @@ _r139:
     j _error_ejecucion
     # L155:
 L155:
-    # t854 = t852 + 2
-    fld ft0, 256(s0)
-    li t0, 2
+    # t889 = t887 + 3
+    fld ft0, 264(s0)
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 272(s0)
-    # t855 = heap[t854]
-    fld ft0, 272(s0)
+    fsd ft2, 280(s0)
+    # t890 = heap[t889]
+    fld ft0, 280(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 280(s0)
-    # stack[t850] = t855
-    fld ft1, 280(s0)
-    fld ft0, 240(s0)
+    fsd ft2, 288(s0)
+    # stack[t885] = t890
+    fld ft1, 288(s0)
+    fld ft0, 248(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
@@ -10016,120 +10226,132 @@ L155:
     j L149
     # L150:
 L150:
-    # t856 = P + 3
+    # t891 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 288(s0)
-    # t857 = P + 1
+    fsd ft2, 296(s0)
+    # t892 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 296(s0)
-    # t858 = stack[t857]
-    fld ft0, 296(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s2
-    fld ft2, 0(t0)
     fsd ft2, 304(s0)
-    # t859 = heap[t858]
+    # t893 = stack[t892]
     fld ft0, 304(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
-    add t0, t0, s1
+    add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 312(s0)
-    # stack[t856] = t859
-    fld ft1, 312(s0)
-    fld ft0, 288(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s2
-    fsd ft1, 0(t0)
-    # t860 = P + 1
-    fcvt.d.w ft0, s10
+    # t894 = t893 + 1
+    fld ft0, 312(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 320(s0)
-    # t861 = stack[t860]
+    # t895 = heap[t894]
     fld ft0, 320(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
-    add t0, t0, s2
+    add t0, t0, s1
     fld ft2, 0(t0)
     fsd ft2, 328(s0)
-    # t862 = P + 1
+    # stack[t891] = t895
+    fld ft1, 328(s0)
+    fld ft0, 296(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s2
+    fsd ft1, 0(t0)
+    # t896 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 336(s0)
-    # t863 = stack[t862]
+    # t897 = stack[t896]
     fld ft0, 336(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 344(s0)
-    # t864 = t863 + 1
+    # t898 = t897 + 1
     fld ft0, 344(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 352(s0)
-    # t865 = heap[t864]
-    fld ft0, 352(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s1
-    fld ft2, 0(t0)
-    fsd ft2, 360(s0)
-    # heap[t861] = t865
-    fld ft1, 360(s0)
-    fld ft0, 328(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s1
-    fsd ft1, 0(t0)
-    # t866 = P + 1
+    # t899 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 368(s0)
-    # t867 = stack[t866]
-    fld ft0, 368(s0)
+    fsd ft2, 360(s0)
+    # t900 = stack[t899]
+    fld ft0, 360(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
+    fsd ft2, 368(s0)
+    # t901 = t900 + 2
+    fld ft0, 368(s0)
+    li t0, 2
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
     fsd ft2, 376(s0)
-    # t868 = t867 + 1
+    # t902 = heap[t901]
     fld ft0, 376(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s1
+    fld ft2, 0(t0)
+    fsd ft2, 384(s0)
+    # heap[t898] = t902
+    fld ft1, 384(s0)
+    fld ft0, 352(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s1
+    fsd ft1, 0(t0)
+    # t903 = P + 1
+    fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 384(s0)
-    # t869 = P + 3
-    fcvt.d.w ft0, s10
-    li t0, 3
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
     fsd ft2, 392(s0)
-    # t870 = stack[t869]
+    # t904 = stack[t903]
     fld ft0, 392(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 400(s0)
-    # heap[t868] = t870
-    fld ft1, 400(s0)
-    fld ft0, 384(s0)
+    # t905 = t904 + 2
+    fld ft0, 400(s0)
+    li t0, 2
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 408(s0)
+    # t906 = P + 3
+    fcvt.d.w ft0, s10
+    li t0, 3
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 416(s0)
+    # t907 = stack[t906]
+    fld ft0, 416(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s2
+    fld ft2, 0(t0)
+    fsd ft2, 424(s0)
+    # heap[t905] = t907
+    fld ft1, 424(s0)
+    fld ft0, 408(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
@@ -10138,28 +10360,28 @@ F_ListaDoble_invertir_fin:
     mv sp, s0
     lw ra, 0(sp)
     lw s0, 4(sp)
-    addi sp, sp, 416
+    addi sp, sp, 432
     ret
 
 F_ListaDoble_ordenar:
-    addi sp, sp, -496
+    addi sp, sp, -544
     sw ra, 0(sp)
     sw s0, 4(sp)
     mv s0, sp
     addi t0, s0, 8
-    li t1, 60
+    li t1, 67
 _r140:
     fsd fs0, 0(t0)
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r140
-    # t871 = P + 2
+    # t908 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # stack[t871] = 0
+    # stack[t908] = 0
     fmv.d ft1, fs0
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
@@ -10168,47 +10390,53 @@ _r140:
     fsd ft1, 0(t0)
     # L156:
 L156:
-    # t872 = P + 2
+    # t909 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 16(s0)
-    # stack[t872] = 0
+    # stack[t909] = 0
     fmv.d ft1, fs0
     fld ft0, 16(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t873 = P + 3
+    # t910 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 24(s0)
-    # t874 = P + 1
+    # t911 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 32(s0)
-    # t875 = stack[t874]
+    # t912 = stack[t911]
     fld ft0, 32(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 40(s0)
-    # t876 = heap[t875]
+    # t913 = t912 + 1
     fld ft0, 40(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 48(s0)
+    # t914 = heap[t913]
+    fld ft0, 48(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 48(s0)
-    # stack[t873] = t876
-    fld ft1, 48(s0)
+    fsd ft2, 56(s0)
+    # stack[t910] = t914
+    fld ft1, 56(s0)
     fld ft0, 24(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
@@ -10216,57 +10444,57 @@ L156:
     fsd ft1, 0(t0)
     # L159:
 L159:
-    # t878 = P + 3
+    # t916 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 56(s0)
-    # t879 = stack[t878]
-    fld ft0, 56(s0)
+    fsd ft2, 64(s0)
+    # t917 = stack[t916]
+    fld ft0, 64(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 64(s0)
-    # t880 = t879 != 0
-    fld ft0, 64(s0)
+    fsd ft2, 72(s0)
+    # t918 = t917 != 0
+    fld ft0, 72(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 72(s0)
-    # t877 = t880
-    fld ft0, 72(s0)
-    fsd ft0, 80(s0)
-    # if_false t877 goto L161
+    fsd ft2, 80(s0)
+    # t915 = t918
     fld ft0, 80(s0)
+    fsd ft0, 88(s0)
+    # if_false t915 goto L161
+    fld ft0, 88(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r141
     j L161
 _r141:
-    # t881 = P + 3
+    # t919 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 88(s0)
-    # t882 = stack[t881]
-    fld ft0, 88(s0)
+    fsd ft2, 96(s0)
+    # t920 = stack[t919]
+    fld ft0, 96(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 96(s0)
-    # t883 = t882 != 0
-    fld ft0, 96(s0)
+    fsd ft2, 104(s0)
+    # t921 = t920 != 0
+    fld ft0, 104(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 104(s0)
-    # if t883 goto L162
-    fld ft0, 104(s0)
+    fsd ft2, 112(s0)
+    # if t921 goto L162
+    fld ft0, 112(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r142
     j L162
@@ -10278,59 +10506,59 @@ _r142:
     j _error_ejecucion
     # L162:
 L162:
-    # t884 = t882 + 1
-    fld ft0, 96(s0)
-    li t0, 1
+    # t922 = t920 + 2
+    fld ft0, 104(s0)
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 112(s0)
-    # t885 = heap[t884]
-    fld ft0, 112(s0)
+    fsd ft2, 120(s0)
+    # t923 = heap[t922]
+    fld ft0, 120(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 120(s0)
-    # t886 = t885 != 0
-    fld ft0, 120(s0)
+    fsd ft2, 128(s0)
+    # t924 = t923 != 0
+    fld ft0, 128(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 128(s0)
-    # t877 = t886
-    fld ft0, 128(s0)
-    fsd ft0, 80(s0)
+    fsd ft2, 136(s0)
+    # t915 = t924
+    fld ft0, 136(s0)
+    fsd ft0, 88(s0)
     # L161:
 L161:
-    # if_false t877 goto L160
-    fld ft0, 80(s0)
+    # if_false t915 goto L160
+    fld ft0, 88(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r143
     j L160
 _r143:
-    # t887 = P + 3
+    # t925 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 136(s0)
-    # t888 = stack[t887]
-    fld ft0, 136(s0)
+    fsd ft2, 144(s0)
+    # t926 = stack[t925]
+    fld ft0, 144(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 144(s0)
-    # t889 = t888 != 0
-    fld ft0, 144(s0)
+    fsd ft2, 152(s0)
+    # t927 = t926 != 0
+    fld ft0, 152(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 152(s0)
-    # if t889 goto L165
-    fld ft0, 152(s0)
+    fsd ft2, 160(s0)
+    # if t927 goto L165
+    fld ft0, 160(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r144
     j L165
@@ -10342,35 +10570,41 @@ _r144:
     j _error_ejecucion
     # L165:
 L165:
-    # t890 = heap[t888]
-    fld ft0, 144(s0)
+    # t928 = t926 + 1
+    fld ft0, 152(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 168(s0)
+    # t929 = heap[t928]
+    fld ft0, 168(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 160(s0)
-    # t891 = P + 3
+    fsd ft2, 176(s0)
+    # t930 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 168(s0)
-    # t892 = stack[t891]
-    fld ft0, 168(s0)
+    fsd ft2, 184(s0)
+    # t931 = stack[t930]
+    fld ft0, 184(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 176(s0)
-    # t893 = t892 != 0
-    fld ft0, 176(s0)
+    fsd ft2, 192(s0)
+    # t932 = t931 != 0
+    fld ft0, 192(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 184(s0)
-    # if t893 goto L166
-    fld ft0, 184(s0)
+    fsd ft2, 200(s0)
+    # if t932 goto L166
+    fld ft0, 200(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r145
     j L166
@@ -10382,28 +10616,28 @@ _r145:
     j _error_ejecucion
     # L166:
 L166:
-    # t894 = t892 + 1
-    fld ft0, 176(s0)
-    li t0, 1
+    # t933 = t931 + 2
+    fld ft0, 192(s0)
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 192(s0)
-    # t895 = heap[t894]
-    fld ft0, 192(s0)
+    fsd ft2, 208(s0)
+    # t934 = heap[t933]
+    fld ft0, 208(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 200(s0)
-    # t896 = t895 != 0
-    fld ft0, 200(s0)
+    fsd ft2, 216(s0)
+    # t935 = t934 != 0
+    fld ft0, 216(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 208(s0)
-    # if t896 goto L167
-    fld ft0, 208(s0)
+    fsd ft2, 224(s0)
+    # if t935 goto L167
+    fld ft0, 224(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r146
     j L167
@@ -10415,53 +10649,59 @@ _r146:
     j _error_ejecucion
     # L167:
 L167:
-    # t897 = heap[t895]
-    fld ft0, 200(s0)
+    # t936 = t934 + 1
+    fld ft0, 216(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 232(s0)
+    # t937 = heap[t936]
+    fld ft0, 232(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 216(s0)
-    # t898 = t890 > t897
-    fld ft0, 160(s0)
-    fld ft1, 216(s0)
+    fsd ft2, 240(s0)
+    # t938 = t929 > t937
+    fld ft0, 176(s0)
+    fld ft1, 240(s0)
     flt.d t0, ft1, ft0
     fcvt.d.w ft2, t0
-    fsd ft2, 224(s0)
-    # if_false t898 goto L164
-    fld ft0, 224(s0)
+    fsd ft2, 248(s0)
+    # if_false t938 goto L164
+    fld ft0, 248(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r147
     j L164
 _r147:
-    # t899 = P + 4
+    # t939 = P + 4
     fcvt.d.w ft0, s10
     li t0, 4
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 232(s0)
-    # t900 = P + 3
+    fsd ft2, 256(s0)
+    # t940 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 240(s0)
-    # t901 = stack[t900]
-    fld ft0, 240(s0)
+    fsd ft2, 264(s0)
+    # t941 = stack[t940]
+    fld ft0, 264(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 248(s0)
-    # t902 = t901 != 0
-    fld ft0, 248(s0)
+    fsd ft2, 272(s0)
+    # t942 = t941 != 0
+    fld ft0, 272(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 256(s0)
-    # if t902 goto L168
-    fld ft0, 256(s0)
+    fsd ft2, 280(s0)
+    # if t942 goto L168
+    fld ft0, 280(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r148
     j L168
@@ -10473,42 +10713,48 @@ _r148:
     j _error_ejecucion
     # L168:
 L168:
-    # t903 = heap[t901]
-    fld ft0, 248(s0)
+    # t943 = t941 + 1
+    fld ft0, 272(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 288(s0)
+    # t944 = heap[t943]
+    fld ft0, 288(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 264(s0)
-    # stack[t899] = t903
-    fld ft1, 264(s0)
-    fld ft0, 232(s0)
+    fsd ft2, 296(s0)
+    # stack[t939] = t944
+    fld ft1, 296(s0)
+    fld ft0, 256(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t904 = P + 3
+    # t945 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 272(s0)
-    # t905 = stack[t904]
-    fld ft0, 272(s0)
+    fsd ft2, 304(s0)
+    # t946 = stack[t945]
+    fld ft0, 304(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 280(s0)
-    # t906 = t905 != 0
-    fld ft0, 280(s0)
+    fsd ft2, 312(s0)
+    # t947 = t946 != 0
+    fld ft0, 312(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 288(s0)
-    # if t906 goto L169
-    fld ft0, 288(s0)
+    fsd ft2, 320(s0)
+    # if t947 goto L169
+    fld ft0, 320(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r149
     j L169
@@ -10520,28 +10766,34 @@ _r149:
     j _error_ejecucion
     # L169:
 L169:
-    # t907 = P + 3
+    # t948 = t946 + 1
+    fld ft0, 312(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 328(s0)
+    # t949 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 296(s0)
-    # t908 = stack[t907]
-    fld ft0, 296(s0)
+    fsd ft2, 336(s0)
+    # t950 = stack[t949]
+    fld ft0, 336(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 304(s0)
-    # t909 = t908 != 0
-    fld ft0, 304(s0)
+    fsd ft2, 344(s0)
+    # t951 = t950 != 0
+    fld ft0, 344(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 312(s0)
-    # if t909 goto L170
-    fld ft0, 312(s0)
+    fsd ft2, 352(s0)
+    # if t951 goto L170
+    fld ft0, 352(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r150
     j L170
@@ -10553,28 +10805,28 @@ _r150:
     j _error_ejecucion
     # L170:
 L170:
-    # t910 = t908 + 1
-    fld ft0, 304(s0)
-    li t0, 1
+    # t952 = t950 + 2
+    fld ft0, 344(s0)
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 320(s0)
-    # t911 = heap[t910]
-    fld ft0, 320(s0)
+    fsd ft2, 360(s0)
+    # t953 = heap[t952]
+    fld ft0, 360(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 328(s0)
-    # t912 = t911 != 0
-    fld ft0, 328(s0)
+    fsd ft2, 368(s0)
+    # t954 = t953 != 0
+    fld ft0, 368(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 336(s0)
-    # if t912 goto L171
-    fld ft0, 336(s0)
+    fsd ft2, 376(s0)
+    # if t954 goto L171
+    fld ft0, 376(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r151
     j L171
@@ -10586,42 +10838,48 @@ _r151:
     j _error_ejecucion
     # L171:
 L171:
-    # t913 = heap[t911]
+    # t955 = t953 + 1
+    fld ft0, 368(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 384(s0)
+    # t956 = heap[t955]
+    fld ft0, 384(s0)
+    fcvt.w.d t0, ft0, rtz
+    slli t0, t0, 3
+    add t0, t0, s1
+    fld ft2, 0(t0)
+    fsd ft2, 392(s0)
+    # heap[t948] = t956
+    fld ft1, 392(s0)
     fld ft0, 328(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
-    fld ft2, 0(t0)
-    fsd ft2, 344(s0)
-    # heap[t905] = t913
-    fld ft1, 344(s0)
-    fld ft0, 280(s0)
-    fcvt.w.d t0, ft0, rtz
-    slli t0, t0, 3
-    add t0, t0, s1
     fsd ft1, 0(t0)
-    # t914 = P + 3
+    # t957 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 352(s0)
-    # t915 = stack[t914]
-    fld ft0, 352(s0)
+    fsd ft2, 400(s0)
+    # t958 = stack[t957]
+    fld ft0, 400(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 360(s0)
-    # t916 = t915 != 0
-    fld ft0, 360(s0)
+    fsd ft2, 408(s0)
+    # t959 = t958 != 0
+    fld ft0, 408(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 368(s0)
-    # if t916 goto L172
-    fld ft0, 368(s0)
+    fsd ft2, 416(s0)
+    # if t959 goto L172
+    fld ft0, 416(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r152
     j L172
@@ -10633,28 +10891,28 @@ _r152:
     j _error_ejecucion
     # L172:
 L172:
-    # t917 = t915 + 1
-    fld ft0, 360(s0)
-    li t0, 1
+    # t960 = t958 + 2
+    fld ft0, 408(s0)
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 376(s0)
-    # t918 = heap[t917]
-    fld ft0, 376(s0)
+    fsd ft2, 424(s0)
+    # t961 = heap[t960]
+    fld ft0, 424(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 384(s0)
-    # t919 = t918 != 0
-    fld ft0, 384(s0)
+    fsd ft2, 432(s0)
+    # t962 = t961 != 0
+    fld ft0, 432(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 392(s0)
-    # if t919 goto L173
-    fld ft0, 392(s0)
+    fsd ft2, 440(s0)
+    # if t962 goto L173
+    fld ft0, 440(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r153
     j L173
@@ -10666,36 +10924,42 @@ _r153:
     j _error_ejecucion
     # L173:
 L173:
-    # t920 = P + 4
+    # t963 = t961 + 1
+    fld ft0, 432(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 448(s0)
+    # t964 = P + 4
     fcvt.d.w ft0, s10
     li t0, 4
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 400(s0)
-    # t921 = stack[t920]
-    fld ft0, 400(s0)
+    fsd ft2, 456(s0)
+    # t965 = stack[t964]
+    fld ft0, 456(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 408(s0)
-    # heap[t918] = t921
-    fld ft1, 408(s0)
-    fld ft0, 384(s0)
+    fsd ft2, 464(s0)
+    # heap[t963] = t965
+    fld ft1, 464(s0)
+    fld ft0, 448(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fsd ft1, 0(t0)
-    # t922 = P + 2
+    # t966 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 416(s0)
-    # stack[t922] = 1
+    fsd ft2, 472(s0)
+    # stack[t966] = 1
     li t0, 1
     fcvt.d.w ft1, t0
-    fld ft0, 416(s0)
+    fld ft0, 472(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
@@ -10706,34 +10970,34 @@ L173:
 L164:
     # L163:
 L163:
-    # t923 = P + 3
+    # t967 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 424(s0)
-    # t924 = P + 3
+    fsd ft2, 480(s0)
+    # t968 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 432(s0)
-    # t925 = stack[t924]
-    fld ft0, 432(s0)
+    fsd ft2, 488(s0)
+    # t969 = stack[t968]
+    fld ft0, 488(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 440(s0)
-    # t926 = t925 != 0
-    fld ft0, 440(s0)
+    fsd ft2, 496(s0)
+    # t970 = t969 != 0
+    fld ft0, 496(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 448(s0)
-    # if t926 goto L174
-    fld ft0, 448(s0)
+    fsd ft2, 504(s0)
+    # if t970 goto L174
+    fld ft0, 504(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r154
     j L174
@@ -10745,22 +11009,22 @@ _r154:
     j _error_ejecucion
     # L174:
 L174:
-    # t927 = t925 + 1
-    fld ft0, 440(s0)
-    li t0, 1
+    # t971 = t969 + 2
+    fld ft0, 496(s0)
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 456(s0)
-    # t928 = heap[t927]
-    fld ft0, 456(s0)
+    fsd ft2, 512(s0)
+    # t972 = heap[t971]
+    fld ft0, 512(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 464(s0)
-    # stack[t923] = t928
-    fld ft1, 464(s0)
-    fld ft0, 424(s0)
+    fsd ft2, 520(s0)
+    # stack[t967] = t972
+    fld ft1, 520(s0)
+    fld ft0, 480(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
@@ -10771,21 +11035,21 @@ L174:
 L160:
     # L157:
 L157:
-    # t929 = P + 2
+    # t973 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 472(s0)
-    # t930 = stack[t929]
-    fld ft0, 472(s0)
+    fsd ft2, 528(s0)
+    # t974 = stack[t973]
+    fld ft0, 528(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 480(s0)
-    # if t930 goto L156
-    fld ft0, 480(s0)
+    fsd ft2, 536(s0)
+    # if t974 goto L156
+    fld ft0, 536(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r155
     j L156
@@ -10796,28 +11060,28 @@ F_ListaDoble_ordenar_fin:
     mv sp, s0
     lw ra, 0(sp)
     lw s0, 4(sp)
-    addi sp, sp, 496
+    addi sp, sp, 544
     ret
 
 F_ListaDoble_imprimirAdelante:
-    addi sp, sp, -320
+    addi sp, sp, -336
     sw ra, 0(sp)
     sw s0, 4(sp)
     mv s0, sp
     addi t0, s0, 8
-    li t1, 39
+    li t1, 41
 _r156:
     fsd fs0, 0(t0)
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r156
-    # t931 = P + 2
+    # t975 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # stack[t931] = 8942
+    # stack[t975] = 8942
     li t0, 8942
     fcvt.d.w ft1, t0
     fld ft0, 8(s0)
@@ -10825,34 +11089,40 @@ _r156:
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t932 = P + 3
+    # t976 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 16(s0)
-    # t933 = P + 1
+    # t977 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 24(s0)
-    # t934 = stack[t933]
+    # t978 = stack[t977]
     fld ft0, 24(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 32(s0)
-    # t935 = heap[t934]
+    # t979 = t978 + 1
     fld ft0, 32(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 40(s0)
+    # t980 = heap[t979]
+    fld ft0, 40(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 40(s0)
-    # stack[t932] = t935
-    fld ft1, 40(s0)
+    fsd ft2, 48(s0)
+    # stack[t976] = t980
+    fld ft1, 48(s0)
     fld ft0, 16(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
@@ -10860,73 +11130,73 @@ _r156:
     fsd ft1, 0(t0)
     # L175:
 L175:
-    # t936 = P + 3
+    # t981 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 48(s0)
-    # t937 = stack[t936]
-    fld ft0, 48(s0)
+    fsd ft2, 56(s0)
+    # t982 = stack[t981]
+    fld ft0, 56(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 56(s0)
-    # t938 = t937 != 0
-    fld ft0, 56(s0)
+    fsd ft2, 64(s0)
+    # t983 = t982 != 0
+    fld ft0, 64(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 64(s0)
-    # if_false t938 goto L176
-    fld ft0, 64(s0)
+    fsd ft2, 72(s0)
+    # if_false t983 goto L176
+    fld ft0, 72(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r157
     j L176
 _r157:
-    # t939 = P + 2
-    fcvt.d.w ft0, s10
-    li t0, 2
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 72(s0)
-    # t940 = P + 2
+    # t984 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 80(s0)
-    # t941 = stack[t940]
-    fld ft0, 80(s0)
+    # t985 = P + 2
+    fcvt.d.w ft0, s10
+    li t0, 2
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 88(s0)
+    # t986 = stack[t985]
+    fld ft0, 88(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 88(s0)
-    # t942 = P + 3
+    fsd ft2, 96(s0)
+    # t987 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 96(s0)
-    # t943 = stack[t942]
-    fld ft0, 96(s0)
+    fsd ft2, 104(s0)
+    # t988 = stack[t987]
+    fld ft0, 104(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 104(s0)
-    # t944 = t943 != 0
-    fld ft0, 104(s0)
+    fsd ft2, 112(s0)
+    # t989 = t988 != 0
+    fld ft0, 112(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 112(s0)
-    # if t944 goto L177
-    fld ft0, 112(s0)
+    fsd ft2, 120(s0)
+    # if t989 goto L177
+    fld ft0, 120(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r158
     j L177
@@ -10938,15 +11208,21 @@ _r158:
     j _error_ejecucion
     # L177:
 L177:
-    # t945 = heap[t943]
-    fld ft0, 104(s0)
+    # t990 = t988 + 1
+    fld ft0, 112(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 128(s0)
+    # t991 = heap[t990]
+    fld ft0, 128(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 120(s0)
-    # t946 = a_cadena t945  (entero)
-    fld ft0, 120(s0)
+    fsd ft2, 136(s0)
+    # t992 = a_cadena t991  (entero)
+    fld ft0, 136(s0)
     mv s4, s11
     li s3, 1
     fmv.d fa0, ft0
@@ -10955,44 +11231,44 @@ L177:
     jal ra, _emitir_car
     li s3, 0
     fcvt.d.w ft2, s4
-    fsd ft2, 128(s0)
-    # t947 = concatenar t941, t946
-    fld ft0, 88(s0)
+    fsd ft2, 144(s0)
+    # t993 = concatenar t986, t992
+    fld ft0, 96(s0)
     fcvt.w.d a1, ft0, rtz
-    fld ft1, 128(s0)
+    fld ft1, 144(s0)
     fcvt.w.d a2, ft1, rtz
     jal ra, _concatenar
     fcvt.d.w ft2, a0
-    fsd ft2, 136(s0)
-    # stack[t939] = t947
-    fld ft1, 136(s0)
-    fld ft0, 72(s0)
+    fsd ft2, 152(s0)
+    # stack[t984] = t993
+    fld ft1, 152(s0)
+    fld ft0, 80(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t948 = P + 3
+    # t994 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 144(s0)
-    # t949 = stack[t948]
-    fld ft0, 144(s0)
+    fsd ft2, 160(s0)
+    # t995 = stack[t994]
+    fld ft0, 160(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 152(s0)
-    # t950 = t949 != 0
-    fld ft0, 152(s0)
+    fsd ft2, 168(s0)
+    # t996 = t995 != 0
+    fld ft0, 168(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 160(s0)
-    # if t950 goto L180
-    fld ft0, 160(s0)
+    fsd ft2, 176(s0)
+    # if t996 goto L180
+    fld ft0, 176(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r159
     j L180
@@ -11004,63 +11280,63 @@ _r159:
     j _error_ejecucion
     # L180:
 L180:
-    # t951 = t949 + 1
-    fld ft0, 152(s0)
-    li t0, 1
+    # t997 = t995 + 2
+    fld ft0, 168(s0)
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 168(s0)
-    # t952 = heap[t951]
-    fld ft0, 168(s0)
+    fsd ft2, 184(s0)
+    # t998 = heap[t997]
+    fld ft0, 184(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 176(s0)
-    # t953 = t952 != 0
-    fld ft0, 176(s0)
+    fsd ft2, 192(s0)
+    # t999 = t998 != 0
+    fld ft0, 192(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 184(s0)
-    # if_false t953 goto L179
-    fld ft0, 184(s0)
+    fsd ft2, 200(s0)
+    # if_false t999 goto L179
+    fld ft0, 200(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r160
     j L179
 _r160:
-    # t954 = P + 2
+    # t1000 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 192(s0)
-    # t955 = P + 2
+    fsd ft2, 208(s0)
+    # t1001 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 200(s0)
-    # t956 = stack[t955]
-    fld ft0, 200(s0)
+    fsd ft2, 216(s0)
+    # t1002 = stack[t1001]
+    fld ft0, 216(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 208(s0)
-    # t957 = concatenar t956, 9167
-    fld ft0, 208(s0)
+    fsd ft2, 224(s0)
+    # t1003 = concatenar t1002, 9167
+    fld ft0, 224(s0)
     fcvt.w.d a1, ft0, rtz
     li t0, 9167
     fcvt.d.w ft1, t0
     fcvt.w.d a2, ft1, rtz
     jal ra, _concatenar
     fcvt.d.w ft2, a0
-    fsd ft2, 216(s0)
-    # stack[t954] = t957
-    fld ft1, 216(s0)
-    fld ft0, 192(s0)
+    fsd ft2, 232(s0)
+    # stack[t1000] = t1003
+    fld ft1, 232(s0)
+    fld ft0, 208(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
@@ -11071,34 +11347,34 @@ _r160:
 L179:
     # L178:
 L178:
-    # t958 = P + 3
+    # t1004 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 224(s0)
-    # t959 = P + 3
+    fsd ft2, 240(s0)
+    # t1005 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 232(s0)
-    # t960 = stack[t959]
-    fld ft0, 232(s0)
+    fsd ft2, 248(s0)
+    # t1006 = stack[t1005]
+    fld ft0, 248(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 240(s0)
-    # t961 = t960 != 0
-    fld ft0, 240(s0)
+    fsd ft2, 256(s0)
+    # t1007 = t1006 != 0
+    fld ft0, 256(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 248(s0)
-    # if t961 goto L181
-    fld ft0, 248(s0)
+    fsd ft2, 264(s0)
+    # if t1007 goto L181
+    fld ft0, 264(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r161
     j L181
@@ -11110,22 +11386,22 @@ _r161:
     j _error_ejecucion
     # L181:
 L181:
-    # t962 = t960 + 1
-    fld ft0, 240(s0)
-    li t0, 1
+    # t1008 = t1006 + 2
+    fld ft0, 256(s0)
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 256(s0)
-    # t963 = heap[t962]
-    fld ft0, 256(s0)
+    fsd ft2, 272(s0)
+    # t1009 = heap[t1008]
+    fld ft0, 272(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 264(s0)
-    # stack[t958] = t963
-    fld ft1, 264(s0)
-    fld ft0, 224(s0)
+    fsd ft2, 280(s0)
+    # stack[t1004] = t1009
+    fld ft1, 280(s0)
+    fld ft0, 240(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
@@ -11134,56 +11410,56 @@ L181:
     j L175
     # L176:
 L176:
-    # t964 = P + 2
+    # t1010 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 272(s0)
-    # t965 = P + 2
+    fsd ft2, 288(s0)
+    # t1011 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 280(s0)
-    # t966 = stack[t965]
-    fld ft0, 280(s0)
+    fsd ft2, 296(s0)
+    # t1012 = stack[t1011]
+    fld ft0, 296(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 288(s0)
-    # t967 = concatenar t966, 9287
-    fld ft0, 288(s0)
+    fsd ft2, 304(s0)
+    # t1013 = concatenar t1012, 9287
+    fld ft0, 304(s0)
     fcvt.w.d a1, ft0, rtz
     li t0, 9287
     fcvt.d.w ft1, t0
     fcvt.w.d a2, ft1, rtz
     jal ra, _concatenar
     fcvt.d.w ft2, a0
-    fsd ft2, 296(s0)
-    # stack[t964] = t967
-    fld ft1, 296(s0)
-    fld ft0, 272(s0)
+    fsd ft2, 312(s0)
+    # stack[t1010] = t1013
+    fld ft1, 312(s0)
+    fld ft0, 288(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t968 = P + 2
+    # t1014 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 304(s0)
-    # t969 = stack[t968]
-    fld ft0, 304(s0)
+    fsd ft2, 320(s0)
+    # t1015 = stack[t1014]
+    fld ft0, 320(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 312(s0)
-    # print t969  (cadena)
-    fld ft0, 312(s0)
+    fsd ft2, 328(s0)
+    # print t1015  (cadena)
+    fld ft0, 328(s0)
     fcvt.w.d a1, ft0, rtz
     jal ra, _emitir_cadena
     # print_salto
@@ -11193,7 +11469,7 @@ F_ListaDoble_imprimirAdelante_fin:
     mv sp, s0
     lw ra, 0(sp)
     lw s0, 4(sp)
-    addi sp, sp, 320
+    addi sp, sp, 336
     ret
 
 F_ListaDoble_imprimirAtras:
@@ -11202,19 +11478,19 @@ F_ListaDoble_imprimirAtras:
     sw s0, 4(sp)
     mv s0, sp
     addi t0, s0, 8
-    li t1, 40
+    li t1, 41
 _r162:
     fsd fs0, 0(t0)
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r162
-    # t970 = P + 2
+    # t1016 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # stack[t970] = 8942
+    # stack[t1016] = 8942
     li t0, 8942
     fcvt.d.w ft1, t0
     fld ft0, 8(s0)
@@ -11222,39 +11498,39 @@ _r162:
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t971 = P + 3
+    # t1017 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 16(s0)
-    # t972 = P + 1
+    # t1018 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 24(s0)
-    # t973 = stack[t972]
+    # t1019 = stack[t1018]
     fld ft0, 24(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 32(s0)
-    # t974 = t973 + 1
+    # t1020 = t1019 + 2
     fld ft0, 32(s0)
-    li t0, 1
+    li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 40(s0)
-    # t975 = heap[t974]
+    # t1021 = heap[t1020]
     fld ft0, 40(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
     fsd ft2, 48(s0)
-    # stack[t971] = t975
+    # stack[t1017] = t1021
     fld ft1, 48(s0)
     fld ft0, 16(s0)
     fcvt.w.d t0, ft0, rtz
@@ -11263,72 +11539,72 @@ _r162:
     fsd ft1, 0(t0)
     # L182:
 L182:
-    # t976 = P + 3
+    # t1022 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 56(s0)
-    # t977 = stack[t976]
+    # t1023 = stack[t1022]
     fld ft0, 56(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 64(s0)
-    # t978 = t977 != 0
+    # t1024 = t1023 != 0
     fld ft0, 64(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
     fsd ft2, 72(s0)
-    # if_false t978 goto L183
+    # if_false t1024 goto L183
     fld ft0, 72(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r163
     j L183
 _r163:
-    # t979 = P + 2
+    # t1025 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 80(s0)
-    # t980 = P + 2
+    # t1026 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 88(s0)
-    # t981 = stack[t980]
+    # t1027 = stack[t1026]
     fld ft0, 88(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 96(s0)
-    # t982 = P + 3
+    # t1028 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 104(s0)
-    # t983 = stack[t982]
+    # t1029 = stack[t1028]
     fld ft0, 104(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 112(s0)
-    # t984 = t983 != 0
+    # t1030 = t1029 != 0
     fld ft0, 112(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
     fsd ft2, 120(s0)
-    # if t984 goto L184
+    # if t1030 goto L184
     fld ft0, 120(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r164
@@ -11341,15 +11617,21 @@ _r164:
     j _error_ejecucion
     # L184:
 L184:
-    # t985 = heap[t983]
+    # t1031 = t1029 + 1
     fld ft0, 112(s0)
+    li t0, 1
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 128(s0)
+    # t1032 = heap[t1031]
+    fld ft0, 128(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 128(s0)
-    # t986 = a_cadena t985  (entero)
-    fld ft0, 128(s0)
+    fsd ft2, 136(s0)
+    # t1033 = a_cadena t1032  (entero)
+    fld ft0, 136(s0)
     mv s4, s11
     li s3, 1
     fmv.d fa0, ft0
@@ -11358,44 +11640,44 @@ L184:
     jal ra, _emitir_car
     li s3, 0
     fcvt.d.w ft2, s4
-    fsd ft2, 136(s0)
-    # t987 = concatenar t981, t986
+    fsd ft2, 144(s0)
+    # t1034 = concatenar t1027, t1033
     fld ft0, 96(s0)
     fcvt.w.d a1, ft0, rtz
-    fld ft1, 136(s0)
+    fld ft1, 144(s0)
     fcvt.w.d a2, ft1, rtz
     jal ra, _concatenar
     fcvt.d.w ft2, a0
-    fsd ft2, 144(s0)
-    # stack[t979] = t987
-    fld ft1, 144(s0)
+    fsd ft2, 152(s0)
+    # stack[t1025] = t1034
+    fld ft1, 152(s0)
     fld ft0, 80(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t988 = P + 3
+    # t1035 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 152(s0)
-    # t989 = stack[t988]
-    fld ft0, 152(s0)
+    fsd ft2, 160(s0)
+    # t1036 = stack[t1035]
+    fld ft0, 160(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 160(s0)
-    # t990 = t989 != 0
-    fld ft0, 160(s0)
+    fsd ft2, 168(s0)
+    # t1037 = t1036 != 0
+    fld ft0, 168(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 168(s0)
-    # if t990 goto L187
-    fld ft0, 168(s0)
+    fsd ft2, 176(s0)
+    # if t1037 goto L187
+    fld ft0, 176(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r165
     j L187
@@ -11407,63 +11689,63 @@ _r165:
     j _error_ejecucion
     # L187:
 L187:
-    # t991 = t989 + 2
-    fld ft0, 160(s0)
-    li t0, 2
+    # t1038 = t1036 + 3
+    fld ft0, 168(s0)
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 176(s0)
-    # t992 = heap[t991]
-    fld ft0, 176(s0)
+    fsd ft2, 184(s0)
+    # t1039 = heap[t1038]
+    fld ft0, 184(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 184(s0)
-    # t993 = t992 != 0
-    fld ft0, 184(s0)
+    fsd ft2, 192(s0)
+    # t1040 = t1039 != 0
+    fld ft0, 192(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 192(s0)
-    # if_false t993 goto L186
-    fld ft0, 192(s0)
+    fsd ft2, 200(s0)
+    # if_false t1040 goto L186
+    fld ft0, 200(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r166
     j L186
 _r166:
-    # t994 = P + 2
-    fcvt.d.w ft0, s10
-    li t0, 2
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 200(s0)
-    # t995 = P + 2
+    # t1041 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 208(s0)
-    # t996 = stack[t995]
-    fld ft0, 208(s0)
+    # t1042 = P + 2
+    fcvt.d.w ft0, s10
+    li t0, 2
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 216(s0)
+    # t1043 = stack[t1042]
+    fld ft0, 216(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 216(s0)
-    # t997 = concatenar t996, 9167
-    fld ft0, 216(s0)
+    fsd ft2, 224(s0)
+    # t1044 = concatenar t1043, 9167
+    fld ft0, 224(s0)
     fcvt.w.d a1, ft0, rtz
     li t0, 9167
     fcvt.d.w ft1, t0
     fcvt.w.d a2, ft1, rtz
     jal ra, _concatenar
     fcvt.d.w ft2, a0
-    fsd ft2, 224(s0)
-    # stack[t994] = t997
-    fld ft1, 224(s0)
-    fld ft0, 200(s0)
+    fsd ft2, 232(s0)
+    # stack[t1041] = t1044
+    fld ft1, 232(s0)
+    fld ft0, 208(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
@@ -11474,34 +11756,34 @@ _r166:
 L186:
     # L185:
 L185:
-    # t998 = P + 3
-    fcvt.d.w ft0, s10
-    li t0, 3
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 232(s0)
-    # t999 = P + 3
+    # t1045 = P + 3
     fcvt.d.w ft0, s10
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 240(s0)
-    # t1000 = stack[t999]
-    fld ft0, 240(s0)
+    # t1046 = P + 3
+    fcvt.d.w ft0, s10
+    li t0, 3
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 248(s0)
+    # t1047 = stack[t1046]
+    fld ft0, 248(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 248(s0)
-    # t1001 = t1000 != 0
-    fld ft0, 248(s0)
+    fsd ft2, 256(s0)
+    # t1048 = t1047 != 0
+    fld ft0, 256(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     xori t0, t0, 1
     fcvt.d.w ft2, t0
-    fsd ft2, 256(s0)
-    # if t1001 goto L188
-    fld ft0, 256(s0)
+    fsd ft2, 264(s0)
+    # if t1048 goto L188
+    fld ft0, 264(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r167
     j L188
@@ -11513,22 +11795,22 @@ _r167:
     j _error_ejecucion
     # L188:
 L188:
-    # t1002 = t1000 + 2
-    fld ft0, 248(s0)
-    li t0, 2
+    # t1049 = t1047 + 3
+    fld ft0, 256(s0)
+    li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 264(s0)
-    # t1003 = heap[t1002]
-    fld ft0, 264(s0)
+    fsd ft2, 272(s0)
+    # t1050 = heap[t1049]
+    fld ft0, 272(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s1
     fld ft2, 0(t0)
-    fsd ft2, 272(s0)
-    # stack[t998] = t1003
-    fld ft1, 272(s0)
-    fld ft0, 232(s0)
+    fsd ft2, 280(s0)
+    # stack[t1045] = t1050
+    fld ft1, 280(s0)
+    fld ft0, 240(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
@@ -11537,56 +11819,56 @@ L188:
     j L182
     # L183:
 L183:
-    # t1004 = P + 2
-    fcvt.d.w ft0, s10
-    li t0, 2
-    fcvt.d.w ft1, t0
-    fadd.d ft2, ft0, ft1
-    fsd ft2, 280(s0)
-    # t1005 = P + 2
+    # t1051 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 288(s0)
-    # t1006 = stack[t1005]
-    fld ft0, 288(s0)
+    # t1052 = P + 2
+    fcvt.d.w ft0, s10
+    li t0, 2
+    fcvt.d.w ft1, t0
+    fadd.d ft2, ft0, ft1
+    fsd ft2, 296(s0)
+    # t1053 = stack[t1052]
+    fld ft0, 296(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 296(s0)
-    # t1007 = concatenar t1006, 9287
-    fld ft0, 296(s0)
+    fsd ft2, 304(s0)
+    # t1054 = concatenar t1053, 9287
+    fld ft0, 304(s0)
     fcvt.w.d a1, ft0, rtz
     li t0, 9287
     fcvt.d.w ft1, t0
     fcvt.w.d a2, ft1, rtz
     jal ra, _concatenar
     fcvt.d.w ft2, a0
-    fsd ft2, 304(s0)
-    # stack[t1004] = t1007
-    fld ft1, 304(s0)
-    fld ft0, 280(s0)
+    fsd ft2, 312(s0)
+    # stack[t1051] = t1054
+    fld ft1, 312(s0)
+    fld ft0, 288(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t1008 = P + 2
+    # t1055 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
-    fsd ft2, 312(s0)
-    # t1009 = stack[t1008]
-    fld ft0, 312(s0)
+    fsd ft2, 320(s0)
+    # t1056 = stack[t1055]
+    fld ft0, 320(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
-    fsd ft2, 320(s0)
-    # print t1009  (cadena)
-    fld ft0, 320(s0)
+    fsd ft2, 328(s0)
+    # print t1056  (cadena)
+    fld ft0, 328(s0)
     fcvt.w.d a1, ft0, rtz
     jal ra, _emitir_cadena
     # print_salto
@@ -11611,86 +11893,86 @@ _r168:
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r168
-    # t1010 = P + 1
+    # t1057 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # t1011 = stack[t1010]
+    # t1058 = stack[t1057]
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 16(s0)
-    # t1012 = stack[t1011]
+    # t1059 = stack[t1058]
     fld ft0, 16(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 24(s0)
-    # t1013 = t1012 + 1
+    # t1060 = t1059 + 1
     fld ft0, 24(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 32(s0)
-    # stack[t1011] = t1013
+    # stack[t1058] = t1060
     fld ft1, 32(s0)
     fld ft0, 16(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fsd ft1, 0(t0)
-    # t1014 = P + 2
+    # t1061 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 40(s0)
-    # t1015 = stack[t1014]
+    # t1062 = stack[t1061]
     fld ft0, 40(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 48(s0)
-    # t1016 = t1015 == 1
+    # t1063 = t1062 == 1
     fld ft0, 48(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     feq.d t0, ft0, ft1
     fcvt.d.w ft2, t0
     fsd ft2, 56(s0)
-    # if t1016 goto L190
+    # if t1063 goto L190
     fld ft0, 56(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r169
     j L190
 _r169:
-    # t1017 = t1015 == 2
+    # t1064 = t1062 == 2
     fld ft0, 48(s0)
     li t0, 2
     fcvt.d.w ft1, t0
     feq.d t0, ft0, ft1
     fcvt.d.w ft2, t0
     fsd ft2, 64(s0)
-    # if t1017 goto L191
+    # if t1064 goto L191
     fld ft0, 64(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r170
     j L191
 _r170:
-    # t1018 = t1015 == 3
+    # t1065 = t1062 == 3
     fld ft0, 48(s0)
     li t0, 3
     fcvt.d.w ft1, t0
     feq.d t0, ft0, ft1
     fcvt.d.w ft2, t0
     fsd ft2, 72(s0)
-    # if t1018 goto L192
+    # if t1065 goto L192
     fld ft0, 72(s0)
     feq.d t0, ft0, fs0
     bnez t0, _r171
@@ -11700,39 +11982,39 @@ _r171:
     j L193
     # L190:
 L190:
-    # t1019 = P + 1
+    # t1066 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 80(s0)
-    # t1020 = stack[t1019]
+    # t1067 = stack[t1066]
     fld ft0, 80(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 88(s0)
-    # t1021 = t1020 + 1
+    # t1068 = t1067 + 1
     fld ft0, 88(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 96(s0)
-    # t1022 = stack[t1021]
+    # t1069 = stack[t1068]
     fld ft0, 96(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 104(s0)
-    # t1023 = t1022 + 1
+    # t1070 = t1069 + 1
     fld ft0, 104(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 112(s0)
-    # stack[t1021] = t1023
+    # stack[t1068] = t1070
     fld ft1, 112(s0)
     fld ft0, 96(s0)
     fcvt.w.d t0, ft0, rtz
@@ -11743,39 +12025,39 @@ L190:
     j L189
     # L191:
 L191:
-    # t1024 = P + 1
+    # t1071 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 120(s0)
-    # t1025 = stack[t1024]
+    # t1072 = stack[t1071]
     fld ft0, 120(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 128(s0)
-    # t1026 = t1025 + 2
+    # t1073 = t1072 + 2
     fld ft0, 128(s0)
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 136(s0)
-    # t1027 = stack[t1026]
+    # t1074 = stack[t1073]
     fld ft0, 136(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 144(s0)
-    # t1028 = t1027 + 1
+    # t1075 = t1074 + 1
     fld ft0, 144(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 152(s0)
-    # stack[t1026] = t1028
+    # stack[t1073] = t1075
     fld ft1, 152(s0)
     fld ft0, 136(s0)
     fcvt.w.d t0, ft0, rtz
@@ -11786,39 +12068,39 @@ L191:
     j L189
     # L192:
 L192:
-    # t1029 = P + 1
+    # t1076 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 160(s0)
-    # t1030 = stack[t1029]
+    # t1077 = stack[t1076]
     fld ft0, 160(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 168(s0)
-    # t1031 = t1030 + 3
+    # t1078 = t1077 + 3
     fld ft0, 168(s0)
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 176(s0)
-    # t1032 = stack[t1031]
+    # t1079 = stack[t1078]
     fld ft0, 176(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 184(s0)
-    # t1033 = t1032 + 1
+    # t1080 = t1079 + 1
     fld ft0, 184(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 192(s0)
-    # stack[t1031] = t1033
+    # stack[t1078] = t1080
     fld ft1, 192(s0)
     fld ft0, 176(s0)
     fcvt.w.d t0, ft0, rtz
@@ -11860,33 +12142,33 @@ _r172:
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r172
-    # t1034 = P + 1
+    # t1081 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # t1035 = stack[t1034]
+    # t1082 = stack[t1081]
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 16(s0)
-    # t1036 = P + 1
+    # t1083 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 24(s0)
-    # t1037 = stack[t1036]
+    # t1084 = stack[t1083]
     fld ft0, 24(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 32(s0)
-    # t1038 = t1037 div 2
+    # t1085 = t1084 div 2
     fld ft0, 32(s0)
     li t0, 2
     fcvt.d.w ft1, t0
@@ -11899,24 +12181,24 @@ _r173:
     div t1, t1, t2
     fcvt.d.w ft2, t1
     fsd ft2, 40(s0)
-    # t1039 = t1038 * 2
+    # t1086 = t1085 * 2
     fld ft0, 40(s0)
     li t0, 2
     fcvt.d.w ft1, t0
     fmul.d ft2, ft0, ft1
     fsd ft2, 48(s0)
-    # t1040 = t1035 - t1039
+    # t1087 = t1082 - t1086
     fld ft0, 16(s0)
     fld ft1, 48(s0)
     fsub.d ft2, ft0, ft1
     fsd ft2, 56(s0)
-    # t1041 = t1040 == 0
+    # t1088 = t1087 == 0
     fld ft0, 56(s0)
     fmv.d ft1, fs0
     feq.d t0, ft0, ft1
     fcvt.d.w ft2, t0
     fsd ft2, 64(s0)
-    # stack[P] = t1041
+    # stack[P] = t1088
     fld ft1, 64(s0)
     slli t0, s10, 3
     add t0, t0, s2
@@ -11942,32 +12224,32 @@ _r174:
     addi t0, t0, 8
     addi t1, t1, -1
     bnez t1, _r174
-    # t1042 = P + 1
+    # t1089 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # t1043 = stack[t1042]
+    # t1090 = stack[t1089]
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 16(s0)
-    # t1044 = P + 2
+    # t1091 = P + 2
     fcvt.d.w ft0, s10
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 24(s0)
-    # t1045 = t1044 + 1
+    # t1092 = t1091 + 1
     fld ft0, 24(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 32(s0)
-    # stack[t1045] = t1043
+    # stack[t1092] = t1090
     fld ft1, 16(s0)
     fld ft0, 32(s0)
     fcvt.w.d t0, ft0, rtz
@@ -11978,21 +12260,21 @@ _r174:
     addi s10, s10, 2
     # call esPar
     jal ra, F_esPar
-    # t1046 = stack[P]
+    # t1093 = stack[P]
     slli t0, s10, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 40(s0)
     # P = P - 2
     addi s10, s10, -2
-    # t1047 = t1046 == 1
+    # t1094 = t1093 == 1
     fld ft0, 40(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     feq.d t0, ft0, ft1
     fcvt.d.w ft2, t0
     fsd ft2, 48(s0)
-    # if_false t1047 goto L195
+    # if_false t1094 goto L195
     fld ft0, 48(s0)
     feq.d t0, ft0, fs0
     beqz t0, _r175
@@ -12047,27 +12329,27 @@ _r176:
     # print_salto
     li a0, 10
     jal ra, _emitir_car
-    # t1048 = P + 1
+    # t1095 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 8(s0)
-    # t1049 = stack[t1048]
+    # t1096 = stack[t1095]
     fld ft0, 8(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 16(s0)
-    # t1050 = stack[t1049]
+    # t1097 = stack[t1096]
     fld ft0, 16(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 24(s0)
-    # t1051 = a_cadena t1050  (entero)
+    # t1098 = a_cadena t1097  (entero)
     fld ft0, 24(s0)
     mv s4, s11
     li s3, 1
@@ -12078,7 +12360,7 @@ _r176:
     li s3, 0
     fcvt.d.w ft2, s4
     fsd ft2, 32(s0)
-    # t1052 = concatenar 9700, t1051
+    # t1099 = concatenar 9700, t1098
     li t0, 9700
     fcvt.d.w ft0, t0
     fcvt.w.d a1, ft0, rtz
@@ -12087,40 +12369,40 @@ _r176:
     jal ra, _concatenar
     fcvt.d.w ft2, a0
     fsd ft2, 40(s0)
-    # print t1052  (cadena)
+    # print t1099  (cadena)
     fld ft0, 40(s0)
     fcvt.w.d a1, ft0, rtz
     jal ra, _emitir_cadena
     # print_salto
     li a0, 10
     jal ra, _emitir_car
-    # t1053 = P + 1
+    # t1100 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 48(s0)
-    # t1054 = stack[t1053]
+    # t1101 = stack[t1100]
     fld ft0, 48(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 56(s0)
-    # t1055 = t1054 + 1
+    # t1102 = t1101 + 1
     fld ft0, 56(s0)
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 64(s0)
-    # t1056 = stack[t1055]
+    # t1103 = stack[t1102]
     fld ft0, 64(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 72(s0)
-    # t1057 = a_cadena t1056  (entero)
+    # t1104 = a_cadena t1103  (entero)
     fld ft0, 72(s0)
     mv s4, s11
     li s3, 1
@@ -12131,7 +12413,7 @@ _r176:
     li s3, 0
     fcvt.d.w ft2, s4
     fsd ft2, 80(s0)
-    # t1058 = concatenar 9722, t1057
+    # t1105 = concatenar 9722, t1104
     li t0, 9722
     fcvt.d.w ft0, t0
     fcvt.w.d a1, ft0, rtz
@@ -12140,40 +12422,40 @@ _r176:
     jal ra, _concatenar
     fcvt.d.w ft2, a0
     fsd ft2, 88(s0)
-    # print t1058  (cadena)
+    # print t1105  (cadena)
     fld ft0, 88(s0)
     fcvt.w.d a1, ft0, rtz
     jal ra, _emitir_cadena
     # print_salto
     li a0, 10
     jal ra, _emitir_car
-    # t1059 = P + 1
+    # t1106 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 96(s0)
-    # t1060 = stack[t1059]
+    # t1107 = stack[t1106]
     fld ft0, 96(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 104(s0)
-    # t1061 = t1060 + 2
+    # t1108 = t1107 + 2
     fld ft0, 104(s0)
     li t0, 2
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 112(s0)
-    # t1062 = stack[t1061]
+    # t1109 = stack[t1108]
     fld ft0, 112(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 120(s0)
-    # t1063 = a_cadena t1062  (entero)
+    # t1110 = a_cadena t1109  (entero)
     fld ft0, 120(s0)
     mv s4, s11
     li s3, 1
@@ -12184,7 +12466,7 @@ _r176:
     li s3, 0
     fcvt.d.w ft2, s4
     fsd ft2, 128(s0)
-    # t1064 = concatenar 9736, t1063
+    # t1111 = concatenar 9736, t1110
     li t0, 9736
     fcvt.d.w ft0, t0
     fcvt.w.d a1, ft0, rtz
@@ -12193,40 +12475,40 @@ _r176:
     jal ra, _concatenar
     fcvt.d.w ft2, a0
     fsd ft2, 136(s0)
-    # print t1064  (cadena)
+    # print t1111  (cadena)
     fld ft0, 136(s0)
     fcvt.w.d a1, ft0, rtz
     jal ra, _emitir_cadena
     # print_salto
     li a0, 10
     jal ra, _emitir_car
-    # t1065 = P + 1
+    # t1112 = P + 1
     fcvt.d.w ft0, s10
     li t0, 1
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 144(s0)
-    # t1066 = stack[t1065]
+    # t1113 = stack[t1112]
     fld ft0, 144(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 152(s0)
-    # t1067 = t1066 + 3
+    # t1114 = t1113 + 3
     fld ft0, 152(s0)
     li t0, 3
     fcvt.d.w ft1, t0
     fadd.d ft2, ft0, ft1
     fsd ft2, 160(s0)
-    # t1068 = stack[t1067]
+    # t1115 = stack[t1114]
     fld ft0, 160(s0)
     fcvt.w.d t0, ft0, rtz
     slli t0, t0, 3
     add t0, t0, s2
     fld ft2, 0(t0)
     fsd ft2, 168(s0)
-    # t1069 = a_cadena t1068  (entero)
+    # t1116 = a_cadena t1115  (entero)
     fld ft0, 168(s0)
     mv s4, s11
     li s3, 1
@@ -12237,7 +12519,7 @@ _r176:
     li s3, 0
     fcvt.d.w ft2, s4
     fsd ft2, 176(s0)
-    # t1070 = concatenar 9752, t1069
+    # t1117 = concatenar 9752, t1116
     li t0, 9752
     fcvt.d.w ft0, t0
     fcvt.w.d a1, ft0, rtz
@@ -12246,7 +12528,7 @@ _r176:
     jal ra, _concatenar
     fcvt.d.w ft2, a0
     fsd ft2, 184(s0)
-    # print t1070  (cadena)
+    # print t1117  (cadena)
     fld ft0, 184(s0)
     fcvt.w.d a1, ft0, rtz
     jal ra, _emitir_cadena
