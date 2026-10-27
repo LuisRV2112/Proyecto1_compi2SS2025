@@ -177,10 +177,13 @@ Errores (en morado), con archivo y línea:
 - usar un objeto `null` (`.atributo`, `.metodo()` o un índice);
 - división entre cero.
 
-> **Para ejecutar, la pestaña activa tiene que ser el `.pig`.** Solo un `.pig` tiene programa
-> principal (`MAIOR>`); un `.y` o un `.z` solo define funciones, estructuras o clases, y al
-> ejecutarlo la consola avisa que no hay nada que ejecutar. Si el programa tiene errores,
-> tampoco se ejecuta: la consola lo dice y queda seleccionada la pestaña **Errores**.
+> **Se ejecuta siempre un `.pig`.** Solo un `.pig` tiene programa principal (`MAIOR>`); un `.y`
+> o un `.z` solo define funciones, estructuras o clases. Si se genera o se ejecuta (F6, F7 o el
+> menú Proyecto 1) con un `.y` o un `.z` en la pestaña activa, se usa el `.pig` de la carpeta de
+> trabajo que lo importa; si lo importan varios, se pregunta cuál, y si no lo importa ninguno, la
+> consola avisa que no hay nada que ejecutar. **Analizar (F5)** sí revisa el archivo activo tal
+> cual. Si el programa tiene errores, no se ejecuta: la consola lo dice y queda seleccionada la
+> pestaña **Errores**.
 
 ### 4.5 Proyecto 1: intérprete y C
 

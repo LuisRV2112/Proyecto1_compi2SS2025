@@ -470,6 +470,41 @@ public class VentanaPrincipal extends JFrame {
         System.exit(0);
     }
 
+    /**
+     * Para generar o ejecutar hace falta un programa principal, y solo un .pig lo tiene. Desde un .y o un .z
+     * se usa el .pig de la carpeta de trabajo que lo importa; si hay varios, se pregunta. Devuelve el mismo
+     * archivo si no hay ninguno (la consola lo explica), o null si se cancelo la eleccion.
+     */
+    private Path programaPara(Path activo) {
+        if (activo.getFileName().toString().endsWith(".pig")) {
+            return activo;
+        }
+        Path absoluto = activo.toAbsolutePath();
+        Path raiz = arbol.getRaiz();
+        Path base = raiz != null && absoluto.startsWith(raiz.toAbsolutePath()) ? raiz
+                : absoluto.getParent().getParent() != null ? absoluto.getParent().getParent() : absoluto.getParent();
+        List<Path> programas;
+        try {
+            programas = Compilador.programasQueImportan(activo, base);
+        } catch (IOException e) {
+            return activo;
+        }
+        if (programas.isEmpty()) {
+            return activo;
+        }
+        if (programas.size() == 1) {
+            return programas.get(0);
+        }
+        String[] opciones = programas.stream().map(p -> base.relativize(p.toAbsolutePath()).toString()).toArray(String[]::new);
+        Object eleccion = JOptionPane.showInputDialog(this,
+                activo.getFileName() + " no tiene programa principal. Lo importan varios .pig; ¿cual ejecuto?",
+                "Elegir programa", JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[0]);
+        if (eleccion == null) {
+            return null;
+        }
+        return programas.get(java.util.Arrays.asList(opciones).indexOf(eleccion));
+    }
+
     private void compilar(Accion accion) {
         if (trabajando) {
             return;
@@ -482,9 +517,14 @@ public class VentanaPrincipal extends JFrame {
         if (!guardarTodo()) {
             return;
         }
-        Path archivo = activa.get().getArchivo();
+        Path activo = activa.get().getArchivo();
+        Path archivo = accion == Accion.ANALIZAR ? activo : programaPara(activo);
+        if (archivo == null) {
+            return;
+        }
         trabajando = true;
-        estado(" Compilando " + archivo.getFileName() + "...");
+        estado(archivo.equals(activo) ? " Compilando " + archivo.getFileName() + "..."
+                : " Compilando " + archivo.getFileName() + ", que importa " + activo.getFileName() + "...");
 
         new SwingWorker<Compilacion, Void>() {
             @Override
@@ -519,8 +559,9 @@ public class VentanaPrincipal extends JFrame {
                             + " error(es). Corregilos (ver la pestana Errores) y volve a ejecutar.");
                 } else if (ejecutar && ultima.resultado().principal() == null) {
                     consola.mostrar("No hay nada que ejecutar: " + ultima.archivo().getFileName()
-                            + " no tiene programa principal.\n\nSolo un .pig tiene MAIOR>. Abri el .pig que importa "
-                            + "este archivo, dejalo en la pestana activa y ejecuta desde ahi.");
+                            + " no tiene programa principal.\n\nSolo un .pig tiene MAIOR>, y ningun .pig de la carpeta "
+                            + "de trabajo importa este archivo. Crea uno que lo importe, o abri el .pig correcto y "
+                            + "ejecuta desde ahi.");
                     inferior.setSelectedComponent(consola);
                     estado(" Nada que ejecutar: el programa principal esta en un .pig");
                 } else if (ultima.exitosa()) {

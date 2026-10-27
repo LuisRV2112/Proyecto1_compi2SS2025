@@ -143,6 +143,48 @@ public class Compilador {
         return lista;
     }
 
+    /**
+     * Los .pig debajo de {@code base} que importan {@code archivo}, el más cercano primero. Sirve para
+     * ejecutar desde un .y o un .z, que no tienen programa principal. Un .pig que no parsea se ignora.
+     */
+    public static List<Path> programasQueImportan(Path archivo, Path base) throws IOException {
+        Path buscado = archivo.toRealPath();
+        Path carpeta = buscado.getParent();
+        List<Path> programas;
+        try (var recorrido = Files.walk(base, 8)) {
+            programas = recorrido
+                    .filter(p -> p.getFileName().toString().endsWith(".pig"))
+                    .filter(Files::isRegularFile)
+                    .sorted()
+                    .toList();
+        }
+        List<Path> encontrados = new ArrayList<>();
+        for (Path programa : programas) {
+            Programa ast = new Compilador().analizar(programa);
+            if (ast == null) {
+                continue;
+            }
+            for (Path importado : ResolvedorImports.rutasImportadas(programa, ast)) {
+                if (importado.toRealPath().equals(buscado)) {
+                    encontrados.add(programa);
+                    break;
+                }
+            }
+        }
+        encontrados.sort(java.util.Comparator.comparingInt(p -> distancia(carpeta, p.toAbsolutePath().getParent())));
+        return encontrados;
+    }
+
+    private static int distancia(Path a, Path b) {
+        Path comun = a;
+        while (comun != null && !b.startsWith(comun)) {
+            comun = comun.getParent();
+        }
+        int subida = comun == null ? a.getNameCount() : a.getNameCount() - comun.getNameCount();
+        int bajada = comun == null ? b.getNameCount() : b.getNameCount() - comun.getNameCount();
+        return subida + bajada;
+    }
+
     public ListaCuartetas generarCuartetas(ResultadoSemantico resultado) {
         return new GeneradorCuartetas().generar(resultado);
     }

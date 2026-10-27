@@ -63,7 +63,20 @@ public class ResolvedorImports {
         return modulos;
     }
 
-    private Path buscar(Path base, Importacion importacion) throws IOException {
+    /** Dónde está cada archivo que importa un .pig, sin cargarlo. Los imports que no se encuentran se omiten. */
+    public static List<Path> rutasImportadas(Path rutaPrincipal, Programa principal) throws IOException {
+        Path base = rutaPrincipal.toAbsolutePath().getParent();
+        List<Path> rutas = new ArrayList<>();
+        for (Importacion importacion : principal.getImportaciones()) {
+            Path ruta = buscar(base, importacion);
+            if (ruta != null) {
+                rutas.add(ruta);
+            }
+        }
+        return rutas;
+    }
+
+    private static Path buscar(Path base, Importacion importacion) throws IOException {
         Path relativa = Path.of(importacion.getRutaRelativa());
         List<Path> candidatos = new ArrayList<>();
         candidatos.add(base.resolve(relativa));
