@@ -410,6 +410,24 @@ dobles con escapes `\n \t \" \\`; carácter entre comillas simples; identificado
 | Zetariano | `// ...` | `/* ... */` |
 | PigLatin | `// ...` | `## ... ##` |
 
+Las tablas de palabras y símbolos y las reglas de 4.2 a 4.4 se extrajeron de los `.g4` (sin las
+etiquetas `# ...` ni las acciones), así que coinciden con lo que acepta el compilador.
+
+**Lo que agregó el Proyecto 2:**
+
+| Lenguaje | Palabra o símbolo | Regla | Ejemplo |
+|---|---|---|---|
+| Zetariano | `extends` | `clase` | `public class Perro extends Animal { ... }` |
+| Zetariano | `protected` | `modificador` | `protected int patas;` |
+| Zetariano | `@` `Override` | `anotacion`, antes del modificador de un método | `@Override public void hablar() { ... }` |
+| Zetariano | `super` | `llamadaSuper` (instrucción) y `expr` | `super(nombre);` · `super.hablar();` · `"x" + super.tipo()` |
+| PigLatin | `null` | `literal` | `esto p : null : Persona ;` · `si (p == null) { ... }` |
+| PigLatin | `:` tipo | `declaracionVariable` | `esto a : novus Perro("Fido") : Animal ;` |
+
+`Override` es palabra reservada, con mayúscula, igual que en Java. `null` ya existía en
+Zetariano. Las restricciones de uso (dónde puede ir `super(...)`, a qué tipos se puede asignar
+`null`, qué exige `@Override`) las aplica el semántico; ver la sección 6.
+
 ### 4.1 La indentación de Y?
 
 Y? define los bloques con la indentación, como Python, y ANTLR no la maneja solo.
@@ -518,9 +536,7 @@ instruccion
     | sentenciaPara
     | sentenciaMientras
     | sentenciaHacer
-
     | INDENT instruccion+ DEDENT
-
     ;
 
 instruccionSimple
@@ -566,9 +582,10 @@ ramaContrario
     ;
 
 sentenciaElegir
-    : ELEGIR PAR_A expr PAR_C LLAVE_A NUEVA_LINEA
-      (INDENT caso* casoSiempre? DEDENT)?
-      LLAVE_C NUEVA_LINEA
+    : ELEGIR PAR_A expr PAR_C
+      ( LLAVE_A NUEVA_LINEA (INDENT caso* casoSiempre? DEDENT)? LLAVE_C NUEVA_LINEA
+      | DOSP NUEVA_LINEA (INDENT caso* casoSiempre? DEDENT)?
+      )
     ;
 
 caso
@@ -654,7 +671,7 @@ literal
 
 **Palabras reservadas y marcadores** (sensibles a mayusculas):
 
-`int` `double` `char` `boolean` `String` `void` `public` `private` `class` `new` `this` `null` `true` `false` `if` `else` `switch` `case` `default` `break` `continue` `return` `for` `while` `do` `println` `print` `readln` `%`
+`int` `double` `char` `boolean` `String` `void` `public` `private` `protected` `extends` `super` `Override` `class` `new` `this` `null` `true` `false` `if` `else` `switch` `case` `default` `break` `continue` `return` `for` `while` `do` `println` `print` `readln`
 
 **Simbolos:**
 
@@ -675,6 +692,7 @@ literal
 | `MENOS` | `-` |
 | `POR` | `*` |
 | `DIV` | `/` |
+| `MOD` | `%` |
 | `MENOR` | `<` |
 | `MAYOR` | `>` |
 | `NOT` | `!` |
@@ -690,6 +708,7 @@ literal
 | `COMA` | `,` |
 | `DOSP` | `:` |
 | `PUNTOYCOMA` | `;` |
+| `ARROBA` | `@` |
 
 <details><summary>Reglas sintacticas de Zetariano</summary>
 
@@ -699,18 +718,23 @@ programa
     ;
 
 clase
-    : modificador? CLASS ID LLAVE_A miembro* LLAVE_C
+    : modificador? CLASS ID (EXTENDS ID)? LLAVE_A miembro* LLAVE_C
     ;
 
 modificador
     : PUBLIC
     | PRIVATE
+    | PROTECTED
+    ;
+
+anotacion
+    : ARROBA OVERRIDE
     ;
 
 miembro
     : modificador? ID PAR_A listaParametros? PAR_C bloque
-    | modificador? VOID ID PAR_A listaParametros? PAR_C bloque
-    | modificador? tipo ID restoMiembro
+    | anotacion? modificador? VOID ID PAR_A listaParametros? PAR_C bloque
+    | anotacion? modificador? tipo ID restoMiembro
     ;
 
 restoMiembro
@@ -748,8 +772,8 @@ instruccion
     | declaracionVariable PUNTOYCOMA
     | asignacion PUNTOYCOMA
     | incremento PUNTOYCOMA
-
     | acceso PUNTOYCOMA
+    | llamadaSuper PUNTOYCOMA
     | sentenciaIf
     | sentenciaSwitch
     | sentenciaFor
@@ -778,6 +802,11 @@ asignacion
 incremento
     : acceso (INCREMENTO | DECREMENTO)
     | (INCREMENTO | DECREMENTO) acceso
+    ;
+
+llamadaSuper
+    : SUPER PAR_A listaExpresiones? PAR_C
+    | SUPER PUNTO ID PAR_A listaExpresiones? PAR_C
     ;
 
 sentenciaIf
@@ -832,6 +861,7 @@ expr
     | <assoc=right> expr INTERROGACION expr DOSP expr
     | literal
     | acceso
+    | SUPER PUNTO ID PAR_A listaExpresiones? PAR_C
     | NEW ID PAR_A listaExpresiones? PAR_C
     | NEW tipoBase (CORCH_A expr CORCH_C)+
     | LLAVE_A listaExpresiones? LLAVE_C
@@ -873,7 +903,7 @@ literal
 
 **Palabras reservadas y marcadores** (sensibles a mayusculas):
 
-`VARIABILES>` `MUNERA>` `MAIOR>` `VARIABILES[` `FINIS` `numerus` `decimalis` `textum` `littera` `bool` `import` `esto` `structura` `series` `novus` `finis` `si` `aliter` `dum` `facere` `per` `perge` `interrumpe` `actio` `ratio` `reddere` `verum` `falsus` `non`
+`VARIABILES>` `MUNERA>` `MAIOR>` `VARIABILES[` `FINIS` `numerus` `decimalis` `textum` `littera` `bool` `import` `esto` `structura` `series` `novus` `finis` `si` `aliter` `dum` `facere` `per` `perge` `interrumpe` `actio` `ratio` `reddere` `verum` `falsus` `null` `non`
 
 **Simbolos:**
 
@@ -925,19 +955,16 @@ importacion
 declaracion
     : declaracionVariable
     | declaracionArreglo
-
     | STRUCTURA ID LLAVE_A declaracion* LLAVE_C FINIS PUNTOYCOMA
-
     ;
 
 declaracionVariable
     : ESTO ID DOSP tipoPrimitivo expr? PUNTOYCOMA
-
     | ESTO ID DOSP (VERUM | FALSUS) PUNTOYCOMA
     | ESTO ID DOSP ID listaValores PUNTOYCOMA?
-
     | ESTO ID DOSP ID PUNTOYCOMA
     | ESTO ID DOSP nuevoObjeto PUNTOYCOMA
+    | ESTO ID DOSP expr DOSP tipo PUNTOYCOMA
     ;
 
 declaracionArreglo
@@ -996,7 +1023,6 @@ instruccion
     | declaracionArreglo
     | asignacion
     | incremento PUNTOYCOMA
-
     | acceso PUNTOYCOMA
     | sentenciaSi
     | sentenciaDum
@@ -1006,7 +1032,6 @@ instruccion
     | INTERRUMPE PUNTOYCOMA
     | REDDERE expr? PUNTOYCOMA
     | IMPRIMIR expr (IMPRIMIR expr)* PUNTOYCOMA
-
     | acceso LEER PUNTOYCOMA?
     | LEER PUNTOYCOMA?
     ;
@@ -1103,6 +1128,7 @@ literal
     | LIT_CADENA
     | LIT_CARACTER
     | (VERUM | FALSUS)
+    | NULL
     ;
 ```
 </details>
