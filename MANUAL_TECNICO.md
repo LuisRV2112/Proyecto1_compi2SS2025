@@ -25,7 +25,7 @@ El Proyecto 2 agrega al del Proyecto 1:
 | Maven | 3.9 | Construcción; genera los analizadores y arma un `.jar` ejecutable con todo adentro |
 | ANTLR | 4.13.2 | Genera los lexers y parsers de los tres lenguajes (`antlr4-maven-plugin`) |
 | Swing + FlatLaf | 3.5.4 | Interfaz gráfica con tema oscuro |
-| RSyntaxTextArea | 3.5.4 | Componente de editor (números de línea, subrayado de errores). **No se usa su coloreado**: ver 6.2 |
+| RSyntaxTextArea | 3.5.4 | Componente de editor (números de línea, subrayado de errores). **No se usa su coloreado**: ver 6.3 |
 | RISC-V RV32IMD | ISA | Destino del ensamblador generado: enteros (I), multiplicación (M) y doble precisión (D) |
 | RARS | 1.6 | Simulador de referencia para el `.s`: se usa la convención de `ecall` de RARS (servicio en `a7`) |
 | gcc | C11 | Compila el código C generado (solo para ejecutarlo; el compilador no lo necesita) |
@@ -1138,12 +1138,17 @@ literal
 ## 5. Tabla de compatibilidad de tipos
 
 Se genera a partir de `semantico/Compatibilidad`, la misma clase que usa el analizador, así que
-no puede diferir de lo que el compilador hace. Las reglas son las mismas en los tres lenguajes;
-solo cambian los nombres de los tipos.
+no puede diferir de lo que el compilador hace. Para regenerarla:
+
+```bash
+java -cp target/contacto-3d-1.0.0.jar com.usac.contacto3d.semantico.TablaCompatibilidad
+```
+
+Las reglas son las mismas en los tres lenguajes; solo cambian los nombres de los tipos.
 
 **Jerarquía** (al operar gana la más alta): cadena 5 > flotante 4 > entero 3 > carácter 2 > bool 1.
 Asignar solo puede **ampliar** dentro de la familia numérica (carácter → entero → flotante); bool y
-cadena exigen el mismo tipo. `null` (Zetariano) se puede asignar a objetos, arreglos y cadenas.
+cadena exigen el mismo tipo. Los objetos, la herencia y `null` están en 5.4.
 
 ### 5.1 Y?
 
@@ -1341,6 +1346,50 @@ cadena exigen el mismo tipo. `null` (Zetariano) se puede asignar a objetos, arre
 | **littera** | no (pierde informacion) | no (pierde informacion) | no | si | no |
 | **bool** | no | no | no | no | si |
 
+### 5.4 Objetos, herencia y `null`
+
+Para las clases de Zetariano usadas desde Zetariano o desde PigLatin. Las clases de ejemplo:
+`Perro extends Animal`, `Gato extends Animal` y `Persona`, sin relacion con las otras.
+`int[]` es cualquier arreglo, `String` la cadena del lenguaje (`textum` en PigLatin) e `int`
+cualquier primitivo.
+
+**Asignacion, paso de parametros y retorno** — fila: tipo del destino, columna: tipo del valor
+
+| destino \ valor | **Animal** | **Perro** | **Gato** | **Persona** | **int[]** | **String** | **int** | **null** |
+|---|---|---|---|---|---|---|---|---|
+| **Animal** | si | si | si | no | no | no | no | si |
+| **Perro** | no | si | no | no | no | no | no | si |
+| **Gato** | no | no | si | no | no | no | no | si |
+| **Persona** | no | no | no | si | no | no | no | si |
+| **int[]** | no | no | no | no | si | no | no | si |
+| **String** | no | no | no | no | no | si | no | no |
+| **int** | no | no | no | no | no | no | si | no |
+
+**Igualdad `==` `!=`** — fila: operando izquierdo, columna: operando derecho
+
+| | **Animal** | **Perro** | **Gato** | **Persona** | **int[]** | **String** | **int** | **null** |
+|---|---|---|---|---|---|---|---|---|
+| **Animal** | boolean | boolean | boolean | error | error | error | error | boolean |
+| **Perro** | boolean | boolean | error | error | error | error | error | boolean |
+| **Gato** | boolean | error | boolean | error | error | error | error | boolean |
+| **Persona** | error | error | error | boolean | error | error | error | boolean |
+| **int[]** | error | error | error | error | boolean | error | error | boolean |
+| **String** | error | error | error | error | error | boolean | error | error |
+| **int** | error | error | error | error | error | error | boolean | error |
+| **null** | boolean | boolean | boolean | boolean | boolean | error | error | boolean |
+
+**Otras operaciones con objetos:** `String + Animal` da error y `Animal - Animal` da error. Un objeto solo se usa con `==`, `!=`, `.atributo` y `.metodo()`.
+
+En resumen:
+- Una variable del tipo padre acepta un objeto de cualquier subclase, directa o indirecta. Al
+  revés no: un `Animal` no se puede guardar en un `Perro`.
+- Dos objetos se pueden comparar si uno es de la clase del otro o de una subclase. Dos hermanas
+  (`Perro` y `Gato`) no.
+- `null` se puede asignar y comparar solo con objetos y arreglos; con ningún primitivo, ni
+  siquiera con la cadena.
+- Las mismas reglas valen para los parámetros, el `return` y el tipo de retorno de un método
+  sobrescrito (retorno covariante).
+
 
 ---
 
@@ -1356,11 +1405,60 @@ cadena exigen el mismo tipo. `null` (Zetariano) se puede asignar a objetos, arre
 | Llamadas | cantidad o tipo de argumentos; método o constructor inexistente con esa firma; `{} Estructura` que no recibe una variable |
 | Flujo | función que no retorna en todos los caminos; retorno de tipo incorrecto; código inalcanzable; `romper`/`continuar` fuera de un ciclo |
 | Archivos | import inexistente o de extensión inválida; `.z` que no se llama como su clase |
+| Herencia | clase padre inexistente o que es una estructura; herencia circular (`A extends B`, `B extends A`); atributo que repite el nombre de uno heredado |
+| Visibilidad | acceso a un miembro `private` o sin modificador fuera de su clase; acceso a un `protected` fuera de su clase y sus subclases |
+| `@Override` | método que sobrescribe sin `@Override`; `@Override` sin método que sobrescribir o sobre un atributo; reducir la visibilidad; tipo de retorno que no es el mismo ni una subclase |
+| `super` | `super(...)` fuera de un constructor o que no es su primera instrucción; `super` en una clase sin padre; `super.m()` a un método que el padre no tiene; constructor sin `super(...)` cuando el padre no tiene constructor sin parámetros accesible |
+| `null` | asignar `null` a un primitivo (incluida la cadena); operar, imprimir o comparar `null` con un primitivo |
 
 Un error se reporta **una sola vez**, donde nace: tras un error la expresión vale
 `Tipo.ERROR`, que se acepta en silencio más arriba.
 
-### 6.2 Por qué el coloreado no usa librerías
+### 6.2 Herencia, visibilidad y `super`
+
+**Quién puede usar un miembro** (atributo, método o constructor):
+
+| Modificador | Dentro de su clase | En una subclase | En otra clase o en el `.pig` |
+|---|---|---|---|
+| `public` | sí | sí | sí |
+| `protected` | sí | sí | no |
+| `private` | sí | no | no |
+| (sin modificador) | sí | no | no |
+
+**Sin modificador es `private`.** Así lo confirmó el auxiliar para el Proyecto 2. Los casos de
+calificación del Proyecto 1 leen atributos sin modificador desde fuera de su clase, así que con
+esta regla dan errores de acceso. `verificacion/casos/` tiene una copia con `public` agregado
+(ver `verificacion/README.md`).
+
+**Orden en que el semántico procesa las clases:**
+1. **Enlaza cada clase con su padre** y corta los ciclos, para que una herencia circular dé un
+   solo error y no un ciclo infinito.
+2. **Completa las clases de padre a hijo:** cada una hereda los campos del padre con los mismos
+   offsets (ver 3.3) y después agrega los suyos.
+3. **Valida `@Override`:** un método sobrescribe a otro del padre (o de un ancestro) cuando
+   tiene el mismo nombre y los mismos tipos de parámetros. En los dos sentidos es obligatorio:
+   - el que sobrescribe debe llevar `@Override`;
+   - un `@Override` sin método que sobrescribir es error.
+
+   Además:
+   - el retorno puede ser el mismo tipo o una subclase (covariante);
+   - la visibilidad no puede bajar (`public` → `protected` es error);
+   - los métodos `private` del padre no se heredan, así que un método con el mismo nombre en la
+     hija es un método nuevo, sin `@Override`.
+4. **Arma la vtable** de cada clase (ver 3.3 y la sección 7).
+
+**Constructores:**
+- `super(args)` solo puede ser la primera instrucción de un constructor.
+- Si el constructor de la hija no llama a `super`, se llama al constructor sin parámetros del
+  padre. Si el padre no tiene uno, o no es accesible, es error.
+- Primero corre el constructor del padre y después los inicializadores de los atributos de la
+  hija, así que en `Cachorro extends Perro extends Animal` el orden es `Animal`, `Perro`,
+  `Cachorro`.
+
+**`super.metodo(args)`** llama siempre a la versión del padre, sin pasar por la vtable. Así un
+método sobrescrito puede extender al del padre sin llamarse a sí mismo.
+
+### 6.3 Por qué el coloreado no usa librerías
 
 El enunciado prohíbe librerías para colorear. RSyntaxTextArea solo se usa como componente
 de texto: `ColoreadorBase.getWordsToHighlight()` devuelve un mapa **vacío** a propósito, y el
