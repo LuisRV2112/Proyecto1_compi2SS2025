@@ -75,7 +75,10 @@ guardan automáticamente todos los archivos abiertos.
 Se compila **el archivo de la pestaña activa**:
 
 - un **`.pig`** es un programa completo: se compilan también los `.y` y `.z` que importa;
-- un **`.y`** o **`.z`** se analiza solo (útil para revisar una biblioteca o una clase).
+- un **`.y`** se analiza solo (útil para revisar una biblioteca);
+- un **`.z`** se analiza junto con los demás `.z` de su carpeta, para que una clase pueda usar
+  a las otras (por ejemplo, `Banco.z` usa `Cuenta`). Solo se muestran los errores del `.z` de la
+  pestaña activa; los de las otras clases aparecen al analizar cada una.
 
 **Menú Compilar**, en el orden de uso:
 

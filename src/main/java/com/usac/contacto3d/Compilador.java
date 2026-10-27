@@ -96,13 +96,51 @@ public class Compilador {
         if (principal == null) {
             return null;
         }
-        modulos = principal.getLenguaje() == Lenguaje.PIGLATIN
-                ? new ResolvedorImports(errores, this::analizar).resolver(archivo, principal)
-                : List.of(principal);
+        modulos = switch (principal.getLenguaje()) {
+            case PIGLATIN -> new ResolvedorImports(errores, this::analizar).resolver(archivo, principal);
+            case ZETARIANO -> conClasesVecinas(archivo, principal);
+            default -> List.of(principal);
+        };
         if (errores.hayErrores()) {
             return null;
         }
-        return new AnalizadorSemantico(errores).analizar(modulos);
+        ResultadoSemantico resultado = new AnalizadorSemantico(errores).analizar(modulos);
+        if (principal.getLenguaje() == Lenguaje.ZETARIANO) {
+            // Los errores de las clases vecinas se ven al analizar cada una
+            String nombre = archivo.getFileName().toString();
+            errores.getErrores().removeIf(e -> !e.getArchivo().equals(nombre));
+        }
+        return resultado;
+    }
+
+    /**
+     * Zetariano no tiene import: una clase solo conoce a las otras cuando un .pig las importa.
+     * Para analizar un .z solo, se cargan los demás .z de su carpeta, como si el .pig los hubiera
+     * importado. Los que no parsean se ignoran (cada uno se parsea con su propia lista de errores).
+     */
+    private List<Programa> conClasesVecinas(Path archivo, Programa principal) throws IOException {
+        List<Programa> lista = new ArrayList<>();
+        lista.add(principal);
+        Path carpeta = archivo.toAbsolutePath().getParent();
+        Path propio = archivo.toRealPath();
+        List<Path> vecinos;
+        try (var recorrido = Files.list(carpeta)) {
+            vecinos = recorrido
+                    .filter(p -> p.getFileName().toString().endsWith(".z"))
+                    .filter(Files::isRegularFile)
+                    .sorted()
+                    .toList();
+        }
+        for (Path vecino : vecinos) {
+            if (vecino.toRealPath().equals(propio)) {
+                continue;
+            }
+            Programa modulo = new Compilador().analizar(vecino);
+            if (modulo != null) {
+                lista.add(modulo);
+            }
+        }
+        return lista;
     }
 
     public ListaCuartetas generarCuartetas(ResultadoSemantico resultado) {

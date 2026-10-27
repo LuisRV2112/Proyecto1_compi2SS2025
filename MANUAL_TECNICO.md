@@ -1414,6 +1414,13 @@ En resumen:
 Un error se reporta **una sola vez**, donde nace: tras un error la expresión vale
 `Tipo.ERROR`, que se acepta en silencio más arriba.
 
+**Un `.z` analizado solo.** Zetariano no tiene `import`: una clase conoce a las demás solo
+cuando un `.pig` las importa. Para que un `.z` se pueda analizar por separado (la interfaz
+compila la pestaña activa), `Compilador.conClasesVecinas` carga también los otros `.z` de su
+carpeta, cada uno parseado con su propia lista de errores; los que no parsean se ignoran. El
+semántico corre sobre todos, pero solo se reportan los errores del `.z` analizado. Así,
+`Banco.z` solo da 0 errores en vez de "El tipo 'Cuenta' no esta declarado".
+
 ### 6.2 Herencia, visibilidad y `super`
 
 **Quién puede usar un miembro** (atributo, método o constructor):
