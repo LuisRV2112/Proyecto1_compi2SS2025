@@ -1445,7 +1445,7 @@ esta regla dan errores de acceso. `verificacion/casos/` tiene una copia con `pub
    - la visibilidad no puede bajar (`public` → `protected` es error);
    - los métodos `private` del padre no se heredan, así que un método con el mismo nombre en la
      hija es un método nuevo, sin `@Override`.
-4. **Arma la vtable** de cada clase (ver 3.3 y la sección 7).
+4. **Arma la vtable** de cada clase (ver 3.3 y 7.1).
 
 **Constructores:**
 - `super(args)` solo puede ser la primera instrucción de un constructor.
@@ -1485,15 +1485,70 @@ por eso la recursividad funciona.
 | Valor | Representación |
 |---|---|
 | Entero, flotante, carácter, bool | Una celda (`double`); el carácter es su código, el bool 0 o 1 |
-| Cadena | Puntero al heap: un carácter por celda terminado en `-1`. `heap[0]` es la cadena vacía, y `null` vale 0 |
+| Cadena | Puntero al heap: un carácter por celda terminado en `-1`. `heap[0]` es la cadena vacía |
 | Arreglo | Puntero al heap: primero sus dimensiones y después los datos **aplanados** por filas: `m[i][j]` está en `p + rango + (i*d2 + j) * tamañoElemento` |
 | Estructura | Sus campos **aplanados** donde esté la variable (stack, global o dentro de un arreglo); un campo es un desplazamiento |
-| Objeto | Puntero al heap, donde están sus atributos seguidos |
+| Objeto | Puntero al heap. La celda 0 es la dirección de la vtable de su clase; los atributos van seguidos desde la celda 1, primero los heredados |
+| `null` | 0. Ningún objeto vive en la dirección 0, así que no se confunde con una referencia válida |
 | Parámetro `{}` / `[]` | Por referencia: la celda guarda la dirección |
 
 **Una llamada:** se evalúan los argumentos en el marco actual, se escriben en
 `stack[P + marcoActual + posición]`, `P` avanza, `call`, se lee el retorno de `stack[P]` y `P`
 vuelve.
+
+**Orden del heap** al empezar `main`:
+
+| Celdas | Contenido |
+|---|---|
+| `heap[0]` | `-1`: la cadena vacía |
+| `heap[1 ..]` | Las vtables de todas las clases, una detrás de otra |
+| después | Las cadenas literales del programa |
+| desde `H` | Lo que se crea al ejecutar: objetos, arreglos y cadenas nuevas |
+
+### 7.1 Vtables y despacho dinámico
+
+Una vtable es una fila de celdas con el **número de función** de cada método. El número de una
+función es su posición en `ListaCuartetas.getFunciones()`. Con las clases de
+`entradas/polimorfismo/` (`ImpresoraPDF extends Impresora`, `ImpresoraColor extends ImpresoraPDF`):
+
+| Índice | `Impresora` (heap 1–3) | `ImpresoraPDF` (heap 4–7) | `ImpresoraColor` (heap 11–14) |
+|---|---|---|---|
+| 0 | `Impresora_imprimir` | `ImpresoraPDF_imprimir` | `ImpresoraColor_imprimir` |
+| 1 | `Impresora_trabajo` | `Impresora_trabajo` | `Impresora_trabajo` |
+| 2 | `Impresora_tipo` | `ImpresoraPDF_tipo` | `ImpresoraColor_tipo` |
+| 3 | | `ImpresoraPDF_comprimir` | `ImpresoraPDF_comprimir` |
+
+- **Cómo se arma:** la hija copia la vtable del padre, reemplaza las entradas que sobrescribe
+  en el mismo índice y agrega al final sus métodos nuevos. Así, un mismo método tiene el mismo
+  índice en toda la jerarquía.
+- **Quién la llena:** `main` la escribe al empezar, antes de las cadenas literales:
+  ```
+  t169 = &Impresora_imprimir      # numero de la funcion
+  heap[1] = t169
+  ```
+- **El objeto:** `novus`/`new` escribe en la celda 0 del objeto nuevo la dirección de la vtable
+  de su clase.
+- **Una llamada `obj.imprimir()`:** si el objeto es `null` es un error de ejecución. Si no, lee
+  la vtable del objeto **en ejecución**, toma la entrada del índice del método y salta a ella:
+  ```
+  t20 = heap[t16]        # vtable del objeto (celda 0)
+  t21 = heap[t20]        # entrada 0: imprimir
+  P = P + 2
+  call_indirecto t21
+  P = P - 2
+  ```
+  Por eso una variable `Impresora` que guarda una `ImpresoraColor` ejecuta
+  `ImpresoraColor_imprimir`. Lo mismo vale para `this.m()` y `m()` dentro de un método: en
+  `trabajo()`, escrito solo en `Impresora`, `this.imprimir()` llama al de la clase real.
+
+**Solo cuando hace falta:** un método se llama por la vtable únicamente si alguna subclase lo
+sobrescribe. Los demás son llamadas directas (`call`):
+- los métodos que no se sobrescriben,
+- los `private`,
+- los constructores,
+- `super.m()`, que llama siempre a la versión del padre.
+
+Así, un programa sin herencia genera exactamente las mismas cuartetas que en el Proyecto 1.
 
 ---
 
@@ -1514,6 +1569,8 @@ Cada cuarteta es `(operación, arg1, arg2, resultado)`. Se muestran en forma leg
 | `IF_TRUE`, `IF_FALSE` | `if t1 goto L1`, `if_false t1 goto L1` | `if (t1 != 0) goto L1;`, `if (t1 == 0) goto L1;` |
 | `FUNCION`, `FIN_FUNCION` | `funcion f:` … `fin f` | `void f_f(void) { ... }` |
 | `CALL`, `RETURN`, `HALT` | `call f`, `return`, `halt` | `f_f();`, `return;`, `return 0;` |
+| `DIRECCION_FUNCION` | `t1 = &f` | `t1 = 7;` (el número de la función) |
+| `CALL_INDIRECTO` | `call_indirecto t1` | `llamar_indirecto(t1);` |
 | `IMPRIMIR`, `SALTO_LINEA` | `print t1 (entero)` | `imprimir_entero(t1);` … |
 | `LEER_CADENA`, `CONVERTIR_CADENA` | `t1 = leer`, `t2 = convertir t1 (entero)` | `leer_cadena()`, `convertir_entero(t1)` |
 | `CONCATENAR`, `A_CADENA`, `IGUAL_CADENAS` | `t3 = concatenar t1, t2` | `concatenar(t1, t2)` … |
@@ -1531,8 +1588,12 @@ L0:                                                        Lb: ...   romper -> g
 ```
 
 `&&` y `||` se evalúan en **cortocircuito**. Los accesos a arreglos verifican el índice y
-los accesos a objetos verifican `null` en tiempo de ejecución, con un mensaje que dice
-archivo y línea.
+los accesos a objetos (`.atributo`, `.metodo()` e índices) verifican `null` en tiempo de
+ejecución, con un mensaje que dice archivo, línea y qué se intentó usar:
+
+```
+Error de ejecucion en prueba_acceso_nulo.pig linea 9: referencia nula: se intento usar el metodo 'getNombre()' sobre null
+```
 
 ---
 
@@ -1548,26 +1609,135 @@ sistema (imprimir, concatenar, leer, convertir). El resultado compila sin advert
 gcc programa.c -o programa && ./programa
 ```
 
+Si el programa tiene llamadas por la vtable, el C lleva además una tabla con un puntero por
+función, en el mismo orden que sus números, y `llamar_indirecto`, que verifica el número antes
+de llamar:
+
+```c
+static void (*const funciones[])(void) = { NULL, f_principal, f_Impresora_constructor, f_Impresora_imprimir, ... };
+```
+
 `InterpreteCuartetas` ejecuta las mismas cuartetas en Java con la misma semántica; sirve para
-correr el programa sin gcc y como referencia para verificar el C.
+correr el programa sin gcc y como referencia para verificar el C y el RISC-V.
 
 ---
 
-## 10. Pruebas
+## 10. Traducción a RISC-V
+
+`GeneradorRiscV` produce un `.s` para **RV32IMD** con la convención de `ecall` de **RARS**.
+
+**Cada celda es un `double` de 8 bytes**, igual que en el intérprete. Así la aritmética,
+las divisiones y las comparaciones dan exactamente lo mismo en los tres backends. Las
+direcciones de celda se convierten a bytes multiplicando por 8 (`slli t0, t0, 3`).
+
+**Registros fijos:**
+
+| Registro | Uso |
+|---|---|
+| `s1` | Dirección base del heap (`CELDAS_HEAP` = 1 000 000 celdas, pedidas con `sbrk`) |
+| `s2` | Dirección base del stack del C3D (`CELDAS_PILA` = 250 000 celdas, con `sbrk`) |
+| `s10`, `s11` | `P` y `H`, como número de celda |
+| `s0` | Marco de la función: `ra` en `0(s0)`, el `s0` anterior en `4(s0)` y los temporales desde `8(s0)` |
+| `s3`, `s4` | Destino de la salida (0 = consola, 1 = heap, para convertir a cadena) e inicio de la cadena que se arma |
+| `fs0`, `fs1`, `fs2` | Las constantes 0.0, −1.0 (fin de cadena) y 1.0 |
+| `t0`–`t6`, `ft0`–`ft2`, `a0`–`a2` | Temporales de una sola cuarteta y argumentos de las rutinas |
+
+**Cada función** de las cuartetas es una etiqueta `F_nombre`:
+1. Reserva en `sp` un marco con espacio para todos sus temporales y lo pone en cero.
+2. Traduce sus cuartetas una por una, cada una precedida por un comentario con la cuarteta.
+3. Termina en `F_nombre_fin`, que restaura `ra` y `s0`.
+
+Los temporales viven en ese marco y no en registros, así que la recursividad no pisa los valores
+pendientes de quien llamó.
+
+| Cuarteta | RISC-V |
+|---|---|
+| `t1 = a + b` | `fld` de los dos operandos, `fadd.d`, `fsd` |
+| `t1 = stack[a]` / `heap[a]` | `fcvt.w.d` de la celda, `slli 3`, `add` con `s2`/`s1`, `fld` |
+| `if t1 goto L` | `feq.d` contra `fs0` y un `bnez`/`beqz` |
+| `call f` | `jal ra, F_f` |
+| `call_indirecto t1` | `t1 × 4` como índice en la tabla `_funciones: .word F_main, F_...` del `.data`, `lw` y `jalr ra, t0, 0` |
+| `print`, `leer`, `concatenar`, conversiones | `jal` a rutinas propias (`_emitir_entero`, `_emitir_flotante`, `_leer_cadena`, `_concatenar`...) que van al final del `.s` |
+
+Dos detalles:
+- **Números:** se imprimen con rutinas propias, carácter por carácter, y no con los servicios
+  de RARS para enteros y flotantes. Así el formato es igual al del intérprete; por ejemplo,
+  `5.0` y no `5`.
+- **Cadenas literales:** una cadena se escribe en celdas consecutivas del heap. Esas escrituras
+  se copian desde una tabla `.word` con un ciclo, y no con una instrucción por carácter.
+
+**Servicios `ecall`** (número en `a7`):
+
+| `a7` | Servicio | Para qué |
+|---|---|---|
+| 9 | `sbrk` | Reservar el heap y el stack al arrancar |
+| 8 | Leer cadena | `leer` / `readln` / `<<` |
+| 11 | Imprimir carácter | Toda la salida |
+| 10 | Terminar | Fin del programa y errores de ejecución |
+
+---
+
+## 11. El simulador RISC-V
+
+Para ejecutar el `.s` dentro de la aplicación, sin RARS, el paquete `riscv` trae un ensamblador
+y un simulador propios.
+
+**`Ensamblador`** convierte el texto en una lista de `Instruccion` y los bytes del `.data`:
+- **Directivas:** `.data`, `.text`, `.word`, `.double`, `.asciz`, `.space` y `.align`.
+- **Seudoinstrucciones** que expande: `li`, `la`, `mv`, `j`, `call`, `ret`, `bnez`, `beqz`...
+- **Etiquetas:** reconoce la de `.text` usada en un `.word` antes de su definición, como en la
+  tabla `_funciones`.
+- **Errores:** un error de sintaxis se reporta con su número de línea.
+
+**`Simulador`** imita la memoria de RARS:
+
+| Zona | Dirección |
+|---|---|
+| `.text` | `0x00400000` |
+| `.data` | `0x10010000` |
+| heap (`sbrk`) | desde `0x10040000` |
+| pila (`sp`) | hacia abajo desde `0x7fffeffc` |
+
+- **Instrucciones:** ejecuta RV32I, M y D, con los modos de redondeo de `fcvt`.
+- **Servicios:** atiende los `ecall` que usa el código generado, más los de imprimir entero,
+  flotante y cadena y leer entero y flotante. Un servicio que no conoce es un error.
+- **Errores:** un acceso fuera de memoria o un `pc` inválido detienen la ejecución con un
+  mensaje.
+- **Límite:** corta un ciclo infinito a los 1 000 millones de instrucciones. La interfaz además
+  puede detenerlo con `detener()`.
+
+---
+
+## 12. Pruebas
 
 | Carpeta | Contenido |
 |---|---|
 | `entradas/ejemplo/` | Un programa que usa todas las construcciones de los tres lenguajes; compila sin errores |
 | `entradas/errores/` | Errores léxicos y sintácticos a propósito, uno por lenguaje |
 | `entradas/errores_semanticos/` | Un error semántico de cada tipo |
-| `entradas/programas/` | Programas con su salida esperada (`.esperado`) y entrada opcional (`.entrada`) |
+| `entradas/programas/` | Programas del Proyecto 1 con su salida esperada (`.esperado`) y entrada opcional (`.entrada`) |
+| `entradas/herencia/` | Herencia en tres niveles, `protected`, `@Override`, `super` y el constructor implícito del padre |
+| `entradas/herencia/errores/` | Cada violación de herencia, visibilidad, `@Override` y `super`; `violaciones.esperado` tiene los 23 errores |
+| `entradas/objetos/` | `null`, la declaración con tipo explícito y el error en ejecución por usar `null`; `errores_*.esperado` con los errores |
+| `entradas/polimorfismo/` | Las impresoras: despacho por variable, por `this` y por arreglo, `super` en tres niveles y un método nuevo después de uno sobrescrito |
+| `entradas/banco/` | El banco del enunciado, con `protected` en `Cuenta` (ver `CAMBIOS.md`) |
+| `verificacion/` | Los cinco casos de calificación, con su `.s` generado y sus salidas (ver `verificacion/README.md`) |
 
-`entradas/programas/probar.sh` corre cada programa con el intérprete **y** compilado con
-`gcc -Wall -Wextra -Werror`, y compara ambas salidas con la esperada.
+**`entradas/programas/probar.sh`** prueba cada `.pig` que tiene `.esperado` de esas carpetas
+con los tres backends, y compara cada salida con la esperada:
+1. el intérprete de cuartetas;
+2. el `.s` generado, en el simulador RISC-V propio;
+3. el `.c` generado, compilado con `gcc -std=c11 -Wall -Wextra -Werror`.
+
+**`verificacion/verificar.sh`** corre los casos de calificación y compara el simulador propio
+contra el intérprete. Con `RARS=ruta/rars1_6.jar`, también corre cada `.s` en RARS.
 
 Desde consola, sin interfaz:
 
 ```bash
 java -cp target/contacto-3d-1.0.0.jar com.usac.contacto3d.Compilador [opciones] archivo
-#   --tokens --arbol --ast --tabla --c3d --ejecutar --c salida.c
+#   --tokens --arbol --ast --tabla --c3d          ver cada etapa
+#   --ejecutar                                    interprete de cuartetas
+#   --riscv salida.s   --simular                  generar el .s / ejecutarlo en el simulador
+#   --c salida.c                                  generar el C
 ```
