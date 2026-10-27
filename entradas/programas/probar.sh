@@ -14,8 +14,12 @@ comparar() {   # $1 = nombre de la prueba, $2 = salida obtenida, $3 = archivo es
     fi
 }
 
-for pig in entradas/programas/*.pig; do
+# los errores_*.pig tienen en su .esperado la lista de errores, no una salida: no se ejecutan
+for pig in entradas/programas/*.pig entradas/herencia/*.pig entradas/objetos/*.pig \
+           entradas/polimorfismo/*.pig entradas/banco/*.pig; do
     esperado="${pig%.pig}.esperado"
+    case "$(basename "$pig")" in errores_*) continue ;; esac
+    [ -f "$esperado" ] || continue
     base=$(basename "${pig%.pig}")
     entrada="${pig%.pig}.entrada"
     [ -f "$entrada" ] || entrada=/dev/null

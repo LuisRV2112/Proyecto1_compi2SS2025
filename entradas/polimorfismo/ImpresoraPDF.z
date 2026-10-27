@@ -1,0 +1,19 @@
+public class ImpresoraPDF extends Impresora {
+    public ImpresoraPDF() {
+        nombre = "pdf";
+        println("constructor ImpresoraPDF");
+    }
+
+    @Override
+    public void imprimir() {
+        println("Imprimiendo en formato .PDF optimizado...");
+    }
+
+    // metodo nuevo despues del sobrescrito: su indice tiene que ser uno nuevo, no el de imprimir
+    public void comprimir() {
+        println("Comprimiendo el PDF");
+    }
+
+    @Override
+    public String tipo() { return "pdf"; }
+}

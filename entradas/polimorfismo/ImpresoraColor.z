@@ -1,0 +1,16 @@
+// Tercer nivel: super.imprimir() dentro de imprimir() debe llamar al del padre y volver, no a si mismo.
+public class ImpresoraColor extends ImpresoraPDF {
+    public ImpresoraColor() {
+        nombre = "color";
+        println("constructor ImpresoraColor");
+    }
+
+    @Override
+    public void imprimir() {
+        super.imprimir();
+        println("...y en colores");
+    }
+
+    @Override
+    public String tipo() { return "color sobre " + super.tipo(); }
+}

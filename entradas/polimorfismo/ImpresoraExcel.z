@@ -1,0 +1,11 @@
+public class ImpresoraExcel extends Impresora {
+    public ImpresoraExcel() {
+        nombre = "excel";
+        println("constructor ImpresoraExcel");
+    }
+
+    @Override
+    public void imprimir() {
+        println("Imprimiendo hojas de calculo en formato tabular...");
+    }
+}

@@ -59,9 +59,11 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.usac.contacto3d.c3d.Operacion.*;
 
@@ -86,6 +88,7 @@ public class GeneradorCuartetas implements Visitante<String> {
 
     private final Map<String, SimboloFuncion> constructoresImplicitos = new HashMap<>();
     private final Map<String, Integer> vtables = new LinkedHashMap<>();
+    private final Set<SimboloFuncion> sobrescritos = new HashSet<>();
 
     public ListaCuartetas generar(ResultadoSemantico resultado) {
         tabla = resultado.tabla();
@@ -94,6 +97,7 @@ public class GeneradorCuartetas implements Visitante<String> {
             if (tipo.esClase()) {
                 vtables.put(tipo.getNombre(), siguienteLiteral);
                 siguienteLiteral += Math.max(1, tipo.getVtable().size());
+                marcarSobrescritos(tipo);
             }
         }
 
@@ -212,7 +216,36 @@ public class GeneradorCuartetas implements Visitante<String> {
         emitir(FIN_FUNCION, principal.getEtiqueta(), null, null);
     }
 
+    /**
+     * Un metodo es sobrescrito si alguna subclase pone otra funcion en su indice de la vtable.
+     * Solo esos necesitan despacho dinamico; el resto se llama directo, como en el Proyecto 1.
+     */
+    private void marcarSobrescritos(SimboloEstructura clase) {
+        List<SimboloFuncion> propia = clase.getVtable();
+        for (SimboloEstructura ancestro = clase.getPadre(); ancestro != null; ancestro = ancestro.getPadre()) {
+            List<SimboloFuncion> heredada = ancestro.getVtable();
+            for (int i = 0; i < heredada.size(); i++) {
+                if (propia.get(i) != heredada.get(i)) {
+                    sobrescritos.add(heredada.get(i));
+                }
+            }
+        }
+    }
+
     private String llamar(SimboloFuncion funcion, List<Expresion> argumentos, String objeto) {
+        return llamar(funcion, argumentos, objeto, false);
+    }
+
+    /**
+     * obj.metodo(), this.metodo() y metodo() dentro de la clase: si el metodo esta sobrescrito en
+     * alguna subclase, la funcion sale de la vtable del objeto real. El indice es el mismo en toda
+     * la jerarquia, asi que se toma del de la clase que declaro el metodo.
+     */
+    private String llamarMetodo(SimboloFuncion metodo, List<Expresion> argumentos, String objeto) {
+        return llamar(metodo, argumentos, objeto, sobrescritos.contains(metodo));
+    }
+
+    private String llamar(SimboloFuncion funcion, List<Expresion> argumentos, String objeto, boolean dinamico) {
         List<SimboloVariable> parametros = funcion.getParametros();
         List<Object> valores = new ArrayList<>();
         for (int i = 0; i < parametros.size(); i++) {
@@ -240,8 +273,18 @@ public class GeneradorCuartetas implements Visitante<String> {
             }
         }
 
+        String destino = null;
+        if (dinamico) {
+            int indice = tabla.buscarTipo(funcion.getClaseDuenia()).indiceEnVtable(funcion);
+            String vtable = cargar(new Ubicacion(true, sumar(objeto, SimboloEstructura.CELDA_VTABLE)));
+            destino = cargar(new Ubicacion(true, sumar(vtable, indice)));
+        }
         emitir(SUMA, "P", marco, "P");
-        emitir(CALL, funcion.getEtiqueta(), null, null);
+        if (dinamico) {
+            emitir(CALL_INDIRECTO, destino, null, null);
+        } else {
+            emitir(CALL, funcion.getEtiqueta(), null, null);
+        }
         String retorno = funcion.sinRetorno() ? null
                 : cargar(new Ubicacion(false, sumar("P", SimboloFuncion.CELDA_RETORNO)));
         emitir(RESTA, "P", marco, "P");
@@ -550,7 +593,7 @@ public class GeneradorCuartetas implements Visitante<String> {
                 case SufijoMetodo metodo -> {
                     String objeto = valorDe(actual);
                     verificarNulo(objeto, metodo);
-                    String retorno = llamar(metodo.getMetodo(), metodo.getArgumentos(), objeto);
+                    String retorno = llamarMetodo(metodo.getMetodo(), metodo.getArgumentos(), objeto);
                     actual = new Paso(null, retorno, metodo.getTipo());
                     i++;
                 }
@@ -613,7 +656,8 @@ public class GeneradorCuartetas implements Visitante<String> {
     @Override
     public String visitarLlamadaFuncion(LlamadaFuncion nodo) {
         SimboloFuncion funcion = nodo.getFuncion();
-        return llamar(funcion, nodo.getArgumentos(), funcion.esMetodo() ? cargarThis() : null);
+        return funcion.esMetodo() ? llamarMetodo(funcion, nodo.getArgumentos(), cargarThis())
+                : llamar(funcion, nodo.getArgumentos(), null);
     }
 
     @Override

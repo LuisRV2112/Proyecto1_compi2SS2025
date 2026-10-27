@@ -1,0 +1,21 @@
+// Ejemplo del enunciado, mas lo que la fase 4 necesita comprobar.
+public class Impresora {
+    protected String nombre;
+
+    public Impresora() {
+        nombre = "generica";
+        println("constructor Impresora");
+    }
+
+    public void imprimir() {
+        println("Imprimiendo documento generico...");
+    }
+
+    // metodo heredado que no se sobrescribe y llama a uno que si: this.imprimir() va al del objeto real
+    public void trabajo() {
+        print("[" + nombre + "] ");
+        this.imprimir();
+    }
+
+    public String tipo() { return "base"; }
+}

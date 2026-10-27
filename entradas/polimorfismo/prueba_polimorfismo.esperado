@@ -1,0 +1,30 @@
+constructor Impresora
+constructor Impresora
+constructor ImpresoraPDF
+constructor Impresora
+constructor ImpresoraExcel
+constructor Impresora
+constructor ImpresoraPDF
+constructor ImpresoraColor
+constructor Impresora
+constructor ImpresoraPDF
+--- por variable ---
+Imprimiendo documento generico...
+Imprimiendo en formato .PDF optimizado...
+Imprimiendo hojas de calculo en formato tabular...
+Imprimiendo en formato .PDF optimizado...
+...y en colores
+--- por this en un metodo heredado ---
+[generica] Imprimiendo documento generico...
+[pdf] Imprimiendo en formato .PDF optimizado...
+[excel] Imprimiendo hojas de calculo en formato tabular...
+[color] Imprimiendo en formato .PDF optimizado...
+...y en colores
+--- por arreglo ---
+base
+pdf
+base
+color sobre pdf
+--- metodo nuevo despues de uno sobrescrito ---
+Comprimiendo el PDF
+Imprimiendo en formato .PDF optimizado...
