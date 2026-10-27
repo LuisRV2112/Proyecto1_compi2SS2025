@@ -1,12 +1,19 @@
 # Manual técnico — Contacto 3xtrat3rr3str3D
 
-Proyecto 1 · Organización de Lenguajes y Compiladores 2 · USAC, Centro Universitario de
-Occidente · Segundo semestre 2026
+Proyecto 2 "St4ck Over-Pig" · Organización de Lenguajes y Compiladores 2 · USAC, Centro
+Universitario de Occidente · Segundo semestre 2026
 
-Compilador de tres lenguajes de alto nivel —**Y?** (`.y`), **Zetariano** (`.z`) y
-**PigLatin** (`.pig`)— que valida el programa (léxico, sintaxis y semántica), genera
-**código de tres direcciones con cuartetas** y lo traduce a un archivo **C** que compila con
-gcc.
+Compilador de tres lenguajes de alto nivel: **Y?** (`.y`), **Zetariano** (`.z`) y
+**PigLatin** (`.pig`). Valida el programa (léxico, sintaxis y semántica) y genera **código de
+tres direcciones con cuartetas**. Las cuartetas se traducen a **ensamblador RISC-V**
+(RV32IMD, para RARS) y a **C**.
+
+El Proyecto 2 agrega al del Proyecto 1:
+- **Programación orientada a objetos en Zetariano:** herencia (`extends`), `protected`,
+  `@Override`, `super` y despacho dinámico por vtable.
+- **En PigLatin:** `null` y la declaración con tipo explícito.
+- **Backend RISC-V:** el generador de ensamblador y un ensamblador con simulador propios, para
+  ejecutar el `.s` dentro de la aplicación.
 
 ---
 
@@ -19,7 +26,12 @@ gcc.
 | ANTLR | 4.13.2 | Genera los lexers y parsers de los tres lenguajes (`antlr4-maven-plugin`) |
 | Swing + FlatLaf | 3.5.4 | Interfaz gráfica con tema oscuro |
 | RSyntaxTextArea | 3.5.4 | Componente de editor (números de línea, subrayado de errores). **No se usa su coloreado**: ver 6.2 |
+| RISC-V RV32IMD | ISA | Destino del ensamblador generado: enteros (I), multiplicación (M) y doble precisión (D) |
+| RARS | 1.6 | Simulador de referencia para el `.s`: se usa la convención de `ecall` de RARS (servicio en `a7`) |
 | gcc | C11 | Compila el código C generado (solo para ejecutarlo; el compilador no lo necesita) |
+
+El ensamblador y el simulador RISC-V que trae la aplicación (paquete `riscv`) están escritos
+desde cero: no usan ninguna librería.
 
 ---
 
@@ -27,7 +39,8 @@ gcc.
 
 La decisión central: **un solo AST para los tres lenguajes**. Cada lenguaje tiene su
 gramática y su constructor, pero todos producen los mismos nodos; de ahí en adelante hay un
-solo analizador semántico, un solo generador de cuartetas y un solo traductor a C.
+solo analizador semántico y un solo generador de cuartetas. Las cuartetas son la única entrada
+de los tres backends: RISC-V, C y el intérprete.
 
 ```mermaid
 flowchart LR
@@ -40,20 +53,27 @@ flowchart LR
     AST --> RI[ResolvedorImports] --> SEM[AnalizadorSemantico]
     SEM -->|"AST anotado +<br/>tabla con memoria"| GEN[GeneradorCuartetas]
     GEN --> Q["Cuartetas"]
+    Q --> RV[GeneradorRiscV] --> S[".s"]
+    S --> RARS["RARS"]
+    S --> ENS[Ensamblador] --> SIM[Simulador]
     Q --> TC[TraductorC] --> C[".c → gcc"]
     Q --> INT[InterpreteCuartetas]
 ```
+
+Los backends sirven también para verificarse entre sí: un mismo programa da la misma salida en el
+intérprete de cuartetas, en el simulador RISC-V y compilado con gcc (ver la sección de pruebas).
 
 | Paquete | Contenido |
 |---|---|
 | `parser` (generado) | Lexers y parsers de ANTLR; `IndentacionY` convierte la indentación de Y? en `INDENT`/`DEDENT` |
 | `errores` | `ListaErrores`, `ErrorCompilacion` y los *listeners* que traducen los errores de ANTLR al español |
-| `ast` | Los 37 nodos (`declaraciones`, `instrucciones`, `expresiones`), `Tipo` y la interfaz `Visitante` |
+| `ast` | Los 39 nodos (`declaraciones`, `instrucciones`, `expresiones`), `Tipo`, `Visibilidad` y la interfaz `Visitante` |
 | `constructores` | `ConstructorAstY`, `ConstructorAstZ`, `ConstructorAstPig`: *parse tree* → AST común |
 | `semantico` | `ResolvedorImports`, `AnalizadorSemantico`, `Compatibilidad` (reglas de tipos), `EvaluadorConstantes` |
-| `simbolos` | `TablaSimbolos` con ámbitos, `SimboloVariable`, `SimboloFuncion`, `SimboloEstructura` (offsets) |
+| `simbolos` | `TablaSimbolos` con ámbitos, `SimboloVariable`, `SimboloFuncion`, `SimboloEstructura` (offsets, clase padre y vtable) |
 | `c3d` | `Cuarteta`, `Operacion`, `ListaCuartetas`, `GeneradorCuartetas` e `InterpreteCuartetas` |
-| `generador` | `TraductorC` |
+| `generador` | `GeneradorRiscV` (cuartetas → `.s`) y `TraductorC` (cuartetas → `.c`) |
+| `riscv` | `Ensamblador` (`.s` → instrucciones y datos), `Instruccion`, `Registros` y `Simulador` |
 | `ui` | Ventana, árbol de trabajo, editor, coloreadores propios, paneles de resultados |
 | (raíz) | `Main` (interfaz) y `Compilador` (orquesta todo; también se usa desde consola) |
 
@@ -71,6 +91,7 @@ classDiagram
         +compilar(Path) ResultadoSemantico
         +generarCuartetas(ResultadoSemantico) ListaCuartetas
         +traducirAC(ListaCuartetas) String
+        +generarRiscV(ListaCuartetas) String
         +getErrores() ListaErrores
     }
     class ResolvedorImports {
@@ -103,6 +124,9 @@ classDiagram
     class TraductorC {
         +traducir(ListaCuartetas) String
     }
+    class GeneradorRiscV {
+        +generar(ListaCuartetas) String
+    }
     class InterpreteCuartetas {
         +ejecutar(ListaCuartetas, String)$ String
     }
@@ -113,6 +137,7 @@ classDiagram
     Compilador --> AnalizadorSemantico
     Compilador --> GeneradorCuartetas
     Compilador --> TraductorC
+    Compilador --> GeneradorRiscV
     AnalizadorSemantico ..|> Visitante : T es Tipo
     GeneradorCuartetas ..|> Visitante : T es String
     AnalizadorSemantico --> ResultadoSemantico
@@ -120,6 +145,7 @@ classDiagram
     GeneradorCuartetas --> ListaCuartetas
     ListaCuartetas o-- Cuarteta
     TraductorC ..> ListaCuartetas
+    GeneradorRiscV ..> ListaCuartetas
     InterpreteCuartetas ..> ListaCuartetas
     class TablaSimbolos {
         +abrirMarcoFuncion(String)
@@ -184,6 +210,9 @@ classDiagram
     Expresion <|-- NuevoObjeto
     Expresion <|-- LiteralLista
     Instruccion <|.. LlamadaFuncion
+    Instruccion <|.. LlamadaSuper
+    Expresion <|-- SuperMetodo
+    Nodo <|-- LlamadaSuper
     Instruccion <|.. Acceso
     Acceso o-- Sufijo
     Sufijo <|-- SufijoAtributo
@@ -194,9 +223,138 @@ classDiagram
 
 `Instruccion` es **interfaz** porque hay nodos que son expresión e instrucción a la vez
 (`calcular(10)` se usa por su valor o por su efecto). El diagrama muestra las clases
-principales; la lista completa son los 37 métodos de `Visitante`.
+principales; la lista completa son los 39 métodos de `Visitante`.
 
-### 3.3 La interfaz
+Nodos y campos que agregó el Proyecto 2:
+- `LlamadaSuper` es `super(args);`, una instrucción.
+- `SuperMetodo` es `super.metodo(args)`, una expresión.
+- `DeclaracionClase` guarda el nombre del padre.
+- `DeclaracionMetodo`, `DeclaracionConstructor` y `DeclaracionVariable` guardan su
+  `Visibilidad` (`PUBLICO`, `PRIVADO`, `PROTEGIDO` o `PAQUETE`, que es sin modificador).
+  `DeclaracionMetodo` guarda además si lleva `@Override`.
+- `null` y la declaración con tipo explícito de PigLatin no necesitan nodos nuevos: son un
+  `Literal` de tipo `NULO` y una `DeclaracionVariable` con el tipo declarado.
+
+### 3.3 La tabla de símbolos y la herencia
+
+```mermaid
+classDiagram
+    direction LR
+    class SimboloEstructura {
+        +CELDA_VTABLE$
+        esClase
+        tamanioTotal
+        +getPadre() SimboloEstructura
+        +heredarCampos()
+        +esSubclaseDe(SimboloEstructura) boolean
+        +getCampo(String) Campo
+        +buscarMetodo(String, int) SimboloFuncion
+        +buscarPorFirma(String) SimboloFuncion
+        +getVtable() List~SimboloFuncion~
+        +indiceEnVtable(SimboloFuncion) int
+    }
+    class Campo {
+        nombre
+        tipo
+        offset
+        tamanio
+        visibilidad
+        duenio
+    }
+    class SimboloFuncion {
+        +CELDA_RETORNO$
+        +CELDA_THIS$
+        parametros
+        claseDuenia
+        visibilidad
+        tamanioMarco
+        +getFirma() String
+    }
+    class Visibilidad {
+        <<enumeration>>
+        PUBLICO
+        PRIVADO
+        PROTEGIDO
+        PAQUETE
+    }
+    SimboloEstructura --> "0..1" SimboloEstructura : padre
+    SimboloEstructura *-- "*" Campo
+    SimboloEstructura o-- "*" SimboloFuncion : metodos, constructores
+    SimboloEstructura o-- "*" SimboloFuncion : vtable
+    Campo --> SimboloEstructura : duenio
+    Campo ..> Visibilidad
+    SimboloFuncion ..> Visibilidad
+```
+
+- **Campos:** cada clase empieza con una copia de los campos del padre (`heredarCampos`), con
+  los mismos offsets, y agrega los suyos después. Así un `Perro` se puede usar donde se espera
+  un `Animal`: los campos de `Animal` están en el mismo lugar. `duenio` es la clase que declaró
+  el campo; se usa para decidir si un `private` o `protected` es accesible.
+- **Vtable:** es una lista de métodos. Una clase copia la del padre, reemplaza en el mismo
+  índice cada método que sobrescribe y agrega al final los métodos nuevos. Los `private` no
+  entran.
+- **Celdas de un objeto:** la celda 0 (`CELDA_VTABLE`) es la dirección de su vtable, así que
+  los atributos empiezan en la celda 1. Las estructuras de Y? no tienen vtable y empiezan en 0.
+
+### 3.4 El backend RISC-V
+
+```mermaid
+classDiagram
+    direction LR
+    class GeneradorRiscV {
+        +CELDAS_HEAP$
+        +CELDAS_PILA$
+        +generar(ListaCuartetas) String
+    }
+    class Ensamblador {
+        +BASE_TEXTO$
+        +BASE_DATOS$
+        +ensamblar(String)$ Programa
+    }
+    class Programa {
+        <<record>>
+        instrucciones
+        datos
+        etiquetas
+    }
+    class Instruccion {
+        <<record>>
+        op
+        rd
+        rs1
+        rs2
+        imm
+        linea
+    }
+    class Simulador {
+        int[] x
+        long[] f
+        pc
+        +ejecutar(String, String)$ String
+        +ejecutar()
+        +detener()
+        +getSalida() String
+    }
+    class Registros {
+        +entero(String, int)$ int
+        +flotante(String, int)$ int
+    }
+    GeneradorRiscV ..> ListaCuartetas
+    Ensamblador --> Programa
+    Programa o-- Instruccion
+    Ensamblador ..> Registros
+    Simulador --> Programa
+```
+
+- **`GeneradorRiscV`:** traduce cada `funcion X:` de las cuartetas a una etiqueta `F_X`. Los
+  temporales viven en el marco de la función, en la pila (`sp`).
+- **`Ensamblador`:** lee el `.s` en dos pasadas: primero ubica las etiquetas, después decodifica
+  cada instrucción. Expande las seudoinstrucciones (`li`, `la`, `call`, `ret`...) y resuelve
+  las etiquetas de `.word` que aparecen más adelante en el archivo.
+- **`Simulador`:** ejecuta las instrucciones y los `ecall` de RARS que usa el código generado.
+  Tiene un límite de instrucciones y se puede detener desde la interfaz.
+
+### 3.5 La interfaz
 
 ```mermaid
 classDiagram
@@ -218,6 +376,7 @@ classDiagram
     VentanaPrincipal *-- PanelTablaSimbolos
     VentanaPrincipal *-- PanelConsola
     VentanaPrincipal ..> Compilador
+    VentanaPrincipal ..> Simulador
     PestanaEditor *-- ParserErrores
     ColoreadorBase <|-- ColoreadorY
     ColoreadorBase <|-- ColoreadorZ
