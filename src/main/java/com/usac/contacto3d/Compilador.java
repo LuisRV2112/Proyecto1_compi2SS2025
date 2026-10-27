@@ -185,6 +185,23 @@ public class Compilador {
         return subida + bajada;
     }
 
+    /**
+     * El AST de lo último que se compiló: el .pig y sus imports, o el archivo solo. De un .z no se dibujan las
+     * clases vecinas, que solo se cargaron para resolver tipos. Vacío si no parseó.
+     */
+    public String dibujarAst() {
+        List<Programa> dibujar = !modulos.isEmpty() && modulos.get(0).getLenguaje() == Lenguaje.ZETARIANO
+                ? modulos.subList(0, 1) : modulos;
+        StringBuilder salida = new StringBuilder();
+        for (Programa modulo : dibujar) {
+            if (!salida.isEmpty()) {
+                salida.append('\n');
+            }
+            salida.append(ImpresorAst.dibujar(modulo));
+        }
+        return salida.toString();
+    }
+
     public ListaCuartetas generarCuartetas(ResultadoSemantico resultado) {
         return new GeneradorCuartetas().generar(resultado);
     }
@@ -269,7 +286,7 @@ public class Compilador {
                 System.out.println(compilador.arbolPrincipal.toStringTree(compilador.parserPrincipal));
             }
             if (verAst) {
-                compilador.modulos.forEach(m -> System.out.print(ImpresorAst.dibujar(m)));
+                System.out.print(compilador.dibujarAst());
             }
             if (verTabla && resultado != null) {
                 imprimirTabla(resultado);

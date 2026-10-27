@@ -34,7 +34,7 @@ carpeta usada.
 | Barra superior | Abrir carpeta, Guardar, Guardar todo, **Analizar (F5)**, **Generar RISC-V (F6)**, **Ejecutar RISC-V (F7)** y **Detener (F9)** |
 | Izquierda: **árbol de trabajo** | Los archivos de la carpeta abierta |
 | Centro: **editor** | Un archivo por pestaña, con números de línea y coloreado del lenguaje |
-| Abajo: **resultados** | Las pestañas Errores, Cuartetas, RISC-V, Tabla de símbolos, Código C y Consola |
+| Abajo: **resultados** | Las pestañas Errores, Cuartetas, RISC-V, Tabla de símbolos, AST, Código C y Consola |
 | Barra de estado | El resultado de la última acción |
 
 **Íconos del árbol:**
@@ -87,6 +87,7 @@ Se compila **el archivo de la pestaña activa**:
 |---|---|---|
 | **Analizar** | `F5` | Valida el programa y llena las pestañas: errores, cuartetas, RISC-V, tabla de símbolos y C |
 | **Ver cuartetas** | | Muestra la pestaña Cuartetas del último análisis |
+| **Ver AST** | | Muestra la pestaña AST del último análisis |
 | **Generar ensamblador RISC-V** | `F6` | Analiza y guarda el ensamblador en `salida/<programa>.s`, dentro de la carpeta del proyecto |
 | **Ejecutar ensamblador RISC-V** | `F7` | Analiza, ensambla y ejecuta el `.s` en el simulador de la aplicación |
 | **Detener ejecución** | `F9` | Detiene la ejecución RISC-V en curso |
@@ -121,7 +122,7 @@ no se generan cuartetas, RISC-V ni C.
   sobrescribe nada también es error.
 - `super(...)` solo puede ir como **primera** instrucción de un constructor.
 
-### 4.2 Cuartetas y tabla de símbolos
+### 4.2 Cuartetas, tabla de símbolos y AST
 
 ![Cuartetas](capturas/cuartetas.png)
 
@@ -140,6 +141,11 @@ y su lugar en memoria:
   los atributos empiezan en el desplazamiento 1, porque la celda 0 es de la vtable.
 
 Se puede ordenar haciendo clic en una columna.
+
+**AST** dibuja el árbol de sintaxis abstracta común a los tres lenguajes: un `Programa` por
+archivo (el `.pig` y cada `.y` y `.z` que importa) con sus clases, funciones, instrucciones y
+expresiones. A diferencia de las cuartetas, se muestra aunque haya errores semánticos, siempre
+que el archivo no tenga errores léxicos ni sintácticos.
 
 ### 4.3 El ensamblador RISC-V
 

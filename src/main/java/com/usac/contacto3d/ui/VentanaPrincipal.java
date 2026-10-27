@@ -66,7 +66,7 @@ public class VentanaPrincipal extends JFrame {
     private enum Accion { ANALIZAR, GENERAR_RISCV, EJECUTAR_RISCV, GENERAR_C, EJECUTAR, GCC }
 
     private record Compilacion(Path archivo, ListaErrores errores, ResultadoSemantico resultado,
-                               ListaCuartetas cuartetas, String codigoC, String riscv) {
+                               ListaCuartetas cuartetas, String codigoC, String riscv, String ast) {
         boolean exitosa() {
             return cuartetas != null;
         }
@@ -80,6 +80,7 @@ public class VentanaPrincipal extends JFrame {
     private final RSyntaxTextArea areaCuartetas = areaSoloLectura();
     private final RSyntaxTextArea areaC = areaSoloLectura();
     private final RSyntaxTextArea areaRiscV = areaSoloLectura();
+    private final RSyntaxTextArea areaAst = areaSoloLectura();
     private final PanelTablaSimbolos panelTabla = new PanelTablaSimbolos();
     private final PanelConsola consola = new PanelConsola();
     private final JTabbedPane inferior = new JTabbedPane();
@@ -122,6 +123,7 @@ public class VentanaPrincipal extends JFrame {
         inferior.addTab("Cuartetas", conScroll(areaCuartetas));
         inferior.addTab("RISC-V", conScroll(areaRiscV));
         inferior.addTab("Tabla de simbolos", panelTabla);
+        inferior.addTab("AST", conScroll(areaAst));
         inferior.addTab("Codigo C", conScroll(areaC));
         inferior.addTab("Consola", consola);
 
@@ -181,6 +183,7 @@ public class VentanaPrincipal extends JFrame {
         JMenu compilar = new JMenu("Compilar");
         compilar.add(item("Analizar", KeyEvent.VK_F5, 0, () -> compilar(Accion.ANALIZAR)));
         compilar.add(item("Ver cuartetas", 0, 0, () -> verPestana("Cuartetas")));
+        compilar.add(item("Ver AST", 0, 0, () -> verPestana("AST")));
         compilar.add(item("Generar ensamblador RISC-V", KeyEvent.VK_F6, 0, () -> compilar(Accion.GENERAR_RISCV)));
         compilar.add(item("Ejecutar ensamblador RISC-V", KeyEvent.VK_F7, 0, () -> compilar(Accion.EJECUTAR_RISCV)));
         compilar.add(item("Detener ejecucion", KeyEvent.VK_F9, 0, this::detener));
@@ -540,7 +543,8 @@ public class VentanaPrincipal extends JFrame {
                     riscv = compilador.generarRiscV(cuartetas);
                 }
                 compilador.getErrores().ordenar();
-                return new Compilacion(archivo, compilador.getErrores(), resultado, cuartetas, codigoC, riscv);
+                return new Compilacion(archivo, compilador.getErrores(), resultado, cuartetas, codigoC, riscv,
+                        compilador.dibujarAst());
             }
 
             @Override
@@ -590,6 +594,9 @@ public class VentanaPrincipal extends JFrame {
         areaC.setCaretPosition(0);
         areaRiscV.setText(compilacion.exitosa() ? compilacion.riscv() : "");
         areaRiscV.setCaretPosition(0);
+        // El AST se muestra aunque haya errores semanticos: sirve para entenderlos
+        areaAst.setText(compilacion.ast());
+        areaAst.setCaretPosition(0);
 
         String archivo = compilacion.archivo().getFileName().toString();
         if (errores.hayErrores()) {
