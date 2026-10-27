@@ -1,6 +1,7 @@
 package com.usac.contacto3d.ui;
 
 import com.usac.contacto3d.Compilador;
+import com.usac.contacto3d.ast.Programa;
 import com.usac.contacto3d.c3d.InterpreteCuartetas;
 import com.usac.contacto3d.c3d.ListaCuartetas;
 import com.usac.contacto3d.errores.ErrorCompilacion;
@@ -66,7 +67,8 @@ public class VentanaPrincipal extends JFrame {
     private enum Accion { ANALIZAR, GENERAR_RISCV, EJECUTAR_RISCV, GENERAR_C, EJECUTAR, GCC }
 
     private record Compilacion(Path archivo, ListaErrores errores, ResultadoSemantico resultado,
-                               ListaCuartetas cuartetas, String codigoC, String riscv, String ast) {
+                               ListaCuartetas cuartetas, String codigoC, String riscv, String ast,
+                               List<Programa> programas) {
         boolean exitosa() {
             return cuartetas != null;
         }
@@ -81,6 +83,7 @@ public class VentanaPrincipal extends JFrame {
     private final RSyntaxTextArea areaC = areaSoloLectura();
     private final RSyntaxTextArea areaRiscV = areaSoloLectura();
     private final RSyntaxTextArea areaAst = areaSoloLectura();
+    private final PanelAst panelAst = new PanelAst();
     private final PanelTablaSimbolos panelTabla = new PanelTablaSimbolos();
     private final PanelConsola consola = new PanelConsola();
     private final JTabbedPane inferior = new JTabbedPane();
@@ -111,6 +114,7 @@ public class VentanaPrincipal extends JFrame {
             @Override public void descargar(Path ruta)                { descargar(ruta); }
         });
         panelErrores.setAlSeleccionar(this::irAError);
+        panelAst.setAlIrALinea(this::irAError);
 
         String anterior = preferencias.get(PREFERENCIA_CARPETA, null);
         if (anterior != null && Files.isDirectory(Path.of(anterior))) {
@@ -123,7 +127,8 @@ public class VentanaPrincipal extends JFrame {
         inferior.addTab("Cuartetas", conScroll(areaCuartetas));
         inferior.addTab("RISC-V", conScroll(areaRiscV));
         inferior.addTab("Tabla de simbolos", panelTabla);
-        inferior.addTab("AST", conScroll(areaAst));
+        inferior.addTab("AST", panelAst);
+        inferior.addTab("AST (texto)", conScroll(areaAst));
         inferior.addTab("Codigo C", conScroll(areaC));
         inferior.addTab("Consola", consola);
 
@@ -544,7 +549,7 @@ public class VentanaPrincipal extends JFrame {
                 }
                 compilador.getErrores().ordenar();
                 return new Compilacion(archivo, compilador.getErrores(), resultado, cuartetas, codigoC, riscv,
-                        compilador.dibujarAst());
+                        compilador.dibujarAst(), compilador.modulosDelAst());
             }
 
             @Override
@@ -596,6 +601,7 @@ public class VentanaPrincipal extends JFrame {
         areaRiscV.setCaretPosition(0);
         // El AST se muestra aunque haya errores semanticos: sirve para entenderlos
         areaAst.setText(compilacion.ast());
+        panelAst.mostrar(compilacion.programas());
         areaAst.setCaretPosition(0);
 
         String archivo = compilacion.archivo().getFileName().toString();

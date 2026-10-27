@@ -190,16 +190,20 @@ public class Compilador {
      * clases vecinas, que solo se cargaron para resolver tipos. Vacío si no parseó.
      */
     public String dibujarAst() {
-        List<Programa> dibujar = !modulos.isEmpty() && modulos.get(0).getLenguaje() == Lenguaje.ZETARIANO
-                ? modulos.subList(0, 1) : modulos;
         StringBuilder salida = new StringBuilder();
-        for (Programa modulo : dibujar) {
+        for (Programa modulo : modulosDelAst()) {
             if (!salida.isEmpty()) {
                 salida.append('\n');
             }
             salida.append(ImpresorAst.dibujar(modulo));
         }
         return salida.toString();
+    }
+
+    /** Los módulos que se muestran como AST: los mismos que {@link #dibujarAst()}. */
+    public List<Programa> modulosDelAst() {
+        return !modulos.isEmpty() && modulos.get(0).getLenguaje() == Lenguaje.ZETARIANO
+                ? modulos.subList(0, 1) : modulos;
     }
 
     public ListaCuartetas generarCuartetas(ResultadoSemantico resultado) {

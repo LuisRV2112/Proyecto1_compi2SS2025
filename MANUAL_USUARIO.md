@@ -34,7 +34,7 @@ carpeta usada.
 | Barra superior | Abrir carpeta, Guardar, Guardar todo, **Analizar (F5)**, **Generar RISC-V (F6)**, **Ejecutar RISC-V (F7)** y **Detener (F9)** |
 | Izquierda: **árbol de trabajo** | Los archivos de la carpeta abierta |
 | Centro: **editor** | Un archivo por pestaña, con números de línea y coloreado del lenguaje |
-| Abajo: **resultados** | Las pestañas Errores, Cuartetas, RISC-V, Tabla de símbolos, AST, Código C y Consola |
+| Abajo: **resultados** | Las pestañas Errores, Cuartetas, RISC-V, Tabla de símbolos, AST, AST (texto), Código C y Consola |
 | Barra de estado | El resultado de la última acción |
 
 **Íconos del árbol:**
@@ -87,7 +87,7 @@ Se compila **el archivo de la pestaña activa**:
 |---|---|---|
 | **Analizar** | `F5` | Valida el programa y llena las pestañas: errores, cuartetas, RISC-V, tabla de símbolos y C |
 | **Ver cuartetas** | | Muestra la pestaña Cuartetas del último análisis |
-| **Ver AST** | | Muestra la pestaña AST del último análisis |
+| **Ver AST** | | Muestra la pestaña AST del último análisis, como diagrama |
 | **Generar ensamblador RISC-V** | `F6` | Analiza y guarda el ensamblador en `salida/<programa>.s`, dentro de la carpeta del proyecto |
 | **Ejecutar ensamblador RISC-V** | `F7` | Analiza, ensambla y ejecuta el `.s` en el simulador de la aplicación |
 | **Detener ejecución** | `F9` | Detiene la ejecución RISC-V en curso |
@@ -142,10 +142,27 @@ y su lugar en memoria:
 
 Se puede ordenar haciendo clic en una columna.
 
-**AST** dibuja el árbol de sintaxis abstracta común a los tres lenguajes: un `Programa` por
-archivo (el `.pig` y cada `.y` y `.z` que importa) con sus clases, funciones, instrucciones y
-expresiones. A diferencia de las cuartetas, se muestra aunque haya errores semánticos, siempre
-que el archivo no tenga errores léxicos ni sintácticos.
+**AST** dibuja el árbol de sintaxis abstracta común a los tres lenguajes como un diagrama: un
+`Programa` por archivo (el `.pig` y cada `.y` y `.z` que importa), elegido en el selector
+**Módulo**. A diferencia de las cuartetas, se muestra aunque haya errores semánticos, siempre que
+el archivo no tenga errores léxicos ni sintácticos.
+
+![AST](capturas/ast.png)
+
+| Acción | Cómo |
+|---|---|
+| Plegar o desplegar un nodo | Clic sobre él. Un nodo plegado tiene borde grueso y dice cuántos nodos esconde: `[+19]` |
+| Ir a la línea del código | Doble clic sobre el nodo |
+| Ver todo / volver a la vista inicial | **Expandir todo** / **Contraer** (la vista inicial muestra clases, funciones y sus miembros) |
+| Moverse | Arrastrar con el mouse, o las barras de desplazamiento |
+| Zoom | `Ctrl` + rueda del mouse, o los botones **-** y **+**; **Real** vuelve al 100 % y **Ajustar** hace que quepa todo |
+| Guardar como imagen | **Exportar SVG...**: guarda el diagrama tal como se ve (con lo plegado, plegado) como `.svg`, que se abre en cualquier navegador |
+
+Los colores indican la categoría del nodo: morado el programa, azul las declaraciones, amarillo
+las instrucciones, verde las expresiones y naranja los literales. Al pasar el mouse sobre un nodo
+se ve su texto completo y su línea.
+
+**AST (texto)** muestra el mismo árbol como texto, completo y sin plegar.
 
 ### 4.3 El ensamblador RISC-V
 

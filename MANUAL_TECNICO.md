@@ -74,7 +74,7 @@ intérprete de cuartetas, en el simulador RISC-V y compilado con gcc (ver la sec
 | `c3d` | `Cuarteta`, `Operacion`, `ListaCuartetas`, `GeneradorCuartetas` e `InterpreteCuartetas` |
 | `generador` | `GeneradorRiscV` (cuartetas → `.s`) y `TraductorC` (cuartetas → `.c`) |
 | `riscv` | `Ensamblador` (`.s` → instrucciones y datos), `Instruccion`, `Registros` y `Simulador` |
-| `ui` | Ventana, árbol de trabajo, editor, coloreadores propios, paneles de resultados |
+| `ui` | Ventana, árbol de trabajo, editor, coloreadores propios, paneles de resultados; `DiagramaAst` (posiciones, dibujo y `.svg` del AST, sin librerías) y `PanelAst` (la pestaña con plegado y zoom) |
 | (raíz) | `Main` (interfaz) y `Compilador` (orquesta todo; también se usa desde consola) |
 
 ---
