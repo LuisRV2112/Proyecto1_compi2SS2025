@@ -64,6 +64,7 @@ carpeta usada.
 | Guardar | `Ctrl+S` el archivo actual, `Ctrl+Shift+S` todos, **Guardar como...** con otro nombre |
 | Cerrar una pestaña | La `x` de la pestaña, o `Ctrl+W`. Si tiene cambios, pregunta si guardarlos |
 | Descargar el proyecto | **Archivo > Descargar proyecto (.zip)**: guarda la carpeta completa en un `.zip` |
+| Descargar un archivo o una carpeta | Clic derecho sobre él > **Descargar archivo...** o **Descargar carpeta (.zip)...**: el archivo se copia tal cual a donde elijas; la carpeta se guarda en un `.zip` con todo su contenido |
 
 Una pestaña con cambios sin guardar muestra un `*` antes del nombre. Antes de compilar se
 guardan automáticamente todos los archivos abiertos.

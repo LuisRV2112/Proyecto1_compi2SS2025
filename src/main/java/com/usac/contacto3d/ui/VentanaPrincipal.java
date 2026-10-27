@@ -107,6 +107,7 @@ public class VentanaPrincipal extends JFrame {
             @Override public void abrir(Path archivo)                { abrirEnPestana(archivo); }
             @Override public void renombrado(Path antes, Path despues) { reubicarPestanas(antes, despues); }
             @Override public void eliminado(Path ruta)                { cerrarPestanasDentroDe(ruta); }
+            @Override public void descargar(Path ruta)                { descargar(ruta); }
         });
         panelErrores.setAlSeleccionar(this::irAError);
 
@@ -388,27 +389,53 @@ public class VentanaPrincipal extends JFrame {
             estado(" No hay una carpeta abierta para descargar");
             return;
         }
+        descargar(raiz);
+    }
+
+    /** Un archivo se copia tal cual; una carpeta se descarga como .zip con todo su contenido. */
+    private void descargar(Path origen) {
         guardarTodo();
+        boolean esCarpeta = Files.isDirectory(origen);
+        String nombre = origen.getFileName().toString();
         JFileChooser selector = selector();
-        selector.setSelectedFile(raiz.resolveSibling(raiz.getFileName() + ".zip").toFile());
+        selector.setDialogTitle(esCarpeta ? "Descargar carpeta " + nombre : "Descargar archivo " + nombre);
+        selector.setSelectedFile(new java.io.File(System.getProperty("user.home"), esCarpeta ? nombre + ".zip" : nombre));
         if (selector.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
             return;
         }
         Path destino = selector.getSelectedFile().toPath();
+        if (destino.toAbsolutePath().equals(origen.toAbsolutePath())) {
+            estado(" El destino es el mismo archivo: elegi otra carpeta");
+            return;
+        }
+        if (Files.exists(destino) && JOptionPane.showConfirmDialog(this, destino.getFileName() + " ya existe. ¿Reemplazarlo?",
+                "Descargar", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+            return;
+        }
+        try {
+            if (esCarpeta) {
+                comprimir(origen, destino);
+            } else {
+                Files.copy(origen, destino, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            }
+            estado(" " + nombre + " descargado en " + destino);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "No se pudo descargar: " + e.getMessage(), "Descargar",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private static void comprimir(Path carpeta, Path destino) throws IOException {
         try (ZipOutputStream zip = new ZipOutputStream(Files.newOutputStream(destino));
-             Stream<Path> recorrido = Files.walk(raiz)) {
+             Stream<Path> recorrido = Files.walk(carpeta)) {
             for (Path archivo : recorrido.filter(Files::isRegularFile).toList()) {
                 if (archivo.toAbsolutePath().equals(destino.toAbsolutePath())) {
                     continue;
                 }
-                zip.putNextEntry(new ZipEntry(raiz.getFileName() + "/" + raiz.relativize(archivo).toString().replace('\\', '/')));
+                zip.putNextEntry(new ZipEntry(carpeta.getFileName() + "/" + carpeta.relativize(archivo).toString().replace('\\', '/')));
                 Files.copy(archivo, zip);
                 zip.closeEntry();
             }
-            estado(" Proyecto descargado en " + destino);
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "No se pudo crear el zip: " + e.getMessage(), "Descargar",
-                    JOptionPane.ERROR_MESSAGE);
         }
     }
 

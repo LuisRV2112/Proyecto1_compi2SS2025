@@ -32,6 +32,7 @@ public class ArbolTrabajo extends JPanel {
         void abrir(Path archivo);
         void renombrado(Path antes, Path despues);
         void eliminado(Path ruta);
+        void descargar(Path ruta);
     }
 
     private final DefaultTreeModel modelo =
@@ -155,6 +156,12 @@ public class ArbolTrabajo extends JPanel {
         eliminar.setEnabled(!esRaiz);
         menu.add(renombrar);
         menu.add(eliminar);
+        menu.addSeparator();
+        menu.add(item(Files.isDirectory(seleccion) ? "Descargar carpeta (.zip)..." : "Descargar archivo...", () -> {
+            if (escucha != null) {
+                escucha.descargar(seleccion);
+            }
+        }));
         menu.addSeparator();
         menu.add(item("Actualizar", this::actualizar));
         menu.show(arbol, evento.getX(), evento.getY());
