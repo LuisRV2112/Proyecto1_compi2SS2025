@@ -9,16 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Traduce las cuartetas a ensamblador RISC-V (RV32IMD, convencion de ecall de RARS: servicio en a7).
- *
- * Cada celda del C3D es un double de 8 bytes, igual que en el interprete, asi que la aritmetica
- * conserva la misma semantica. Registros fijos:
- *   s1 = base del heap      s2 = base de la pila      s10 = P (celda)      s11 = H (celda)
- *   s3 = destino de la salida (0 = consola, 1 = heap)  s4 = inicio de la cadena en construccion
- *   fs0 = 0.0   fs1 = -1.0 (fin de cadena)   fs2 = 1.0
- *   s0 = marco de la funcion actual: ra en 0(s0), s0 anterior en 4(s0), temporales desde 8(s0)
- */
 public class GeneradorRiscV {
 
     public static final int CELDAS_HEAP = 1_000_000;
@@ -52,7 +42,6 @@ public class GeneradorRiscV {
         s.append(".align 2\n");
         imagenes.forEach((etiqueta, valores) -> s.append(etiqueta).append(": .word ").append(valores).append('\n'));
         if (hayIndirectas) {
-            // el numero de una funcion es su posicion en esta tabla
             s.append("_funciones: .word ")
              .append(String.join(", ", numeradas.stream().map(GeneradorRiscV::etiquetaFuncion).toList()))
              .append('\n');
@@ -327,10 +316,6 @@ public class GeneradorRiscV {
         }
     }
 
-    /**
-     * Las cadenas literales llegan como una racha de heap[k] = constante con k consecutivos.
-     * Devuelve el indice donde termina la racha que empieza en desde.
-     */
     private static int finDeBloqueConstante(List<Cuarteta> cuerpo, int desde) {
         int fin = desde;
         while (fin < cuerpo.size()) {
@@ -347,7 +332,6 @@ public class GeneradorRiscV {
         return fin;
     }
 
-    /** Copia la racha desde una tabla .word en .data, en vez de una escritura por celda. */
     private void copiarBloqueConstante(List<Cuarteta> bloque) {
         String etiqueta = "_imagen" + imagenes.size();
         StringBuilder valores = new StringBuilder();
@@ -375,7 +359,6 @@ public class GeneradorRiscV {
         emitir("bnez t2, " + ciclo);
     }
 
-    /** Emite el valor de ft0 segun su tipo, hacia la consola o el heap segun s3. */
     private void emitirValor(String tipo) {
         switch (tipo) {
             case "cadena" -> {
@@ -433,7 +416,6 @@ public class GeneradorRiscV {
         texto.append(sigue).append(":\n");
     }
 
-    /** Deja en t0 la direccion en bytes de la celda indicada por el operando, en la zona dada. */
     private void direccion(String operando, String base) {
         if (esEnteroPequenio(operando, 0, Integer.MAX_VALUE / 8)) {
             emitir("li t0, " + (long) Double.parseDouble(operando) * 8);
@@ -548,8 +530,6 @@ public class GeneradorRiscV {
             _buffer: .space 1024
             """;
 
-    // Rutinas de apoyo. Convencion propia: solo usan registros t*, a*, ft*, fa* y guardan ra en la pila.
-    // _emitir_car solo modifica a7, t6 y ft10, de modo que quien la llama conserva sus demas t*.
     private static final String RUTINAS = """
 
             # ---------------------------------------------------------------- rutinas de apoyo

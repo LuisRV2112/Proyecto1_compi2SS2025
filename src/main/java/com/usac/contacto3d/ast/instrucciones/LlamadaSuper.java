@@ -7,7 +7,6 @@ import com.usac.contacto3d.simbolos.SimboloFuncion;
 
 import java.util.List;
 
-/** super(args): llama al constructor de la clase padre. Solo es valida dentro de un constructor. */
 public class LlamadaSuper extends Nodo implements Instruccion {
 
     private final List<Expresion> argumentos;

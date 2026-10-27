@@ -4,7 +4,7 @@ JAR=target/contacto-3d-1.0.0.jar
 mkdir -p salida
 fallos=0
 
-comparar() {   # $1 = nombre de la prueba, $2 = salida obtenida, $3 = archivo esperado
+comparar() {
     if diferencias=$(diff <(echo "$2") "$3"); then
         echo "OK    $1"
     else
@@ -14,7 +14,6 @@ comparar() {   # $1 = nombre de la prueba, $2 = salida obtenida, $3 = archivo es
     fi
 }
 
-# los errores_*.pig tienen en su .esperado la lista de errores, no una salida: no se ejecutan
 for pig in entradas/programas/*.pig entradas/herencia/*.pig entradas/objetos/*.pig \
            entradas/polimorfismo/*.pig entradas/banco/*.pig; do
     esperado="${pig%.pig}.esperado"

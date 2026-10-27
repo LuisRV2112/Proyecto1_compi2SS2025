@@ -6,10 +6,6 @@ import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-/**
- * Ejecuta un programa ensamblado. Imita la distribucion de memoria y los servicios ecall de RARS,
- * para que la salida coincida con la del simulador externo.
- */
 public class Simulador {
 
     public static final long MAXIMO_INSTRUCCIONES = 1_000_000_000L;
@@ -63,7 +59,6 @@ public class Simulador {
         x[3] = 0x1000_8000;
     }
 
-    /** Ensambla y ejecuta. Devuelve la salida; un error de ejecucion se agrega al final. */
     public static String ejecutar(String ensamblador, String entrada) {
         Ensamblador.Programa programa;
         try {
@@ -86,7 +81,6 @@ public class Simulador {
         }
     }
 
-    /** El error que detuvo la simulacion, o null si el programa termino normalmente. */
     public String getError() {
         return error;
     }
@@ -258,8 +252,6 @@ public class Simulador {
         return negativo ? 1 << 1 : 1 << 6;
     }
 
-    // ------------------------------------------------------------------ servicios
-
     private void ecall() {
         int servicio = x[17];
         switch (servicio) {
@@ -337,12 +329,9 @@ public class Simulador {
         }
     }
 
-    // ------------------------------------------------------------------ memoria
-
     private byte[] zona;
     private int desplazamiento;
 
-    /** Ubica la direccion en su segmento: deja el arreglo en zona y el indice en desplazamiento. */
     private void ubicar(int direccion, int bytes) {
         if ((direccion & (Math.min(bytes, 4) - 1)) != 0) {
             throw new ErrorEjecucion(String.format("acceso de %d bytes no alineado (0x%08x)", bytes, direccion));

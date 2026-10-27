@@ -184,7 +184,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         }
     }
 
-    /** A extends B y B extends A: se reporta y se corta el enlace para que nada mas se cuelgue. */
     private void cortarCiclo(DeclaracionClase declaracion) {
         SimboloEstructura clase = declaracion.getSimbolo();
         if (clase == null) {
@@ -242,10 +241,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         estructurasCompletas.add(nombre);
     }
 
-    /**
-     * Calcula el layout de la clase. El padre se completa primero, porque sus campos van al
-     * principio y en las mismas posiciones: asi un objeto del hijo es un objeto valido del padre.
-     */
     private void completarClase(DeclaracionClase declaracion) {
         SimboloEstructura clase = declaracion.getSimbolo();
         if (clase == null || !clasesCompletas.add(clase.getNombre())) {
@@ -343,10 +338,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         }
     }
 
-    /**
-     * Reglas de la sobrescritura (el @Override es obligatorio, y de mas tambien es error) y de la
-     * llamada implicita al constructor del padre.
-     */
     private void validarHerencia(DeclaracionClase declaracion) {
         SimboloEstructura clase = declaracion.getSimbolo();
         if (clase == null) {
@@ -358,7 +349,7 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
             SimboloFuncion enPadre = padre == null ? null : padre.buscarPorFirma(simbolo.getFirma());
             boolean privadoEnPadre = enPadre != null && esPrivado(enPadre.getVisibilidad());
             if (privadoEnPadre) {
-                enPadre = null;   // un private no se hereda: el del hijo es un metodo nuevo
+                enPadre = null;
             }
             if (enPadre == null) {
                 if (metodo.tieneOverride()) {
@@ -401,10 +392,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         }
     }
 
-    /**
-     * La tabla del padre se copia entera; cada metodo propio reemplaza al que sobrescribe (mismo
-     * indice) o se agrega al final. Los private no entran: no se sobrescriben y se llaman directo.
-     */
     private void construirVtable(SimboloEstructura clase) {
         if (clase == null || !vtablesCompletas.add(clase.getNombre())) {
             return;
@@ -427,7 +414,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         }
     }
 
-    /** Sin super(...) escrito, se llama al constructor sin parametros del padre: tiene que existir. */
     private void verificarSuperImplicito(Nodo nodo, String lexema, SimboloEstructura padre, String quien) {
         if (padre.getConstructores().isEmpty()) {
             return;
@@ -455,7 +441,6 @@ public class AnalizadorSemantico implements Visitante<Tipo> {
         };
     }
 
-    /** Sin modificador cuenta como private. {@code desde} es null fuera de toda clase (.pig y .y). */
     private static boolean puedeAcceder(SimboloEstructura duenio, Visibilidad visibilidad, SimboloEstructura desde) {
         return switch (visibilidad) {
             case PUBLICO -> true;

@@ -1,9 +1,5 @@
 package com.usac.contacto3d.riscv;
 
-/**
- * Instruccion ya decodificada. En saltos y ramas, imm es la direccion destino absoluta.
- * En las conversiones de punto flotante, imm es el modo de redondeo.
- */
 public record Instruccion(Op op, int rd, int rs1, int rs2, int imm, int linea, String fuente) {
 
     public enum Op {

@@ -60,7 +60,6 @@ public class VentanaPrincipal extends JFrame {
     private static final String PREFERENCIA_CARPETA = "ultimaCarpeta";
     private static final long SEGUNDOS_EJECUCION = 10;
 
-    // Mensajes que el propio programa imprime al abortar: "Error de ejecucion en Archivo.y linea 12: ..."
     private static final Pattern ERROR_CON_LINEA = Pattern.compile("^Error de ejecucion en (\\S+) linea (\\d+): (.*)$");
     private static final Pattern ERROR_SIN_LINEA = Pattern.compile("^Error de ejecucion: (.*)$");
 
@@ -400,7 +399,6 @@ public class VentanaPrincipal extends JFrame {
         descargar(raiz);
     }
 
-    /** Un archivo se copia tal cual; una carpeta se descarga como .zip con todo su contenido. */
     private void descargar(Path origen) {
         guardarTodo();
         boolean esCarpeta = Files.isDirectory(origen);
@@ -478,11 +476,6 @@ public class VentanaPrincipal extends JFrame {
         System.exit(0);
     }
 
-    /**
-     * Para generar o ejecutar hace falta un programa principal, y solo un .pig lo tiene. Desde un .y o un .z
-     * se usa el .pig de la carpeta de trabajo que lo importa; si hay varios, se pregunta. Devuelve el mismo
-     * archivo si no hay ninguno (la consola lo explica), o null si se cancelo la eleccion.
-     */
     private Path programaPara(Path activo) {
         if (activo.getFileName().toString().endsWith(".pig")) {
             return activo;
@@ -599,7 +592,6 @@ public class VentanaPrincipal extends JFrame {
         areaC.setCaretPosition(0);
         areaRiscV.setText(compilacion.exitosa() ? compilacion.riscv() : "");
         areaRiscV.setCaretPosition(0);
-        // El AST se muestra aunque haya errores semanticos: sirve para entenderlos
         areaAst.setText(compilacion.ast());
         panelAst.mostrar(compilacion.programas());
         areaAst.setCaretPosition(0);
@@ -762,10 +754,6 @@ public class VentanaPrincipal extends JFrame {
         estado(" Deteniendo la ejecucion...");
     }
 
-    /**
-     * Lleva al panel de errores los errores de ejecucion: los que imprime el propio programa
-     * y el que detuvo al simulador. Devuelve true si hubo alguno.
-     */
     private boolean mostrarErroresDeEjecucion(String salida, String errorSimulador) {
         String archivo = ultima.archivo().getFileName().toString();
         ListaErrores lista = new ListaErrores();

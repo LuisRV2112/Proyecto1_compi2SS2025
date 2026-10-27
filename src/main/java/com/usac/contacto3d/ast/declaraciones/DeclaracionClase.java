@@ -9,7 +9,7 @@ import java.util.List;
 public class DeclaracionClase extends Nodo {
 
     private final String nombre;
-    private final String nombrePadre;   // null si no hereda; se resuelve en el semantico
+    private final String nombrePadre;
     private final List<DeclaracionVariable> atributos;
     private final List<DeclaracionConstructor> constructores;
     private final List<DeclaracionMetodo> metodos;

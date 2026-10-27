@@ -63,7 +63,6 @@ public class ResolvedorImports {
         return modulos;
     }
 
-    /** Dónde está cada archivo que importa un .pig, sin cargarlo. Los imports que no se encuentran se omiten. */
     public static List<Path> rutasImportadas(Path rutaPrincipal, Programa principal) throws IOException {
         Path base = rutaPrincipal.toAbsolutePath().getParent();
         List<Path> rutas = new ArrayList<>();

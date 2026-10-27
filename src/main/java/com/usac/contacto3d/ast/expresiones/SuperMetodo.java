@@ -7,7 +7,6 @@ import com.usac.contacto3d.simbolos.SimboloFuncion;
 
 import java.util.List;
 
-/** super.metodo(args): llama al metodo de la clase padre sin pasar por la sobrescritura. */
 public class SuperMetodo extends Expresion implements Instruccion {
 
     private final String nombre;

@@ -1,16 +1,6 @@
 #!/bin/bash
-# Verificacion cruzada del ensamblador RISC-V.
-#
-# Por cada caso de calificacion: genera el .s, lo ejecuta en el simulador propio con su entrada
-# y compara contra la salida del interprete de cuartetas (la referencia del Proyecto 1).
-# Si RARS esta disponible, ejecuta tambien el mismo .s en RARS y compara.
-#
-# Uso:  verificacion/verificar.sh [carpeta de casos]
-#       RARS=/ruta/rars1_6.jar verificacion/verificar.sh
 cd "$(dirname "$0")/.." || exit 1
 JAR=target/contacto-3d-1.0.0.jar
-# por defecto, las copias de verificacion/casos: los originales usan atributos sin modificador
-# fuera de su clase, que en el Proyecto 2 son private (ver verificacion/README.md)
 CASOS=${1:-verificacion/casos}
 DESTINO=verificacion/generado
 mkdir -p "$DESTINO"
@@ -21,7 +11,7 @@ if [ -z "$CASOS" ] || [ ! -d "$CASOS" ]; then
     exit 2
 fi
 
-salida_de() {   # extrae lo que hay entre -- salida -- y -- fin --
+salida_de() {
     sed -n '/^-- salida --$/,/^-- fin --$/p' | sed '1d;$d'
 }
 

@@ -25,10 +25,6 @@ public class ListaCuartetas {
         return Collections.unmodifiableList(cuartetas);
     }
 
-    /**
-     * Los nombres de las funciones en el orden del programa. La posicion de cada una es el numero
-     * que DIRECCION_FUNCION carga y CALL_INDIRECTO recibe, igual en todos los backends.
-     */
     public List<String> getFunciones() {
         List<String> funciones = new ArrayList<>();
         for (Cuarteta c : cuartetas) {

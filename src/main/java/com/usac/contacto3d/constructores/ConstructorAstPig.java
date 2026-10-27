@@ -123,10 +123,6 @@ public class ConstructorAstPig extends PigLatinBaseVisitor<Nodo> {
                 linea(ctx.ID()), columna(ctx.ID()));
     }
 
-    /**
-     * esto x : valor : Tipo ;  El tipo de la variable es el declarado al final (el estatico), no el
-     * del valor: con novus Profesor(...) : Persona, x solo ve lo que tiene Persona.
-     */
     @Override
     public Nodo visitVarTipoExplicito(VarTipoExplicitoContext ctx) {
         return new DeclaracionVariable(ctx.ID().getText(), tipo(ctx.tipo()), expr(ctx.expr()),

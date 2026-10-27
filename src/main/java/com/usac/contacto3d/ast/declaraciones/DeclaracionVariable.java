@@ -44,7 +44,6 @@ public class DeclaracionVariable extends Nodo implements Instruccion {
     public boolean esTipoImplicito() { return tipoImplicito; }
     public Visibilidad getVisibilidad() { return visibilidad; }
 
-    // un atributo con @Override parsea pero no tiene sentido; se guarda para que el semantico lo rechace
     private boolean conOverride;
 
     public boolean tieneOverride()   { return conOverride; }

@@ -9,11 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Convierte el texto .s en un programa ejecutable por el Simulador, en dos pasadas:
- * la primera reserva los datos y ubica las etiquetas, la segunda decodifica las instrucciones.
- * Las seudoinstrucciones se expanden aqui, asi el simulador solo conoce instrucciones base.
- */
 public class Ensamblador {
 
     public static final int BASE_TEXTO = 0x0040_0000;
@@ -32,7 +27,6 @@ public class Ensamblador {
     private final Map<String, Integer> etiquetas = new HashMap<>();
     private final ByteArrayOutputStream datos = new ByteArrayOutputStream();
     private final List<LineaTexto> texto = new ArrayList<>();
-    /** .word con una etiqueta que aun no aparece (por ejemplo una funcion de .text): se rellena al final. */
     private final List<Pendiente> pendientes = new ArrayList<>();
 
     private record Pendiente(int linea, int posicion, String etiqueta) { }
@@ -102,8 +96,6 @@ public class Ensamblador {
         return new Programa(instrucciones, bytes, Map.copyOf(etiquetas));
     }
 
-    // ------------------------------------------------------------------ datos
-
     private void directiva(int numero, String nombre, String resto) {
         switch (nombre) {
             case ".align" -> alinear(1 << entero(numero, resto));
@@ -167,8 +159,6 @@ public class Ensamblador {
             datos.write((int) (valor >>> (8 * i)) & 0xff);
         }
     }
-
-    // ------------------------------------------------------------------ instrucciones
 
     private Instruccion decodificar(LineaTexto l, int direccion) {
         List<String> o = l.operandos();
@@ -320,7 +310,6 @@ public class Ensamblador {
         return valor;
     }
 
-    /** "off(reg)" o "(reg)" -> {desplazamiento, registro} */
     private static int[] memoria(LineaTexto l, String texto) {
         int abre = texto.indexOf('(');
         int cierra = texto.lastIndexOf(')');
@@ -346,8 +335,6 @@ public class Ensamblador {
     private static int fr(LineaTexto l, List<String> o, int indice) {
         return Registros.flotante(arg(l, o, indice), l.numero());
     }
-
-    // ------------------------------------------------------------------ lexico
 
     private static int finDeEtiqueta(String linea) {
         int dosPuntos = linea.indexOf(':');

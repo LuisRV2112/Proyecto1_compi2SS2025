@@ -106,18 +106,12 @@ public class Compilador {
         }
         ResultadoSemantico resultado = new AnalizadorSemantico(errores).analizar(modulos);
         if (principal.getLenguaje() == Lenguaje.ZETARIANO) {
-            // Los errores de las clases vecinas se ven al analizar cada una
             String nombre = archivo.getFileName().toString();
             errores.getErrores().removeIf(e -> !e.getArchivo().equals(nombre));
         }
         return resultado;
     }
 
-    /**
-     * Zetariano no tiene import: una clase solo conoce a las otras cuando un .pig las importa.
-     * Para analizar un .z solo, se cargan los demás .z de su carpeta, como si el .pig los hubiera
-     * importado. Los que no parsean se ignoran (cada uno se parsea con su propia lista de errores).
-     */
     private List<Programa> conClasesVecinas(Path archivo, Programa principal) throws IOException {
         List<Programa> lista = new ArrayList<>();
         lista.add(principal);
@@ -143,10 +137,6 @@ public class Compilador {
         return lista;
     }
 
-    /**
-     * Los .pig debajo de {@code base} que importan {@code archivo}, el más cercano primero. Sirve para
-     * ejecutar desde un .y o un .z, que no tienen programa principal. Un .pig que no parsea se ignora.
-     */
     public static List<Path> programasQueImportan(Path archivo, Path base) throws IOException {
         Path buscado = archivo.toRealPath();
         Path carpeta = buscado.getParent();
@@ -185,10 +175,6 @@ public class Compilador {
         return subida + bajada;
     }
 
-    /**
-     * El AST de lo último que se compiló: el .pig y sus imports, o el archivo solo. De un .z no se dibujan las
-     * clases vecinas, que solo se cargaron para resolver tipos. Vacío si no parseó.
-     */
     public String dibujarAst() {
         StringBuilder salida = new StringBuilder();
         for (Programa modulo : modulosDelAst()) {
@@ -200,7 +186,6 @@ public class Compilador {
         return salida.toString();
     }
 
-    /** Los módulos que se muestran como AST: los mismos que {@link #dibujarAst()}. */
     public List<Programa> modulosDelAst() {
         return !modulos.isEmpty() && modulos.get(0).getLenguaje() == Lenguaje.ZETARIANO
                 ? modulos.subList(0, 1) : modulos;

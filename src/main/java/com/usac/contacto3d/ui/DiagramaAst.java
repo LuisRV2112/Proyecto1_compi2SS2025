@@ -17,17 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * El AST de un módulo como diagrama: cajas por nodo, de arriba hacia abajo, con nodos plegables.
- * Calcula las posiciones una vez y las usa para pintar en pantalla y para escribir el .svg, así que
- * los dos se ven igual. No depende de ningún componente: se puede probar sin ventana.
- */
 public class DiagramaAst {
 
     public static final Font FUENTE = new Font(Font.SANS_SERIF, Font.PLAIN, 12);
     public static final Color FONDO = TemaEditor.FONDO;
 
-    /** Programa en morado, declaraciones en azul, instrucciones en amarillo, expresiones en verde, literales en naranja. */
     public enum Categoria {
         PROGRAMA("Programa", new Color(0xC586C0)),
         DECLARACION("Declaracion", new Color(0x569CD6)),
@@ -92,7 +86,6 @@ public class DiagramaAst {
         public Rectangle limites()         { return new Rectangle(x, y, ancho, ALTO); }
     }
 
-    /** Hasta qué profundidad se ve desplegado al principio: el programa, sus clases y funciones, y sus miembros. */
     public static final int NIVEL_INICIAL = 2;
 
     private static final int ALTO = 26;
@@ -123,7 +116,6 @@ public class DiagramaAst {
         recorrer(raiz, c -> c.plegada = c.tieneHijos() && c.profundidad >= NIVEL_INICIAL);
     }
 
-    /** Recalcula las posiciones con las medidas de la fuente. Hay que llamarlo después de plegar o desplegar. */
     public void ubicar(FontMetrics medidas) {
         medir(raiz, medidas);
         int profundidadMaxima = colocar(raiz, MARGEN, 0);
@@ -135,10 +127,7 @@ public class DiagramaAst {
         return buscar(raiz, px, py);
     }
 
-    // ---------------------------------------------------------------- posiciones
-
     private static void medir(Caja caja, FontMetrics medidas) {
-        // Un literal puede traer \n o \t: en pantalla descuadran la caja y en el .svg no son XML válido
         String etiqueta = caja.nodo.getEtiqueta().replaceAll("\\p{Cntrl}", " ");
         if (etiqueta.length() > MAXIMO_TEXTO) {
             etiqueta = etiqueta.substring(0, MAXIMO_TEXTO - 1) + "…";
@@ -160,7 +149,6 @@ public class DiagramaAst {
         caja.anchoSubarbol = Math.max(caja.ancho, hijos);
     }
 
-    /** Coloca el subárbol desde {@code izquierda}: el padre centrado sobre sus hijos. Devuelve la profundidad máxima. */
     private static int colocar(Caja caja, int izquierda, int nivel) {
         caja.y = MARGEN + nivel * (ALTO + SEPARACION_Y);
         caja.x = izquierda + (caja.anchoSubarbol - caja.ancho) / 2;
@@ -199,9 +187,6 @@ public class DiagramaAst {
         caja.hijos.forEach(h -> recorrer(h, accion));
     }
 
-    // ---------------------------------------------------------------- pantalla
-
-    /** Pinta lo que cae dentro de {@code visible} (en coordenadas del diagrama, sin zoom). */
     public void pintar(Graphics2D g, Rectangle visible, Caja resaltada) {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -249,9 +234,6 @@ public class DiagramaAst {
         }
     }
 
-    // ---------------------------------------------------------------- svg
-
-    /** El diagrama tal como se ve (con lo plegado plegado), como un .svg independiente. */
     public String aSvg() {
         StringBuilder svg = new StringBuilder();
         svg.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")

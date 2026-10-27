@@ -46,15 +46,10 @@ public final class Compatibilidad {
         return a.equals(b);
     }
 
-    /**
-     * Como {@link #asignable(Tipo, Tipo)}, y ademas un objeto de una subclase se puede guardar en
-     * una variable de la clase padre. Al reves no.
-     */
     public static boolean asignable(Tipo destino, Tipo origen, TablaSimbolos tabla) {
         return asignable(destino, origen) || esSubclaseDe(origen, destino, tabla);
     }
 
-    /** Dos objetos se pueden comparar con == si uno es de la clase del otro o de una subclase. */
     public static boolean comparables(Tipo a, Tipo b, TablaSimbolos tabla) {
         return comparables(a, b) || esSubclaseDe(a, b, tabla) || esSubclaseDe(b, a, tabla);
     }
@@ -110,7 +105,6 @@ public final class Compatibilidad {
         return tipo.getBase() == Tipo.Base.BOOLEANO;
     }
 
-    /** null solo vale para referencias: objetos y arreglos. Ningun primitivo, ni siquiera la cadena. */
     private static boolean aceptaNulo(Tipo tipo) {
         return tipo.esObjeto() || tipo.esArreglo() || tipo.getBase() == Tipo.Base.NULO;
     }

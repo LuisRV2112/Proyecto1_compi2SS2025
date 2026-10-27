@@ -33,14 +33,9 @@ public class SimboloEstructura extends Simbolo {
         public int getOffset()               { return offset; }
         public int getTamanio()              { return tamanio; }
         public Visibilidad getVisibilidad()  { return visibilidad; }
-        /** La clase o estructura que declaro el campo; en un campo heredado, el padre. */
         public SimboloEstructura getDuenio() { return duenio; }
     }
 
-    /**
-     * En un objeto, la celda 0 guarda el puntero a la tabla de metodos virtuales de su clase real,
-     * y los campos empiezan en la 1. Las estructuras de Y? no la tienen: sus campos empiezan en 0.
-     */
     public static final int CELDA_VTABLE = 0;
 
     private final Map<String, Campo> campos = new LinkedHashMap<>();
@@ -50,7 +45,7 @@ public class SimboloEstructura extends Simbolo {
     private final boolean esClase;
 
     private int tamanioTotal = 0;
-    private SimboloEstructura padre;          // null si no hereda
+    private SimboloEstructura padre;
 
     public SimboloEstructura(String nombre, boolean esClase,
                              String archivo, int linea, int columna) {
@@ -66,10 +61,6 @@ public class SimboloEstructura extends Simbolo {
     public SimboloEstructura getPadre()           { return padre; }
     public void setPadre(SimboloEstructura padre) { this.padre = padre; }
 
-    /**
-     * Copia los campos del padre con sus mismos offsets, para que un objeto de esta clase sea
-     * tambien un objeto valido del padre en memoria. Se llama antes de agregar los campos propios.
-     */
     public void heredarCampos() {
         if (padre == null) {
             return;
@@ -80,7 +71,6 @@ public class SimboloEstructura extends Simbolo {
         tamanioTotal = padre.getTamanio();
     }
 
-    /** Verdadero si esta clase es {@code otra} o hereda de ella, directa o indirectamente. */
     public boolean esSubclaseDe(SimboloEstructura otra) {
         for (SimboloEstructura actual = this; actual != null; actual = actual.padre) {
             if (actual == otra) {
@@ -125,10 +115,6 @@ public class SimboloEstructura extends Simbolo {
         return null;
     }
 
-    /**
-     * Los metodos con ese nombre visibles en esta clase: los propios y los heredados, del mas
-     * cercano al mas lejano. Un metodo sobrescrito oculta al del padre con la misma firma.
-     */
     public List<SimboloFuncion> metodosEnCadena(String nombre) {
         List<SimboloFuncion> encontrados = new ArrayList<>();
         java.util.Set<String> firmas = new java.util.HashSet<>();
@@ -142,7 +128,6 @@ public class SimboloEstructura extends Simbolo {
         return encontrados;
     }
 
-    /** El metodo con esa firma (nombre y tipos de parametros) en esta clase o sus ancestros. */
     public SimboloFuncion buscarPorFirma(String firma) {
         for (SimboloEstructura actual = this; actual != null; actual = actual.padre) {
             for (SimboloFuncion metodo : actual.metodos) {
@@ -154,10 +139,6 @@ public class SimboloEstructura extends Simbolo {
         return null;
     }
 
-    /**
-     * Metodos virtuales en orden fijo: los heredados conservan su indice y los propios nuevos van
-     * al final, asi el mismo indice sirve para cualquier clase de la jerarquia.
-     */
     public List<SimboloFuncion> getVtable() { return vtable; }
 
     public int indiceEnVtable(SimboloFuncion metodo) {

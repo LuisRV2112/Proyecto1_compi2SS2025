@@ -92,7 +92,6 @@ public class GeneradorCuartetas implements Visitante<String> {
 
     public ListaCuartetas generar(ResultadoSemantico resultado) {
         tabla = resultado.tabla();
-        // las vtables van al principio del heap, antes de los literales: su direccion es fija
         for (SimboloEstructura tipo : tabla.getTipos().values()) {
             if (tipo.esClase()) {
                 vtables.put(tipo.getNombre(), siguienteLiteral);
@@ -157,11 +156,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         generarFuncion(funcion, cuerpo, atributos, false);
     }
 
-    /**
-     * En un constructor de una clase con padre, lo primero es el constructor del padre: el
-     * super(...) escrito o, si no hay, el del padre sin parametros. Despues van los
-     * inicializadores de los atributos propios y el resto del cuerpo.
-     */
     private void generarFuncion(SimboloFuncion funcion, List<Instruccion> cuerpo,
                                 List<DeclaracionVariable> atributos, boolean esConstructor) {
         funcionActual = funcion;
@@ -216,10 +210,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         emitir(FIN_FUNCION, principal.getEtiqueta(), null, null);
     }
 
-    /**
-     * Un metodo es sobrescrito si alguna subclase pone otra funcion en su indice de la vtable.
-     * Solo esos necesitan despacho dinamico; el resto se llama directo, como en el Proyecto 1.
-     */
     private void marcarSobrescritos(SimboloEstructura clase) {
         List<SimboloFuncion> propia = clase.getVtable();
         for (SimboloEstructura ancestro = clase.getPadre(); ancestro != null; ancestro = ancestro.getPadre()) {
@@ -236,11 +226,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         return llamar(funcion, argumentos, objeto, false);
     }
 
-    /**
-     * obj.metodo(), this.metodo() y metodo() dentro de la clase: si el metodo esta sobrescrito en
-     * alguna subclase, la funcion sale de la vtable del objeto real. El indice es el mismo en toda
-     * la jerarquia, asi que se toma del de la clase que declaro el metodo.
-     */
     private String llamarMetodo(SimboloFuncion metodo, List<Expresion> argumentos, String objeto) {
         return llamar(metodo, argumentos, objeto, sobrescritos.contains(metodo));
     }
@@ -633,7 +618,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         return new Ubicacion(true, operar(SUMA, sumar(arreglo, rango), desplazamiento));
     }
 
-    // super nunca pasa por el despacho dinamico: llama directo al constructor o metodo del padre
     @Override
     public String visitarLlamadaSuper(LlamadaSuper nodo) {
         SimboloFuncion constructor = nodo.getConstructor() != null ? nodo.getConstructor()
@@ -642,7 +626,6 @@ public class GeneradorCuartetas implements Visitante<String> {
         return null;
     }
 
-    /** El semantico ya garantizo que existe: el declarado sin parametros o el implicito. */
     private SimboloFuncion constructorSinParametros(SimboloEstructura clase) {
         SimboloFuncion declarado = clase.buscarConstructor(0);
         return declarado != null ? declarado : constructoresImplicitos.get(clase.getNombre());

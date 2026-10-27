@@ -106,7 +106,6 @@ public class ConstructorAstZ extends ZetarianoBaseVisitor<Nodo> {
                 default -> throw new IllegalStateException("Miembro no contemplado: " + miembro.getText());
             }
         }
-        // con extends hay dos ID: el de la clase es siempre el primero
         String nombrePadre = ctx.EXTENDS() != null ? ctx.ID(1).getText() : null;
         return new DeclaracionClase(ctx.ID(0).getText(), nombrePadre, atributos, constructores, metodos,
                 linea(ctx.ID(0)), columna(ctx.ID(0)));

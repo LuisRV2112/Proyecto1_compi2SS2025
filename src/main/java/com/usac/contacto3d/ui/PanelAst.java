@@ -34,10 +34,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-/**
- * La pestaña AST: el árbol de cada módulo dibujado como diagrama. Clic plega o despliega un nodo,
- * doble clic lleva a su línea en el editor, arrastrar mueve la vista y Ctrl + rueda hace zoom.
- */
 public class PanelAst extends JPanel {
 
     private static final double ZOOM_MINIMO = 0.2;
@@ -70,7 +66,6 @@ public class PanelAst extends JPanel {
         this.alIrALinea = accion;
     }
 
-    /** Los módulos del último análisis: el .pig y sus imports, o el archivo solo. Lista vacía si no parseó. */
     public void mostrar(List<Programa> programas) {
         diagramas.clear();
         modulos.removeAllItems();
@@ -125,8 +120,6 @@ public class PanelAst extends JPanel {
         return panel;
     }
 
-    // ---------------------------------------------------------------- acciones
-
     private void seleccionar(int indice) {
         actual = indice >= 0 && indice < diagramas.size() ? diagramas.get(indice) : null;
         bajoElMouse = null;
@@ -134,7 +127,6 @@ public class PanelAst extends JPanel {
         centrarEnRaiz();
     }
 
-    /** En un diagrama más ancho que la vista, la raíz queda al centro: ahí empieza la lectura. */
     private void centrarEnRaiz() {
         if (actual == null) {
             mover(0, 0);
@@ -175,7 +167,6 @@ public class PanelAst extends JPanel {
         etiquetaZoom.setText(Math.round(escala * 100) + "%");
     }
 
-    /** Cambia el zoom dejando quieto el punto {@code ancla} (en coordenadas del lienzo). */
     private void zoom(double nueva, Point ancla) {
         nueva = Math.max(ZOOM_MINIMO, Math.min(ZOOM_MAXIMO, nueva));
         JViewport vista = scroll.getViewport();
@@ -205,7 +196,6 @@ public class PanelAst extends JPanel {
         mover(0, 0);
     }
 
-    /** Lleva la vista a (x, y) sin salirse del lienzo. */
     private void mover(int x, int y) {
         JViewport vista = scroll.getViewport();
         Dimension extension = vista.getExtentSize();
@@ -214,7 +204,6 @@ public class PanelAst extends JPanel {
         vista.setViewPosition(new Point(Math.max(0, Math.min(maxX, x)), Math.max(0, Math.min(maxY, y))));
     }
 
-    /** Plega o despliega la caja sin que salte de lugar en la pantalla. */
     private void alternar(DiagramaAst.Caja caja) {
         Point posicion = scroll.getViewport().getViewPosition();
         int enPantallaX = (int) (caja.x * escala) - posicion.x;
@@ -255,8 +244,6 @@ public class PanelAst extends JPanel {
                     JOptionPane.ERROR_MESSAGE);
         }
     }
-
-    // ---------------------------------------------------------------- lienzo
 
     private final class Lienzo extends JComponent {
 
@@ -316,7 +303,6 @@ public class PanelAst extends JPanel {
                     if (evento.isControlDown()) {
                         zoom(evento.getWheelRotation() < 0 ? escala * PASO_ZOOM : escala / PASO_ZOOM, evento.getPoint());
                     } else {
-                        // Sin Ctrl, la rueda desplaza como en cualquier otra vista
                         scroll.dispatchEvent(SwingUtilities.convertMouseEvent(Lienzo.this, evento, scroll));
                     }
                 }

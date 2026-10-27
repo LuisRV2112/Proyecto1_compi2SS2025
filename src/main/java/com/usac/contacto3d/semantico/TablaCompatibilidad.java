@@ -7,13 +7,6 @@ import com.usac.contacto3d.simbolos.TablaSimbolos;
 
 import java.util.List;
 
-/**
- * Genera la seccion 5 del manual tecnico (la tabla de compatibilidad de tipos) consultando
- * {@link Compatibilidad}, la misma clase que usa el analizador. Si cambian las reglas, la tabla se
- * regenera con:
- *
- * <pre>java -cp target/contacto-3d-1.0.0.jar com.usac.contacto3d.semantico.TablaCompatibilidad</pre>
- */
 public final class TablaCompatibilidad {
 
     private static final List<Tipo> PRIMITIVOS =
@@ -94,7 +87,6 @@ public final class TablaCompatibilidad {
         sb.append('\n');
     }
 
-    /** Animal, Perro y Gato heredan de Animal; Persona no tiene relacion con ellas. */
     private static TablaSimbolos tablaConHerencia() {
         TablaSimbolos tabla = new TablaSimbolos();
         SimboloEstructura animal = new SimboloEstructura("Animal", true, "Animal.z", 1, 1);

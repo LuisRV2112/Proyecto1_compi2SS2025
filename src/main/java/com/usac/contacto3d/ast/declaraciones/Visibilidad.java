@@ -1,9 +1,5 @@
 package com.usac.contacto3d.ast.declaraciones;
 
-/**
- * Visibilidad de un miembro de clase. PAQUETE es la ausencia de modificador: no hay paquetes en el
- * proyecto y se trata como private, pero se distingue para que los mensajes de error lo digan.
- */
 public enum Visibilidad {
     PUBLICO("public"), PRIVADO("private"), PROTEGIDO("protected"), PAQUETE("sin modificador");
 
@@ -27,7 +23,6 @@ public enum Visibilidad {
         };
     }
 
-    /** Prefijo para la etiqueta del AST: vacio cuando no hay modificador. */
     String prefijo() {
         return this == PAQUETE ? "" : palabra + " ";
     }

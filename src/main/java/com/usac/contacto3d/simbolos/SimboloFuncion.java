@@ -17,7 +17,7 @@ public class SimboloFuncion extends Simbolo {
 
     private int tamanioMarco = 0;
     private String etiqueta;
-    private Visibilidad visibilidad = Visibilidad.PUBLICO;   // las funciones de .y son publicas
+    private Visibilidad visibilidad = Visibilidad.PUBLICO;
 
     public SimboloFuncion(String nombre, Tipo tipoRetorno, List<SimboloVariable> parametros,
                           boolean esMetodo, String claseDuenia,

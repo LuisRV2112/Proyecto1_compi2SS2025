@@ -48,10 +48,6 @@ public class TraductorC {
         return c.toString();
     }
 
-    /**
-     * El numero de una funcion es su posicion en el programa; la tabla traduce ese numero a la
-     * funcion de C. main no se llama nunca por numero, asi que su lugar queda en NULL.
-     */
     private void tablaDeFunciones(StringBuilder c) {
         c.append("\n/* ----------------------- llamadas por la vtable ------------------------ */\n\n");
         c.append("static void (*const funciones[])(void) = {\n");
