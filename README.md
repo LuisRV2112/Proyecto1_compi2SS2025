@@ -69,7 +69,7 @@ para ejecutar el `.s` sin salir de la interfaz.
 
 ## Compilar y ejecutar
 
-Requiere Java 21 y Maven 3.9.
+Requiere Java 25 y Maven 3.9.
 
 ```bash
 mvn clean package

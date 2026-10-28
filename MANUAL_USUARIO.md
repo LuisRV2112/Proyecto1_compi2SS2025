@@ -11,7 +11,7 @@ abrir en RARS. También se puede traducir a **C** y compilar con gcc.
 
 ## 1. Requisitos e instalación
 
-- **Java 21** o superior.
+- **Java 25** o superior.
 - **Maven**, para construir el programa.
 - **RARS 1.6** (opcional), para correr el `.s` generado fuera de la aplicación.
 - **gcc** (opcional), para compilar el código C que se genera.

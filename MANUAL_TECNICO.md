@@ -21,7 +21,7 @@ El Proyecto 2 agrega al del Proyecto 1:
 
 | Tecnología | Versión | Para qué |
 |---|---|---|
-| Java | 21 | Lenguaje del compilador y de la interfaz (se usa *pattern matching* en `switch` y `record`) |
+| Java | 25 | Lenguaje del compilador y de la interfaz (se usa *pattern matching* en `switch` y `record`) |
 | Maven | 3.9 | Construcción; genera los analizadores y arma un `.jar` ejecutable con todo adentro |
 | ANTLR | 4.13.2 | Genera los lexers y parsers de los tres lenguajes (`antlr4-maven-plugin`) |
 | Swing + FlatLaf | 3.5.4 | Interfaz gráfica con tema oscuro |

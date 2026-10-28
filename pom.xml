@@ -13,7 +13,7 @@
     <description>Proyecto 1 - Organizacion de Lenguajes y Compiladores 2 - USAC CUNOC</description>
 
     <properties>
-        <maven.compiler.release>21</maven.compiler.release>
+        <maven.compiler.release>25</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <antlr.version>4.13.2</antlr.version>
         <main.class>com.usac.contacto3d.Main</main.class>
