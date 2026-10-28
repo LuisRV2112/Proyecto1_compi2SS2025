@@ -1,0 +1,13 @@
+public class Circulo extends Figura {
+    private double radio;
+
+    public Circulo(int id, double radio) {
+        super("circulo", id);
+        this.radio = radio;
+    }
+
+    @Override
+    public double area() {
+        return 3.0 * radio * radio;
+    }
+}

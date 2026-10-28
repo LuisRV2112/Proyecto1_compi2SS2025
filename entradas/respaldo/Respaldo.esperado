@@ -1,0 +1,70 @@
+== pig variables
+53.0piglatinpfalsusfalsus
+== pig lectura
+pig leyo: Luis42
+== pig condicionales
+cinco
+== pig ciclos
+per: 18
+dum: 10
+facere: 20
+== pig arreglos
+520ab
+== pig funciones e importaciones
+36
+r0
+r1
+15
+80
+mayorigualmenor
+720
+== y
+105.0hola mundokverdadero
+Y leyo: Ana!
+uno
+dos o tres
+cae al cuatro
+otro
+para:18
+mientras:5
+hacer:10
+9662
+Ana202
+99Modificado5
+1203.5
+== z
+10
+15.0
+zetaq
+true
+sin salto con salto
+Z leyo: Zeta
+igual
+otro
+grande
+menor
+dos o tres
+cae al cuatro
+chico
+for: 18
+while: 5
+do: 10
+15
+1
+42
+es null
+ya no es null: 42
+5
+120
+10
+base #0 area 0.0
+circulo #1 area 12.0
+[cuadrado #2 area 9.0]
+4.0
+9
+== pig objetos y null
+3.0
+circulo #5 area 3.0
+fig es null
+[cuadrado #3 area 16.0]
+fin

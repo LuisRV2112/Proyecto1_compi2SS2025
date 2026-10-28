@@ -1,0 +1,21 @@
+public class Figura {
+    protected String nombre;
+    private int id;
+
+    public Figura(String nombre, int id) {
+        this.nombre = nombre;
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public double area() {
+        return 0.0;
+    }
+
+    public String describir() {
+        return nombre + " #" + id + " area " + area();
+    }
+}

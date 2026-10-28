@@ -15,7 +15,7 @@ comparar() {
 }
 
 for pig in entradas/programas/*.pig entradas/herencia/*.pig entradas/objetos/*.pig \
-           entradas/polimorfismo/*.pig entradas/banco/*.pig; do
+           entradas/polimorfismo/*.pig entradas/banco/*.pig entradas/respaldo/*.pig; do
     esperado="${pig%.pig}.esperado"
     case "$(basename "$pig")" in errores_*) continue ;; esac
     [ -f "$esperado" ] || continue

@@ -1728,6 +1728,7 @@ y un simulador propios.
 | `entradas/objetos/` | `null`, la declaración con tipo explícito y el error en ejecución por usar `null`; `errores_*.esperado` con los errores |
 | `entradas/polimorfismo/` | Las impresoras: despacho por variable, por `this` y por arreglo, `super` en tres niveles y un método nuevo después de uno sobrescrito |
 | `entradas/banco/` | El banco del enunciado, con `protected` en `Cuenta` (ver `CAMBIOS.md`) |
+| `entradas/respaldo/` | Cada punto de la hoja de calificación ejecutado en los tres lenguajes, sección por sección (`== pig ciclos`, `== y`, `== z`…); cubre lo que el banco no usa, como la lectura y todos los tipos de ciclo. Entrada en `Respaldo.entrada` |
 | `verificacion/` | Los cinco casos de calificación, con su `.s` generado y sus salidas (ver `verificacion/README.md`) |
 
 **`entradas/programas/probar.sh`** prueba cada `.pig` que tiene `.esperado` de esas carpetas

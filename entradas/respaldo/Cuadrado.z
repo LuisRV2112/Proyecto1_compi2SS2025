@@ -1,0 +1,18 @@
+public class Cuadrado extends Figura {
+    private double lado;
+
+    public Cuadrado(int id, double lado) {
+        super("cuadrado", id);
+        this.lado = lado;
+    }
+
+    @Override
+    public double area() {
+        return lado * lado;
+    }
+
+    @Override
+    public String describir() {
+        return "[" + super.describir() + "]";
+    }
+}

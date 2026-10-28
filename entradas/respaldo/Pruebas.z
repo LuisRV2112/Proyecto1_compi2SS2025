@@ -1,0 +1,134 @@
+public class Pruebas {
+    public int contador;
+    public String etiqueta = "pruebas";
+    public Pruebas siguiente = null;
+
+    public Pruebas() {
+        contador = 0;
+    }
+
+    public void zVariables() {
+        int a = 4;
+        double d = 1.5;
+        String s = "z";
+        char c = 'q';
+        boolean b = false;
+        a += 6;
+        d = d * a;
+        s = s + "eta";
+        b = !b;
+        println(a);
+        println(d);
+        println(s + c);
+        println(b);
+        print("sin salto ");
+        println("con salto");
+    }
+
+    public void zLectura() {
+        String nombre = readln();
+        println("Z leyo: " + nombre);
+    }
+
+    public void zCondicionales(int n) {
+        if (n > 10) {
+            println("mayor");
+        } else if (n == 10) {
+            println("igual");
+        } else {
+            println("menor");
+        }
+        switch (n) {
+            case 1:
+                println("uno");
+                break;
+            case 2:
+            case 3:
+                println("dos o tres");
+            case 4:
+                println("cae al cuatro");
+                break;
+            default:
+                println("otro");
+        }
+        String r = n > 5 ? "grande" : "chico";
+        println(r);
+    }
+
+    public void zCiclos() {
+        int suma = 0;
+        for (int i = 0; i < 10; i++) {
+            if (i == 3) continue;
+            if (i == 7) break;
+            suma += i;
+        }
+        println("for: " + suma);
+        int k = 0;
+        while (k < 5) {
+            k++;
+        }
+        println("while: " + k);
+        int j = 0;
+        do {
+            j += 2;
+        } while (j < 9);
+        println("do: " + j);
+    }
+
+    public void zArreglos() {
+        int[] v = new int[4];
+        int[][] m = {{1, 2, 3}, {4, 5, 6}};
+        for (int i = 0; i < 4; i++) {
+            v[i] = i * i;
+        }
+        Figura[] figuras = new Figura[2];
+        figuras[0] = new Circulo(1, 1.0);
+        println(v[3] + m[1][2]);
+        println(figuras[0].getId());
+    }
+
+    public void zObjetosYNull() {
+        Pruebas otra = new Pruebas();
+        otra.contador = 41;
+        otra.contador++;
+        this.siguiente = otra;
+        println(this.siguiente.contador);
+        Pruebas vacia = null;
+        if (vacia == null) {
+            println("es null");
+        }
+        vacia = otra;
+        if (vacia != null) {
+            println("ya no es null: " + vacia.contador);
+        }
+    }
+
+    public int sumar(int a, int b) {
+        return a + b;
+    }
+
+    public int factorial(int n) {
+        if (n <= 1) return 1;
+        return n * factorial(n - 1);
+    }
+
+    public void zMetodos() {
+        println(sumar(2, 3));
+        println(this.factorial(5));
+        contador = sumar(contador, 10);
+        println(contador);
+    }
+
+    public void zHerenciaYPolimorfismo() {
+        Figura[] lista = new Figura[3];
+        lista[0] = new Figura("base", 0);
+        lista[1] = new Circulo(1, 2.0);
+        lista[2] = new Cuadrado(2, 3.0);
+        for (int i = 0; i < 3; i++) {
+            println(lista[i].describir());
+        }
+        Figura f = new Cuadrado(9, 2.0);
+        println(f.area());
+        println(f.getId());
+    }
+}

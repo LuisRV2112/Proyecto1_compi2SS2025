@@ -44,9 +44,14 @@ para ejecutar el `.s` sin salir de la interfaz.
 | 8 | Manual técnico, manual de usuario y este README | Lista |
 
 **Verificado** (con `entradas/programas/probar.sh` y `verificacion/verificar.sh`):
-- Las 10 pruebas con salida esperada (programas, herencia, objetos, polimorfismo y el banco del
-  enunciado) dan la misma salida en los tres backends: intérprete de cuartetas, `.s` en el
-  simulador propio y `.c` compilado con gcc. 30 de 30.
+- Las 11 pruebas con salida esperada (programas, herencia, objetos, polimorfismo, el banco del
+  enunciado y la prueba de respaldo) dan la misma salida en los tres backends: intérprete de
+  cuartetas, `.s` en el simulador propio y `.c` compilado con gcc. 33 de 33.
+- **Prueba de respaldo** (`entradas/respaldo/Respaldo.pig`): ejecuta, sección por sección, cada
+  punto de la hoja de calificación en los tres lenguajes, incluido lo que el banco no usa: la
+  lectura (`<<`, `leer()`, `readln()`), los ciclos de PigLatin, `mientras`/`hacer` y `elegir` en Y?,
+  y `while`/`do`/`switch` en Zetariano. La entrada de teclado está en `Respaldo.entrada`: en la
+  interfaz se copia al cuadro de entrada de la consola antes de pulsar F7.
 - Los cinco casos de calificación (`00_hello_world` a `04_ahorcado`) dan en el simulador RISC-V
   la misma salida que el intérprete de cuartetas. Los `.s` generados y sus salidas están en
   `verificacion/generado/`.
